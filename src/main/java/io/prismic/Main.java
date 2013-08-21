@@ -8,7 +8,7 @@ public class Main {
     System.out.println("GO!");
 
     Api api = Api.get("http://lesbonneschoses.wroom.io/api");
-    SearchForm products = api.getForm("products");
+    Form.Search products = api.getForm("products");
 
     products.ref("UgjWQN_mqa8HvPJY").query("[:d = at(document.tags, [\"Macaron\"])]");
     System.out.println(products);

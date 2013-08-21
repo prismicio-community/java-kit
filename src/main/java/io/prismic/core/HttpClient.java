@@ -33,7 +33,7 @@ public class HttpClient {
       }
 
     } catch(Exception e) {
-      throw new ApiError(ApiError.Code.UNEXPECTED, e.getMessage());
+      throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
     }
   }
 
@@ -41,7 +41,7 @@ public class HttpClient {
     try {
       return URLEncoder.encode(str, "utf-8");
     } catch(Exception e) {
-      throw new ApiError(ApiError.Code.UNEXPECTED, e.getMessage());
+      throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
     }
   }
 

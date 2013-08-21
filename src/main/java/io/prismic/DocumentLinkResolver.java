@@ -1,3 +1,7 @@
 package io.prismic;
 
-interface DocumentLinkResolver {}
+interface DocumentLinkResolver {
+  
+  public String resolve(Fragment.DocumentLink link);
+
+}
