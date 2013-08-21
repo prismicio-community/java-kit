@@ -118,6 +118,34 @@ public class Document {
       return Fragment.StructuredText.parse(json);
     }
 
+    if("Link.web".equals(type)) {
+      return Fragment.Link.WebLink.parse(json);
+    }
+
+    if("Link.document".equals(type)) {
+      return Fragment.Link.DocumentLink.parse(json);
+    }
+
+    if("Text".equals(type)) {
+      return Fragment.Text.parse(json);
+    }
+
+    if("Date".equals(type)) {
+      return Fragment.Date.parse(json);
+    }
+
+    if("Number".equals(type)) {
+      return Fragment.Number.parse(json);
+    }
+
+    if("Color".equals(type)) {
+      return Fragment.Color.parse(json);
+    }
+
+    if("Embed".equals(type)) {
+      return Fragment.Embed.parse(json);
+    }
+
     return null;
   }
 
