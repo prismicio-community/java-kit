@@ -1,7 +1,11 @@
 package io.prismic;
 
-interface DocumentLinkResolver {
+public abstract class DocumentLinkResolver {
   
-  public String resolve(Fragment.DocumentLink link);
+  public abstract String resolve(Fragment.DocumentLink link);
+
+  public String resolve(Document document) {
+    return resolve(new Fragment.DocumentLink(document.getId(), document.getType(), document.getTags(), document.getSlug(), false));
+  }
 
 }

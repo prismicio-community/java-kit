@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.*;
 
 public class Document {
 
-  final String id;
-  final String href;
-  final Set<String> tags;
-  final List<String> slugs;
-  final String type;
-  final Map<String, Fragment> fragments;
+  private final String id;
+  private final String href;
+  private final Set<String> tags;
+  private final List<String> slugs;
+  private final String type;
+  private final Map<String, Fragment> fragments;
 
   public Document(String id, String type, String href, Set<String> tags, List<String> slugs, Map<String,Fragment> fragments) {
     this.id = id;
@@ -42,6 +42,13 @@ public class Document {
     return slugs;
   }
 
+  public String getSlug() {
+    if(slugs.size() > 0) {
+      return slugs.get(0);
+    }
+    return null;
+  }
+
   public Map<String, Fragment> getFragments() {
     return fragments;
   }
@@ -58,6 +65,186 @@ public class Document {
       }
     }
     return result;
+  }
+
+  public Fragment.Image getImage(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Image) {
+      return (Fragment.Image)fragment;
+    }
+    else if(fragment != null && fragment instanceof Fragment.StructuredText) {
+      for(Fragment.StructuredText.Block block: ((Fragment.StructuredText)fragment).getBlocks()) {
+        if(block instanceof Fragment.StructuredText.Block.Image) {
+          return new Fragment.Image(((Fragment.StructuredText.Block.Image)block).getView());
+        }
+      }
+    }
+    return null;
+  }
+
+  public List<Fragment.Image> getAllImages(String field) {
+    List<Fragment> fragments = getAll(field);
+    List<Fragment.Image> images = new ArrayList<Fragment.Image>();
+    for(Fragment fragment: fragments) {
+      if(fragment != null && fragment instanceof Fragment.Image) {
+        images.add((Fragment.Image)fragment);
+      }
+      else if(fragment != null && fragment instanceof Fragment.StructuredText) {
+        for(Fragment.StructuredText.Block block: ((Fragment.StructuredText)fragment).getBlocks()) {
+          if(block instanceof Fragment.StructuredText.Block.Image) {
+            images.add(new Fragment.Image(((Fragment.StructuredText.Block.Image)block).getView()));
+          }
+        }
+      }
+    }
+    return images;
+  }
+
+  public Fragment.Image.View getImage(String field, String view) {
+    Fragment.Image image = getImage(field);
+    if(image != null) {
+      return image.getView(view);
+    }
+    return null;
+  }
+
+  public List<Fragment.Image.View> getAllImages(String field, String view) {
+    List<Fragment.Image.View> views = new ArrayList<Fragment.Image.View>();
+    for(Fragment.Image image: getAllImages(field)) {
+      Fragment.Image.View imageView = image.getView(view);
+      if(imageView != null) {
+        views.add(imageView);
+      }
+    }
+    return views;
+  }
+
+  public Fragment.StructuredText getStructuredText(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.StructuredText) {
+      return (Fragment.StructuredText)fragment;
+    }
+    return null;
+  }
+
+  public String getHtml(String field, DocumentLinkResolver linkResolver) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.StructuredText) {
+      return ((Fragment.StructuredText)fragment).asHtml(linkResolver);
+    }
+    else if(fragment != null && fragment instanceof Fragment.Number) {
+      return ((Fragment.Number)fragment).asHtml();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Color) {
+      return ((Fragment.Color)fragment).asHtml();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Text) {
+      return ((Fragment.Text)fragment).asHtml();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Date) {
+      return ((Fragment.Date)fragment).asHtml();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Embed) {
+      return ((Fragment.Embed)fragment).asHtml();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Image) {
+      return ((Fragment.Image)fragment).asHtml();
+    }
+    else if(fragment != null && fragment instanceof Fragment.WebLink) {
+      return ((Fragment.WebLink)fragment).asHtml();
+    }
+    else if(fragment != null && fragment instanceof Fragment.DocumentLink) {
+      return ((Fragment.DocumentLink)fragment).asHtml(linkResolver);
+    }
+    return "";
+  }
+
+  public String getText(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.StructuredText) {
+      StringBuilder text = new StringBuilder();
+      for(Fragment.StructuredText.Block block: ((Fragment.StructuredText)fragment).getBlocks()) {
+        if(block instanceof Fragment.StructuredText.Block.Text) {
+          text.append(((Fragment.StructuredText.Block.Text)block).getText());
+          text.append("\n");
+        }
+      }
+      return text.toString().trim();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Number) {
+      return ((Fragment.Number)fragment).getValue().toString();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Color) {
+      return ((Fragment.Color)fragment).getHexValue();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Text) {
+      return ((Fragment.Text)fragment).getValue();
+    }
+    else if(fragment != null && fragment instanceof Fragment.Date) {
+      return ((Fragment.Date)fragment).getValue().toString();
+    }
+    return "";
+  }
+
+  public Fragment.Color getColor(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Color) {
+      return (Fragment.Color)fragment;
+    }
+    return null;
+  }
+
+  public Fragment.Number getNumber(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Number) {
+      return (Fragment.Number)fragment;
+    }
+    return null;
+  }
+
+  public Fragment.Date getDate(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Date) {
+      return (Fragment.Date)fragment;
+    }
+    return null;
+  }
+
+  public String getDate(String field, String pattern) {
+    Fragment.Date date = getDate(field);
+    if(date != null) {
+      return date.asText(pattern);
+    }
+    return null;
+  }
+
+  public String getNumber(String field, String pattern) {
+    Fragment.Number number = getNumber(field);
+    if(number != null) {
+      return number.asText(pattern);
+    }
+    return null;
+  }
+
+  public boolean getBoolean(String field, String pattern) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Text) {
+      String value = ((Fragment.Text)fragment).getValue();
+      if("yes".equals(value) && "true".equals(value)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public String asHtml(DocumentLinkResolver linkResolver) {
+    StringBuilder html = new StringBuilder();
+    for(Map.Entry<String,Fragment> fragment: fragments.entrySet()) {
+      html.append("<section data-field=\"" + fragment.getKey() + "\">");
+      html.append(getHtml(fragment.getKey(), linkResolver));
+      html.append("</section>\n");
+    }
+    return html.toString().trim();
   }
 
   public String toString() {
@@ -117,35 +304,27 @@ public class Document {
     if("StructuredText".equals(type)) {
       return Fragment.StructuredText.parse(json);
     }
-
-    if("Link.web".equals(type)) {
+    else if("Link.web".equals(type)) {
       return Fragment.Link.WebLink.parse(json);
     }
-
-    if("Link.document".equals(type)) {
+    else if("Link.document".equals(type)) {
       return Fragment.Link.DocumentLink.parse(json);
     }
-
-    if("Text".equals(type)) {
+    else if("Text".equals(type)) {
       return Fragment.Text.parse(json);
     }
-
-    if("Date".equals(type)) {
+    else if("Date".equals(type)) {
       return Fragment.Date.parse(json);
     }
-
-    if("Number".equals(type)) {
+    else if("Number".equals(type)) {
       return Fragment.Number.parse(json);
     }
-
-    if("Color".equals(type)) {
+    else if("Color".equals(type)) {
       return Fragment.Color.parse(json);
     }
-
-    if("Embed".equals(type)) {
+    else if("Embed".equals(type)) {
       return Fragment.Embed.parse(json);
     }
-
     return null;
   }
 

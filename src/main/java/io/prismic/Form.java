@@ -31,7 +31,6 @@ public class Form {
     static Field parse(JsonNode json) {
       String type = json.path("type").asText();
       String defaultValue = (json.has("default") ? json.path("default").asText() : null);
-
       return new Field(type, defaultValue);
     }
 

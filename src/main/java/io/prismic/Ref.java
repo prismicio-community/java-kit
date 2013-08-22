@@ -44,7 +44,6 @@ public class Ref {
     String ref = json.path("ref").asText();
     String label = json.path("label").asText();
     boolean masterRef = json.path("isMasterRef").asBoolean();
-
     return new Ref(ref, label, masterRef, null);
   }
 

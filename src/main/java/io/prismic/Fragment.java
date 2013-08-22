@@ -234,11 +234,11 @@ public interface Fragment {
   public static class DocumentLink implements Link {
     private final String id;
     private final String type;
-    private final List<String> tags;
+    private final Set<String> tags;
     private final String slug;
     private final boolean broken;
 
-    public DocumentLink(String id, String type, List<String> tags, String slug, boolean broken) {
+    public DocumentLink(String id, String type, Set<String> tags, String slug, boolean broken) {
       this.id = id;
       this.type = type;
       this.tags = tags;
@@ -254,7 +254,7 @@ public interface Fragment {
       return type;
     }
 
-    public List<String> getTags() {
+    public Set<String> getTags() {
       return tags;
     }
 
@@ -266,8 +266,8 @@ public interface Fragment {
       return broken;
     }
 
-    public String asHtml() {
-      return null;
+    public String asHtml(DocumentLinkResolver linkResolver) {
+      return ("<a href=\"" + linkResolver.resolve(this) + "\">" + slug + "</a>");
     }
 
     // --
@@ -278,7 +278,7 @@ public interface Fragment {
       String id = document.path("id").asText();
       String type = document.path("type").asText();
       String slug = document.path("slug").asText();
-      List<String> tags = new ArrayList<String>();
+      Set<String> tags = new HashSet<String>();
       for(JsonNode tagJson: document.withArray("tags")) {
         tags.add(tagJson.asText());
       }
@@ -339,6 +339,10 @@ public interface Fragment {
     public Image(View main, Map<String, View> views) {
       this.main = main;
       this.views = views;
+    }
+
+    public Image(View main) {
+      this(main, new HashMap<String,View>());
     }
 
     public View getView(String view) {
@@ -452,6 +456,10 @@ public interface Fragment {
 
         public Image(Fragment.Image.View view) {
           this.view = view;
+        }
+
+        public Fragment.Image.View getView() {
+          return view;
         }
 
         public String getUrl() {
@@ -583,8 +591,95 @@ public interface Fragment {
       return null;
     }
 
+    private static class Group {
+      final String tag;
+      final List<Block> blocks;
+
+      public Group(String tag, List<Block> blocks) {
+        this.tag = tag;
+        this.blocks = blocks;
+      }
+    }
+
+    public String asHtml(List<Block> blocks, DocumentLinkResolver linkResolver) {
+      List<Group> groups = new ArrayList<Group>();
+      for(Block block: blocks) {
+        if(groups.size() > 0) {
+          Group lastOne = groups.get(groups.size() - 1);
+          if("ul".equals(lastOne.tag) && block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
+            lastOne.blocks.add(block);
+          }
+          else if("ol".equals(lastOne.tag) && block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
+            lastOne.blocks.add(block);
+          }
+          else if(block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
+            Group newGroup = new Group("ul", new ArrayList<Block>());
+            newGroup.blocks.add(block);
+            groups.add(newGroup);
+          }
+          else if(block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
+            Group newGroup = new Group("ol", new ArrayList<Block>());
+            newGroup.blocks.add(block);
+            groups.add(newGroup);
+          }
+          else {
+            Group newGroup = new Group(null, new ArrayList<Block>());
+            newGroup.blocks.add(block);
+            groups.add(newGroup);
+          }
+        } else {
+          Group newGroup = new Group(null, new ArrayList<Block>());
+          newGroup.blocks.add(block);
+          groups.add(newGroup);
+        }
+      }
+      StringBuilder html = new StringBuilder();
+      for(Group group: groups) {
+        if(group.tag != null) {
+          html.append("<" + group.tag + ">");
+          for(Block block: group.blocks) {
+            html.append(asHtml(block, linkResolver));
+          }
+          html.append("</" + group.tag + ">");
+        } else {
+          for(Block block: group.blocks) {
+            html.append(asHtml(block, linkResolver));
+          }
+        }
+      }
+      return html.toString();
+    }
+
+    public String asHtml(Block block, DocumentLinkResolver linkResolver) {
+      if(block instanceof StructuredText.Block.Heading) {
+        StructuredText.Block.Heading heading = (StructuredText.Block.Heading)block;
+        return ("<h" + heading.getLevel() + ">" + asHtml(heading.getText(), heading.getSpans(), linkResolver) + "</h" + heading.getLevel() + ">");
+      }
+      else if(block instanceof StructuredText.Block.Paragraph) {
+        StructuredText.Block.Paragraph paragraph = (StructuredText.Block.Paragraph)block;
+        return ("<p>" + asHtml(paragraph.getText(), paragraph.getSpans(), linkResolver) + "</p>");
+      }
+      else if(block instanceof StructuredText.Block.ListItem) {
+        StructuredText.Block.ListItem listItem = (StructuredText.Block.ListItem)block;
+        return ("<li>" + asHtml(listItem.getText(), listItem.getSpans(), linkResolver) + "</li>");
+      }
+      else if(block instanceof StructuredText.Block.Image) {
+        StructuredText.Block.Image image = (StructuredText.Block.Image)block;
+        return ("<p>" + image.getView().asHtml() + "</p>");
+      }
+      else if(block instanceof StructuredText.Block.Embed) {
+        StructuredText.Block.Embed embed = (StructuredText.Block.Embed)block;
+        return (embed.getObj().asHtml());
+      }
+      return "";
+    }
+
+    public String asHtml(String text, List<Span> spans, DocumentLinkResolver linkResolver) {
+      return text; // TODO
+    }
+
     public String asHtml(DocumentLinkResolver linkResolver) {
-      return null;
+      return asHtml(getBlocks(), linkResolver);
     }
 
     // --
@@ -610,7 +705,7 @@ public interface Fragment {
         if("Link.web".equals(linkType)) {
           link = Link.WebLink.parse(value);
         }
-        if("Link.document".equals(linkType)) {
+        else if("Link.document".equals(linkType)) {
           link = Link.DocumentLink.parse(value);
         }
         if(link != null) {
@@ -621,7 +716,17 @@ public interface Fragment {
       return null;
     }
 
-    static Object[] parseText(JsonNode json) {
+    private static class ParsedText {
+      final String text;
+      final List<Span> spans;
+
+      public ParsedText(String text, List<Span> spans) {
+        this.text = text;
+        this.spans = spans;
+      }
+    }
+
+    static ParsedText parseText(JsonNode json) {
       String text = json.path("text").asText();
       List<Span> spans = new ArrayList<Span>();
       for(JsonNode spanJson: json.withArray("spans")) {
@@ -630,52 +735,43 @@ public interface Fragment {
           spans.add(span);
         }
       }
-      return new Object[] { text, spans };
+      return new ParsedText(text, spans);
     }
 
     static Block parseBlock(JsonNode json) {
       String type = json.path("type").asText();
-
       if("heading1".equals(type)) {
-        Object[] p = parseText(json);
-        return new Block.Heading((String)p[0], (List<Span>)p[1], 1);
+        ParsedText p = parseText(json);
+        return new Block.Heading(p.text, p.spans, 1);
       }
-
-      if("heading2".equals(type)) {
-        Object[] p = parseText(json);
-        return new Block.Heading((String)p[0], (List<Span>)p[1], 2);
+      else if("heading2".equals(type)) {
+        ParsedText p = parseText(json);
+        return new Block.Heading(p.text, p.spans, 2);
       }
-
-      if("heading3".equals(type)) {
-        Object[] p = parseText(json);
-        return new Block.Heading((String)p[0], (List<Span>)p[1], 3);
+      else if("heading3".equals(type)) {
+        ParsedText p = parseText(json);
+        return new Block.Heading(p.text, p.spans, 3);
       }
-
-      if("heading4".equals(type)) {
-        Object[] p = parseText(json);
-        return new Block.Heading((String)p[0], (List<Span>)p[1], 4);
+      else if("heading4".equals(type)) {
+        ParsedText p = parseText(json);
+        return new Block.Heading(p.text, p.spans, 4);
       }
-
-      if("paragraph".equals(type)) {
-        Object[] p = parseText(json);
-        return new Block.Paragraph((String)p[0], (List<Span>)p[1]);
+      else if("paragraph".equals(type)) {
+        ParsedText p = parseText(json);
+        return new Block.Paragraph(p.text, p.spans);
       }
-
-      if("list-item".equals(type)) {
-        Object[] p = parseText(json);
-        return new Block.ListItem((String)p[0], (List<Span>)p[1], false);
+      else if("list-item".equals(type)) {
+        ParsedText p = parseText(json);
+        return new Block.ListItem(p.text, p.spans, false);
       }
-
-      if("image".equals(type)) {
+      else if("image".equals(type)) {
         Image.View view = Image.View.parse(json);
         return new Block.Image(view);
       }
-
-      if("embed".equals(type)) {
+      else if("embed".equals(type)) {
         Embed obj = Embed.parse(json);
         return new Block.Embed(obj);
       }
-
       return null;
     }
 
