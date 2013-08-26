@@ -43,7 +43,7 @@ public class Api {
   }
 
   public static Api get(String url, String accessToken) {
-    return get(url, accessToken, Cache.NoCache.INSTANCE, Logger.NoLogger.INSTANCE);
+    return get(url, accessToken, new Cache.NoCache(), new Logger.NoLogger());
   }
 
   public static Api get(String url) {
@@ -89,6 +89,14 @@ public class Api {
       if(ref.isMasterRef()) return ref;
     }
     throw new Api.Error(Api.Error.Code.UNEXPECTED, "No master?");
+  }
+
+  public String getOAuthInitiateEndpoint() {
+    return apiData.getOAuthInitiateEndpoint();
+  }
+
+  public String getOAuthTokenEndpoint() {
+    return apiData.getOAuthTokenEndpoint();
   }
 
   // --

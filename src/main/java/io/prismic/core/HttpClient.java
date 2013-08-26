@@ -14,6 +14,11 @@ public class HttpClient {
   public static JsonNode fetch(String url, Logger logger, Cache cache) {
     try {
 
+      JsonNode cachedResult = cache.get(url);
+      if(cachedResult != null) {
+        return cachedResult;
+      }
+
       URLConnection connection = new URL(url).openConnection();
       HttpURLConnection httpConnection = (HttpURLConnection)connection;
       InputStream response;
@@ -24,7 +29,15 @@ public class HttpClient {
         logger.log("DEBUG", "Making request: " + url);
         response = connection.getInputStream();
         if(httpConnection.getResponseCode() == 200) {
-          return new ObjectMapper().readTree(response);
+          JsonNode value = new ObjectMapper().readTree(response);
+
+          String cacheHeader = httpConnection.getHeaderField("Cache-Control");
+          if(cacheHeader != null && cacheHeader.matches("max-age=\\d+")) {
+            Long expiration = System.currentTimeMillis() + Long.parseLong(cacheHeader.substring(8)) * 1000;
+            cache.set(url, expiration, value);
+          }
+
+          return value;
         } else {
           throw new Exception("Oops)");
         }

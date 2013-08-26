@@ -139,7 +139,7 @@ public class Form {
     }
 
     public Search query(String q) {
-      this.data.put("q", ("[ " + (form.getFields().containsKey("q") ? strip(form.getFields().get("q").getDefaultValue()) : "") + " " + q + " ]"));
+      this.data.put("q", ("[ " + (form.getFields().containsKey("q") ? strip(form.getFields().get("q").getDefaultValue()) : "") + " " + strip(q) + " ]"));
       return this;
     }
 
