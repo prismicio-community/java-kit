@@ -674,8 +674,64 @@ public interface Fragment {
       return "";
     }
 
+    class Tuple<X, Y> { 
+        public final X x; 
+        public final Y y; 
+        public Tuple(X x, Y y) { 
+            this.x = x; 
+            this.y = y; 
+        } 
+    } 
+
+    private Tuple<String,String> getStartAndEnd(Span span, DocumentLinkResolver linkResolver){
+
+        return new Tuple("","");
+
+    }
+    Integer peekStart(Stack<Span> span){
+
+        return span.empty()? Integer.MAX_VALUE : span.peek().getStart();
+
+    }
+    Integer peekEnd(Stack<Span> span){
+
+        return span.empty()? Integer.MAX_VALUE : span.peek().getEnd();
+
+    }
     public String asHtml(String text, List<Span> spans, DocumentLinkResolver linkResolver) {
-      return text; // TODO
+        Stack<Span> starts = new Stack<Span>();
+        for(int i = spans.size() - 1; i >= 0; i--) {
+            starts.add(spans.get(i));
+        }
+        Stack<Span> endings = new Stack<Span>();
+        StringBuffer result = new StringBuffer();
+        Integer pos = 0;
+
+        while(!(starts.empty() && endings.empty())){
+            int next = Math.min(peekStart(starts), peekEnd(endings));
+            if(next > pos){
+                result.append(text.substring(0,next-pos-1));
+                text = text.substring(next-pos);
+                pos = next;
+            }
+            else{
+                StringBuffer spansToApply = new StringBuffer();
+                while(Math.min(peekStart(starts), peekEnd(endings)) == pos){
+                    if (!endings.empty() && endings.peek().getEnd() == pos){
+                        spansToApply.append(getStartAndEnd(endings.pop(), linkResolver).y);
+                        }
+                    else if (!starts.empty() && starts.peek().getStart() == pos) {
+                        Span start = starts.pop();
+                            endings.push(start);
+                            spansToApply.append(getStartAndEnd(start, linkResolver).x);
+                        }
+
+                    }
+                    result.append(spansToApply);
+            }
+        }
+
+        return result.toString();
     }
 
     public String asHtml(DocumentLinkResolver linkResolver) {
