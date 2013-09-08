@@ -717,9 +717,11 @@ public interface Fragment {
             else{
                 StringBuffer spansToApply = new StringBuffer();
                 while(Math.min(peekStart(starts), peekEnd(endings)) == pos){
+                    // Always close endings before looking into starts
                     if (!endings.empty() && endings.peek().getEnd() == pos){
                         spansToApply.append(getStartAndEnd(endings.pop(), linkResolver).y);
                         }
+                    // Once we closed Endings we add starts and we add their endings to Endings
                     else if (!starts.empty() && starts.peek().getStart() == pos) {
                         Span start = starts.pop();
                             endings.push(start);
