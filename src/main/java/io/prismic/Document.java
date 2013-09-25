@@ -54,7 +54,14 @@ public class Document {
   }
 
   public Fragment get(String field) {
-    return fragments.get(field);
+    Fragment single = fragments.get(field);
+    if(single == null) {
+      List<Fragment> multi = getAll(field);
+      if(multi.size() > 0) {
+        single = multi.get(0);
+      }
+    }
+    return single;
   }
 
   public List<Fragment> getAll(String field) {
@@ -226,7 +233,7 @@ public class Document {
     return null;
   }
 
-  public boolean getBoolean(String field, String pattern) {
+  public boolean getBoolean(String field) {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.Text) {
       String value = ((Fragment.Text)fragment).getValue();
@@ -303,6 +310,9 @@ public class Document {
   static Fragment parseFragment(String type, JsonNode json) {
     if("StructuredText".equals(type)) {
       return Fragment.StructuredText.parse(json);
+    }
+    else if("Image".equals(type)) {
+      return Fragment.Image.parse(json);
     }
     else if("Link.web".equals(type)) {
       return Fragment.Link.WebLink.parse(json);

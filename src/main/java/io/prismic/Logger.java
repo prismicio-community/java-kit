@@ -13,4 +13,14 @@ public interface Logger {
 
   }
 
+  // --
+
+  public static class PrintlnLogger implements Logger {
+
+    public void log(String level, String message) {
+      System.out.println("[prismic." + level + "] " + message);
+    }
+
+  }
+
 }
