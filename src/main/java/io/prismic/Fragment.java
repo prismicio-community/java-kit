@@ -228,7 +228,48 @@ public interface Fragment {
       String url = json.path("url").asText();
       return new WebLink(url, null);
     }
+  }
 
+  public static class MediaLink implements Link {
+    private final String url;
+    private final String kind;
+    private final Long size;
+    private final String filename;
+
+    public MediaLink(String url, String kind, Long size, String filename) {
+      this.url = url;
+      this.kind = kind;
+      this.size = size;
+      this.filename = filename;
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public String getKind() {
+      return kind;
+    }
+
+    public Long getSize() {
+      return size;
+    }
+
+    public String getFilename() {
+      return filename;
+    }
+
+    public String asHtml() {
+      return ("<a href=\"" + url + "\">" + filename + "</a>");
+    }
+
+    static MediaLink parse(JsonNode json) {
+      String url = json.path("file").path("url").asText();
+      String kind = json.path("file").path("kind").asText();
+      String size = json.path("file").path("size").asText();
+      String name = json.path("file").path("name").asText();
+      return new MediaLink(url, kind, Long.parseLong(size), name);
+    }
   }
 
   public static class DocumentLink implements Link {
@@ -683,11 +724,32 @@ public interface Fragment {
         } 
     } 
 
-    private Tuple<String,String> getStartAndEnd(Span span, DocumentLinkResolver linkResolver){
-
-        return new Tuple("","");
-
+      private Tuple<String,String> getStartAndEnd(Span span, DocumentLinkResolver linkResolver) {
+          if(span instanceof Span.Strong) {
+              return new Tuple("<strong>", "</strong>");
+          }
+          if(span instanceof Span.Em) {
+              return new Tuple("<em>", "</em>");
+          }
+          if(span instanceof Span.Hyperlink) {
+              Span.Hyperlink hyperlink = (Span.Hyperlink)span;
+              if(hyperlink.link instanceof WebLink) {
+                  WebLink webLink = (WebLink)hyperlink.getLink();
+                  return new Tuple("<a href=\""+ webLink.getUrl() + "\">", "</a>");
+              }
+              else if(hyperlink.link instanceof MediaLink) {
+                  MediaLink mediaLink = (MediaLink)hyperlink.getLink();
+                  return new Tuple("<a href=\""+ mediaLink.getUrl() + "\">", "</a>");
+              }
+              else if(hyperlink.link instanceof Link.DocumentLink) {
+                  DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
+                  String url = linkResolver.resolveLink(documentLink);
+                  return new Tuple("<a href=\""+ url+ "\">", "</a>");
+              }
+          }
+          return new Tuple("","");
     }
+
     Integer peekStart(Stack<Span> span){
 
         return span.empty()? Integer.MAX_VALUE : span.peek().getStart();
@@ -707,33 +769,35 @@ public interface Fragment {
         StringBuffer result = new StringBuffer();
         Integer pos = 0;
 
-        while(!(starts.empty() && endings.empty())){
-            int next = Math.min(peekStart(starts), peekEnd(endings));
-            if(next > pos){
-                result.append(text.substring(0,next-pos-1));
-                text = text.substring(next-pos);
-                pos = next;
-            }
-            else{
-                StringBuffer spansToApply = new StringBuffer();
-                while(Math.min(peekStart(starts), peekEnd(endings)) == pos){
-                    // Always close endings before looking into starts
-                    if (!endings.empty() && endings.peek().getEnd() == pos){
-                        spansToApply.append(getStartAndEnd(endings.pop(), linkResolver).y);
+        if(!spans.isEmpty()) {
+            while(!(starts.empty() && endings.empty())){
+                int next = Math.min(peekStart(starts), peekEnd(endings));
+                if(next > pos){
+                    result.append(text.substring(0,next-pos));
+                    text = text.substring(next-pos);
+                    pos = next;
+                }
+                else{
+                    StringBuffer spansToApply = new StringBuffer();
+                    while(Math.min(peekStart(starts), peekEnd(endings)) == pos){
+                        // Always close endings before looking into starts
+                        if (!endings.empty() && endings.peek().getEnd() == pos){
+                            spansToApply.append(getStartAndEnd(endings.pop(), linkResolver).y);
                         }
-                    // Once we closed Endings we add starts and we add their endings to Endings
-                    else if (!starts.empty() && starts.peek().getStart() == pos) {
-                        Span start = starts.pop();
+                        // Once we closed Endings we add starts and we add their endings to Endings
+                        else if (!starts.empty() && starts.peek().getStart() == pos) {
+                            Span start = starts.pop();
                             endings.push(start);
                             spansToApply.append(getStartAndEnd(start, linkResolver).x);
                         }
-
                     }
                     result.append(spansToApply);
+                }
             }
+            return result.toString() + (text.length() > 0 ? text : "");
+        } else {
+            return text;
         }
-
-        return result.toString();
     }
 
     public String asHtml(DocumentLinkResolver linkResolver) {
@@ -765,6 +829,9 @@ public interface Fragment {
         }
         else if("Link.document".equals(linkType)) {
           link = Link.DocumentLink.parse(value);
+        }
+        else if("Link.file".equals(linkType)) {
+          link = Link.MediaLink.parse(value);
         }
         if(link != null) {
           return new Span.Hyperlink(start, end, link);
@@ -821,6 +888,10 @@ public interface Fragment {
       else if("list-item".equals(type)) {
         ParsedText p = parseText(json);
         return new Block.ListItem(p.text, p.spans, false);
+      }
+      else if("o-list-item".equals(type)) {
+        ParsedText p = parseText(json);
+        return new Block.ListItem(p.text, p.spans, true);
       }
       else if("image".equals(type)) {
         Image.View view = Image.View.parse(json);
