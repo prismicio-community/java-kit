@@ -68,6 +68,10 @@ public class Api {
     return logger;
   }
 
+  public String getAccessToken() {
+    return accessToken;
+  }
+
   public Cache getCache() {
     return cache;
   }

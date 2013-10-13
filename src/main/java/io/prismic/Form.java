@@ -118,6 +118,9 @@ public class Form {
           this.data.put(field.getKey(), field.getValue().getDefaultValue());
         }
       }
+      if(api.getAccessToken() != null) {
+        this.data.put("access_token", api.getAccessToken());
+      }
     }
 
     public Search ref(Ref ref) {
