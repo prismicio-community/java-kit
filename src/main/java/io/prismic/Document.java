@@ -236,8 +236,8 @@ public class Document {
   public boolean getBoolean(String field) {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.Text) {
-      String value = ((Fragment.Text)fragment).getValue();
-      if("yes".equals(value) && "true".equals(value)) {
+      String value = ((Fragment.Text)fragment).getValue().toLowerCase();
+      if("yes".equals(value) || "true".equals(value)) {
         return true;
       }
     }
@@ -321,6 +321,9 @@ public class Document {
       return Fragment.Link.DocumentLink.parse(json);
     }
     else if("Text".equals(type)) {
+      return Fragment.Text.parse(json);
+    }
+    else if("Select".equals(type)) {
       return Fragment.Text.parse(json);
     }
     else if("Date".equals(type)) {
