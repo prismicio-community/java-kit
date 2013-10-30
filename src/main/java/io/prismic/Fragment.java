@@ -451,8 +451,27 @@ public interface Fragment {
       public static class Paragraph implements Text {
         private final String text;
         private final List<Span> spans;
-        
+
         public Paragraph(String text, List<Span> spans) {
+          this.text = text;
+          this.spans = spans;
+        }
+
+        public String getText() {
+          return text;
+        }
+
+        public List<Span> getSpans() {
+          return spans;
+        }
+
+      }
+
+      public static class Preformatted implements Text {
+        private final String text;
+        private final List<Span> spans;
+
+        public Preformatted(String text, List<Span> spans) {
           this.text = text;
           this.spans = spans;
         }
@@ -625,6 +644,13 @@ public interface Fragment {
       return null;
     }
 
+    public Block.Preformatted getFirstPreformatted() {
+      for(Block block: blocks) {
+        if(block instanceof Block.Preformatted) return (Block.Preformatted)block;
+      }
+      return null;
+    }
+
     public Block.Image getFirstImage() {
       for(Block block: blocks) {
         if(block instanceof Block.Image) return (Block.Image)block;
@@ -699,6 +725,10 @@ public interface Fragment {
       else if(block instanceof StructuredText.Block.Paragraph) {
         StructuredText.Block.Paragraph paragraph = (StructuredText.Block.Paragraph)block;
         return ("<p>" + asHtml(paragraph.getText(), paragraph.getSpans(), linkResolver) + "</p>");
+      }
+      else if(block instanceof StructuredText.Block.Preformatted) {
+        StructuredText.Block.Preformatted paragraph = (StructuredText.Block.Preformatted)block;
+        return ("<pre>" + asHtml(paragraph.getText(), paragraph.getSpans(), linkResolver) + "</pre>");
       }
       else if(block instanceof StructuredText.Block.ListItem) {
         StructuredText.Block.ListItem listItem = (StructuredText.Block.ListItem)block;
@@ -884,6 +914,10 @@ public interface Fragment {
       else if("paragraph".equals(type)) {
         ParsedText p = parseText(json);
         return new Block.Paragraph(p.text, p.spans);
+      }
+      else if("preformatted".equals(type)) {
+        ParsedText p = parseText(json);
+        return new Block.Preformatted(p.text, p.spans);
       }
       else if("list-item".equals(type)) {
         ParsedText p = parseText(json);
