@@ -11,10 +11,12 @@ public class Form {
   public static class Field {
 
     final private String type;
+    final private Boolean multiple;
     final private String defaultValue;
 
-    public Field(String type, String defaultValue) {
+    public Field(String type, Boolean multiple, String defaultValue) {
       this.type = type;
+      this.multiple = multiple;
       this.defaultValue = defaultValue;
     }
 
@@ -26,12 +28,17 @@ public class Form {
       return defaultValue;
     }
 
+    public Boolean isMultiple() {
+      return multiple;
+    }
+
     // --
 
     static Field parse(JsonNode json) {
       String type = json.path("type").asText();
       String defaultValue = (json.has("default") ? json.path("default").asText() : null);
-      return new Field(type, defaultValue);
+      Boolean multiple = (json.has("multiple") ? json.path("multiple").asBoolean() : false);
+      return new Field(type, multiple, defaultValue);
     }
 
   }
@@ -107,20 +114,50 @@ public class Form {
 
     final private Api api;
     final private Form form;
-    final private Map<String,String> data;
+    final private Map<String,List<String>> data;
 
     public Search(Api api, Form form) {
       this.api = api;
       this.form = form;
-      this.data = new HashMap<String,String>();
+      this.data = new HashMap<String,List<String>>();
       for(Map.Entry<String,Field> field: form.getFields().entrySet()) {
         if(field.getValue().getDefaultValue() != null) {
-          this.data.put(field.getKey(), field.getValue().getDefaultValue());
+          List<String> value = new ArrayList<String>(1);
+          value.add(field.getValue().getDefaultValue());
+          this.data.put(field.getKey(), value);
         }
       }
-      if(api.getAccessToken() != null) {
-        this.data.put("access_token", api.getAccessToken());
+    }
+
+    public Search set(String field, String value) {
+      Field fieldDesc = form.getFields().get(field);
+      if(fieldDesc == null) {
+        throw new RuntimeException("Unknown field " + field); 
       }
+      if(fieldDesc.isMultiple()) {
+        List<String> existingValue = data.get(field);
+        if(existingValue == null) {
+          existingValue = new ArrayList<String>();
+        }
+        existingValue.add(value);
+        data.put(field, existingValue);
+      } else {
+        List<String> newValue = new ArrayList<String>();
+        newValue.add(value);
+        data.put(field, newValue);
+      }
+      return this;
+    }
+
+    public Search set(String field, Integer value) {
+      Field fieldDesc = form.getFields().get(field);
+      if(fieldDesc == null) {
+        throw new RuntimeException("Unknown field " + field); 
+      }
+      if(!"Integer".equals(fieldDesc.getType())) {
+        throw new RuntimeException("Cannot set an Integer value to field " + field + " of type " + fieldDesc.getType()); 
+      }
+      return set(field, value.toString());
     }
 
     public Search ref(Ref ref) {
@@ -128,10 +165,10 @@ public class Form {
     }
 
     public Search ref(String ref) {
-      this.data.put("ref", ref);
-      return this;
+      return set("ref", ref);
     }
 
+    // Temporary hack for Backward compatibility
     private String strip(String q) {
       if(q == null) return "";
       String tq = q.trim();
@@ -142,23 +179,37 @@ public class Form {
     }
 
     public Search query(String q) {
-      this.data.put("q", ("[ " + (form.getFields().containsKey("q") ? strip(form.getFields().get("q").getDefaultValue()) : "") + " " + strip(q) + " ]"));
-      return this;
+      Field fieldDesc = form.getFields().get("q");
+      if(fieldDesc != null && fieldDesc.isMultiple()) {
+        return set("q", q);
+      } else {
+        List<String> value = new ArrayList<String>();
+        value.add(("[ " + (form.getFields().containsKey("q") ? strip(form.getFields().get("q").getDefaultValue()) : "") + " " + strip(q) + " ]"));
+        this.data.put("q", value);
+        return this;
+      }
     }
 
     public List<Document> submit() {
       if("GET".equals(form.getMethod()) && "application/x-www-form-urlencoded".equals(form.getEnctype())) {
         StringBuilder url = new StringBuilder(form.getAction());
         String sep = form.getAction().contains("?") ? "&" : "?";
-        for(Map.Entry<String,String> d: data.entrySet()) {
-          url.append(sep);
-          url.append(d.getKey());
-          url.append("=");
-          url.append(HttpClient.encodeURIComponent(d.getValue()));
-          sep = "&";
+        for(Map.Entry<String,List<String>> d: data.entrySet()) {
+          for(String v: d.getValue()) {
+            url.append(sep);
+            url.append(d.getKey());
+            url.append("=");
+            url.append(HttpClient.encodeURIComponent(v));
+            sep = "&";
+          }
         }
         JsonNode json = HttpClient.fetch(url.toString(), api.getLogger(), api.getCache());
-        Iterator<JsonNode> results = json.elements();
+        Iterator<JsonNode> results = null;
+        if(json.isArray()) {
+          results = json.elements();
+        } else {
+          results = json.path("results").elements();
+        }
         List<Document> documents = new ArrayList<Document>();
         while (results.hasNext()) {
           documents.add(Document.parse(results.next()));
@@ -171,8 +222,10 @@ public class Form {
 
     public String toString() {
       StringBuilder dataStr = new StringBuilder();
-      for(Map.Entry<String,String> d: data.entrySet()) {
-        dataStr.append(d.getKey() + "=" + d.getValue() + " ");
+      for(Map.Entry<String,List<String>> d: data.entrySet()) {
+        for(String v: d.getValue()) {
+          dataStr.append(d.getKey() + "=" + v + " ");
+        }
       }
       return form.toString() + " {" + dataStr.toString().trim() + "}";
     }
