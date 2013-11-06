@@ -26,7 +26,7 @@ The kit coordinates are:
 
 ### API documentation
 
-You can browse the [API documentation](http://prismicio.github.io/java-kit).
+You can browse the [API documentation](https://developers.prismic.io/documentation/UjBe8bGIJ3EKtgBZ/api-documentation).
 
 ### Licence
 
