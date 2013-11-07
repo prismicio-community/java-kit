@@ -24,7 +24,7 @@ public interface Cache {
 
   public static class BuiltInCache implements Cache {
 
-    private final org.apache.commons.collections.map.LRUMap cache;
+    private final java.util.Map<String, Entry> cache;
 
     static class Entry {
       public final Long expiration;
@@ -36,7 +36,7 @@ public interface Cache {
     }
 
     public BuiltInCache(int maxDocuments) {
-      this.cache = new org.apache.commons.collections.map.LRUMap(maxDocuments);
+      this.cache = java.util.Collections.synchronizedMap(new org.apache.commons.collections.map.LRUMap(maxDocuments));
     }
 
     public void set(String url, Long expiration, JsonNode response) {
