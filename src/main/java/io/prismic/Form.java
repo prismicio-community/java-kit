@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.*;
 import io.prismic.core.*;
 
 /**
- * A general usage RESTful form, manipulated by higher-level forms like {@link Form.Search}.
+ * A general usage RESTful form, manipulated by higher-level forms like {@link Form.SearchForm}.
  * If your need is simply to query content, you shouldn't need to look into this class, and use
- * the methods in {@link Form.Search} instead.
+ * the methods in {@link Form.SearchForm} instead.
  */
 public class Form {
 
@@ -116,21 +116,21 @@ public class Form {
   // --
 
   /**
-   * The object you will use to perform queries. At the moment, only queries of the type "Search" exist in prismic.io's APIs.
+   * The object you will use to perform queries. At the moment, only queries of the type "SearchForm" exist in prismic.io's APIs.
    * There is one named "everything", that allow to query through the while repository, and there is also one per collection
    * created by prismic.io administrators in the writing-room.
    *
-   * From an {@link API} object, you get a Search form like this: <code>api.getForm("everything");</code>
+   * From an {@link API} object, you get a SearchForm form like this: <code>api.getForm("everything");</code>
    *
-   * Then, from a Search form, you query like this: <code>search.query("[[:d = at(document.type, "Product")]]").ref(ref).submit();</code>
+   * Then, from a SearchForm form, you query like this: <code>search.query("[[:d = at(document.type, "Product")]]").ref(ref).submit();</code>
    */
-  public static class Search {
+  public static class SearchForm {
 
     final private Api api;
     final private Form form;
     final private Map<String,List<String>> data;
 
-    public Search(Api api, Form form) {
+    public SearchForm(Api api, Form form) {
       this.api = api;
       this.form = form;
       this.data = new HashMap<String,List<String>>();
@@ -153,7 +153,7 @@ public class Form {
      * @param value the value with which to set it
      * @return the current form, in order to chain those calls
      */
-    public Search set(String field, String value) {
+    public SearchForm set(String field, String value) {
       Field fieldDesc = form.getFields().get(field);
       if(fieldDesc == null) {
         throw new RuntimeException("Unknown field " + field); 
@@ -176,7 +176,7 @@ public class Form {
     /**
      * A simple helper to set numeric value; see set(String,String).
      */
-    public Search set(String field, Integer value) {
+    public SearchForm set(String field, Integer value) {
       Field fieldDesc = form.getFields().get(field);
       if(fieldDesc == null) {
         throw new RuntimeException("Unknown field " + field); 
@@ -199,7 +199,7 @@ public class Form {
      * @param ref the ref object representing the ref on which you wish to query
      * @return the current form, in order to chain those calls
      */
-    public Search ref(Ref ref) {
+    public SearchForm ref(Ref ref) {
       return ref(ref.getRef());
     }
 
@@ -215,7 +215,7 @@ public class Form {
      * @param ref the ID of the ref on which you wish to query
      * @return the current form, in order to chain those calls
      */
-    public Search ref(String ref) {
+    public SearchForm ref(String ref) {
       return set("ref", ref);
     }
 
@@ -228,7 +228,7 @@ public class Form {
      * @param pageSize the size of the pagination you wish
      * @return the current form, in order to chain those calls
      */
-    public Search pageSize(String pageSize) {
+    public SearchForm pageSize(String pageSize) {
       return set("pageSize", pageSize);
     }
 
@@ -241,7 +241,7 @@ public class Form {
      * @param pageSize the size of the pagination you wish
      * @return the current form, in order to chain those calls
      */
-    public Search pageSize(int pageSize) {
+    public SearchForm pageSize(int pageSize) {
       return set("pageSize", pageSize);
     }
 
@@ -255,7 +255,7 @@ public class Form {
      * @param page the page number
      * @return the current form, in order to chain those calls
      */
-    public Search page(String page) {
+    public SearchForm page(String page) {
       return set("page", page);
     }
 
@@ -269,7 +269,7 @@ public class Form {
      * @param page the page number
      * @return the current form, in order to chain those calls
      */
-    public Search page(int page) {
+    public SearchForm page(int page) {
       return set("page", page);
     }
 
@@ -283,7 +283,7 @@ public class Form {
      * @param orderings the orderings
      * @return the current form, in order to chain those calls
      */
-    public Search orderings(String orderings) {
+    public SearchForm orderings(String orderings) {
       return set("orderings", orderings);
     }
 
@@ -306,7 +306,7 @@ public class Form {
      *
      * @param q the query to pass
      */
-    public Search query(String q) {
+    public SearchForm query(String q) {
       Field fieldDesc = form.getFields().get("q");
       if(fieldDesc != null && fieldDesc.isMultiple()) {
         return set("q", q);
@@ -321,7 +321,7 @@ public class Form {
     /**
      * The method to call to perform and retrieve your query.
      *
-     * Please make sure you're set a ref on this Search form before querying, or the kit will complain!
+     * Please make sure you're set a ref on this SearchForm form before querying, or the kit will complain!
      *
      * @return the list of documents, that can be directly used as such.
      */

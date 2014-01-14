@@ -9,7 +9,7 @@ public class Main {
 
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Ref ref = api.getMaster();
-    Form.Search products = api.getForm("products");
+    Form.SearchForm products = api.getForm("products");
 
     products.ref(ref).query("[[:d = at(document.tags, [\"Macaron\"])]]");
     System.out.println(products);

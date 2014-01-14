@@ -168,10 +168,10 @@ public class Api {
    *
    * @param form the name of the form to query on
    * @return the form to use to perform the query
-   * @see Form.Search
+   * @see Form.SearchForm
    */
-  public Form.Search getForm(String form) {
-    return new Form.Search(this, apiData.getForms().get(form));
+  public Form.SearchForm getForm(String form) {
+    return new Form.SearchForm(this, apiData.getForms().get(form));
   }
 
   /**
