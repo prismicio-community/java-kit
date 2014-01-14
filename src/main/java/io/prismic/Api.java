@@ -6,6 +6,12 @@ import io.prismic.core.*;
 
 import com.fasterxml.jackson.databind.*;
 
+/**
+ * Embodies an API endpoint, from which it is possible to make queries.
+ *
+ * This object should be instantiated once per webpage on your project,
+ * at the very beginning of the webpage, and then used for every subsequent document query.
+ */
 public class Api {
 
   public static class Error extends RuntimeException {
@@ -35,6 +41,16 @@ public class Api {
 
   // --
 
+  /**
+   * Entry point to get an {@link API} object.
+   * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null, new Cache.BuiltInCache(999), new Logger.PrintlnLogger());</code>
+   *
+   * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
+   * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
+   * @param cache the instantiation of a class that implements the {@link Cache} interface, and will handle the cache
+   * @param logger the instantiaction of a class that implements the {@link Logger} interface, and will handle the logging
+   * @return the usable API object
+   */
   public static Api get(String url, String accessToken, Cache cache, Logger logger) {
     String fetchUrl = (accessToken == null ? url : (url + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = HttpClient.fetch(fetchUrl, logger, cache);
@@ -42,10 +58,25 @@ public class Api {
     return new Api(apiData, accessToken, cache, logger);
   }
 
+  /**
+   * Entry point to get an {@link API} object.
+   * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null);</code>
+   *
+   * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
+   * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
+   * @return the usable API object
+   */
   public static Api get(String url, String accessToken) {
     return get(url, accessToken, new Cache.NoCache(), new Logger.NoLogger());
   }
 
+  /**
+   * Entry point to get an {@link API} object.
+   * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api");</code>
+   *
+   * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
+   * @return the usable API object
+   */
   public static Api get(String url) {
     return get(url, null);
   }
@@ -57,6 +88,16 @@ public class Api {
   final private Cache cache;
   final private Logger logger;
 
+  /**
+   * Constructor to build a proper {@link API} object. This is not to build an {@link API} object
+   * from an {@link API} endpoint (the most usual case). In this case, you'll use the <code>API.get</code> method.
+   *
+   * @param apiData the data retrieved from the API document, ready to be stored in memory
+   * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
+   * @param cache the instantiation of a class that implements the {@link Cache} interface, and will handle the cache
+   * @param logger the instantiaction of a class that implements the {@link Logger} interface, and will handle the logging
+   * @return the usable API object
+   */
   public Api(ApiData apiData, String accessToken, Cache cache, Logger logger) {
     this.apiData = apiData;
     this.accessToken = accessToken;
@@ -76,18 +117,47 @@ public class Api {
     return cache;
   }
 
+  /**
+   * From a properly built {@link API} object, returns the ref IDs (points in a prismic.io repository's timeline,
+   * whether in the past, in the present, or in the future) to which the passed credentials give access.
+   *
+   * @return the list of ref IDs
+   */
   public List<Ref> getRefs() {
     return apiData.getRefs();
   }
 
+  /**
+   * From a properly built {@link API} object, returns the map associating the bookmark names to their document IDs.
+   *
+   * Therefore, to get a bookmarked document's ID, it will look like this: <code>api.getBookmarks().get("home")</code>
+   *
+   * @return the map &lt;name, id&gt;
+   */
   public Map<String,String> getBookmarks() {
     return apiData.getBookmarks();
   }
 
+  /**
+   * From a properly built {@link API} object, return a Form object that will allow to perform queries.
+   * Currently, all the forms offered by prismic.io are SearchForms, but this will change.
+   *
+   * To use it: <code>api.get("everything").query(.....)......</code>
+   *
+   * @param form the name of the form to query on
+   * @return the form to use to perform the query
+   * @see Form.Search
+   */
   public Form.Search getForm(String form) {
     return new Form.Search(this, apiData.getForms().get(form));
   }
 
+  /**
+   * From a properly built {@link API} object, returns the ref ID (points in a prismic.io repository's timeline,
+   * whether in the past, in the present, or in the future) of the master ref (the one presently live).
+   *
+   * @return the ref object representing the master ref
+   */
   public Ref getMaster() {
     for(Ref ref: getRefs()) {
       if(ref.isMasterRef()) return ref;

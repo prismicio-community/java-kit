@@ -6,6 +6,11 @@ import com.fasterxml.jackson.databind.*;
 
 import io.prismic.core.*;
 
+/**
+ * A general usage RESTful form, manipulated by higher-level forms like {@link Form.Search}.
+ * If your need is simply to query content, you shouldn't need to look into this class, and use
+ * the methods in {@link Form.Search} instead.
+ */
 public class Form {
 
   public static class Field {
@@ -110,6 +115,15 @@ public class Form {
 
   // --
 
+  /**
+   * The object you will use to perform queries. At the moment, only queries of the type "Search" exist in prismic.io's APIs.
+   * There is one named "everything", that allow to query through the while repository, and there is also one per collection
+   * created by prismic.io administrators in the writing-room.
+   *
+   * From an {@link API} object, you get a Search form like this: <code>api.getForm("everything");</code>
+   *
+   * Then, from a Search form, you query like this: <code>search.query("[[:d = at(document.type, "Product")]]").ref(ref).submit();</code>
+   */
   public static class Search {
 
     final private Api api;
@@ -129,6 +143,16 @@ public class Form {
       }
     }
 
+    /**
+     * Allows to set one of the form's fields, such as "q" for the query field, or the "ordering" field, or the "pageSize" field.
+     * The field must exist in the RESTful description that is in the /api document. To be on the safe side, you should use the
+     * specialized methods, and use <code>searchForm.orderings(o)</code> rather than <code>searchForm.set("orderings", o)</code>
+     * if they exist.
+     *
+     * @param field the name of the field to set
+     * @param value the value with which to set it
+     * @return the current form, in order to chain those calls
+     */
     public Search set(String field, String value) {
       Field fieldDesc = form.getFields().get(field);
       if(fieldDesc == null) {
@@ -149,6 +173,9 @@ public class Form {
       return this;
     }
 
+    /**
+     * A simple helper to set numeric value; see set(String,String).
+     */
     public Search set(String field, Integer value) {
       Field fieldDesc = form.getFields().get(field);
       if(fieldDesc == null) {
@@ -160,10 +187,34 @@ public class Form {
       return set(field, value.toString());
     }
 
+    /**
+     * Allows to set the ref on which you wish to be performing the query.
+     *
+     * This is mandatory to submit a query; if you call <code>api.getForm("everything").submit();</code>, the kit will complain!
+     *
+     * Please do not forge the ref dynamically in this call, like this: <code>ref(api.getMaster())</code>.
+     * Prefer to set a ref variable once for your whole webpage, and use that variable in this method: <code>ref(ref)</code>.
+     * That way, you can change this variable's assignment once, and trivially set your whole webpage into the future or the past.
+     *
+     * @param ref the ref object representing the ref on which you wish to query
+     * @return the current form, in order to chain those calls
+     */
     public Search ref(Ref ref) {
       return ref(ref.getRef());
     }
 
+    /**
+     * Allows to set the ref on which you wish to be performing the query.
+     *
+     * This is mandatory to submit a query; if you call <code>api.getForm("everything").submit();</code>, the kit will complain!
+     *
+     * Please do not forge the ref dynamically in this call, like this: <code>ref(api.getMaster().getRef())</code>.
+     * Prefer to set a ref variable once for your whole webpage, and use that variable in this method: <code>ref(ref)</code>.
+     * That way, you can change this variable's assignment once, and trivially set your whole webpage into the future or the past.
+     *
+     * @param ref the ID of the ref on which you wish to query
+     * @return the current form, in order to chain those calls
+     */
     public Search ref(String ref) {
       return set("ref", ref);
     }
@@ -178,6 +229,15 @@ public class Form {
       return tq;
     }
 
+    /**
+     * Allows to set the query field of the current form. For instance:
+     * <code>search.query("[[:d = at(document.type, "Product")]]");</code>
+     * Look up prismic.io's documentation online to discover the possible query predicates.
+     *
+     * Beware: a query is a list of predicates, therefore, it always starts with "[[" and ends with "]]".
+     *
+     * @param q the query to pass
+     */
     public Search query(String q) {
       Field fieldDesc = form.getFields().get("q");
       if(fieldDesc != null && fieldDesc.isMultiple()) {
@@ -190,6 +250,13 @@ public class Form {
       }
     }
 
+    /**
+     * The method to call to perform and retrieve your query.
+     *
+     * Please make sure you're set a ref on this Search form before querying, or the kit will complain!
+     *
+     * @return the list of documents, that can be directly used as such.
+     */
     public List<Document> submit() {
       if("GET".equals(form.getMethod()) && "application/x-www-form-urlencoded".equals(form.getEnctype())) {
         StringBuilder url = new StringBuilder(form.getAction());
