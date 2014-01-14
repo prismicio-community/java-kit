@@ -230,13 +230,13 @@ public interface Fragment {
     }
   }
 
-  public static class MediaLink implements Link {
+  public static class FileLink implements Link {
     private final String url;
     private final String kind;
     private final Long size;
     private final String filename;
 
-    public MediaLink(String url, String kind, Long size, String filename) {
+    public FileLink(String url, String kind, Long size, String filename) {
       this.url = url;
       this.kind = kind;
       this.size = size;
@@ -263,12 +263,33 @@ public interface Fragment {
       return ("<a href=\"" + url + "\">" + filename + "</a>");
     }
 
-    static MediaLink parse(JsonNode json) {
+    static FileLink parse(JsonNode json) {
       String url = json.path("file").path("url").asText();
       String kind = json.path("file").path("kind").asText();
       String size = json.path("file").path("size").asText();
       String name = json.path("file").path("name").asText();
-      return new MediaLink(url, kind, Long.parseLong(size), name);
+      return new FileLink(url, kind, Long.parseLong(size), name);
+    }
+  }
+
+  public static class ImageLink implements Link {
+    private final String url;
+
+    public ImageLink(String url) {
+      this.url = url;
+    }
+
+    public String getUrl() {
+      return url;
+    }
+
+    public String asHtml() {
+      return ("<a href=\"" + url + "\">" + url + "</a>");
+    }
+
+    static ImageLink parse(JsonNode json) {
+      String url = json.path("image").path("url").asText();
+      return new ImageLink(url);
     }
   }
 
@@ -767,9 +788,13 @@ public interface Fragment {
                   WebLink webLink = (WebLink)hyperlink.getLink();
                   return new Tuple("<a href=\""+ webLink.getUrl() + "\">", "</a>");
               }
-              else if(hyperlink.link instanceof MediaLink) {
-                  MediaLink mediaLink = (MediaLink)hyperlink.getLink();
-                  return new Tuple("<a href=\""+ mediaLink.getUrl() + "\">", "</a>");
+              else if(hyperlink.link instanceof FileLink) {
+                  FileLink fileLink = (FileLink)hyperlink.getLink();
+                  return new Tuple("<a href=\""+ fileLink.getUrl() + "\">", "</a>");
+              }
+              else if(hyperlink.link instanceof ImageLink) {
+                  ImageLink imageLink = (ImageLink)hyperlink.getLink();
+                  return new Tuple("<a href=\""+ imageLink.getUrl() + "\">", "</a>");
               }
               else if(hyperlink.link instanceof Link.DocumentLink) {
                   DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
@@ -861,7 +886,10 @@ public interface Fragment {
           link = Link.DocumentLink.parse(value);
         }
         else if("Link.file".equals(linkType)) {
-          link = Link.MediaLink.parse(value);
+          link = Link.FileLink.parse(value);
+        }
+        else if("Link.image".equals(linkType)) {
+          link = Link.ImageLink.parse(value);
         }
         if(link != null) {
           return new Span.Hyperlink(start, end, link);
