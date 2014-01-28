@@ -842,30 +842,34 @@ public interface Fragment {
       int end = json.path("end").intValue();
       JsonNode data = json.with("data");
 
-      if("strong".equals(type)) {
-        return new Span.Strong(start, end);
-      }
+      if (end > start) {
 
-      if("em".equals(type)) {
-        return new Span.Em(start, end);
-      }
+        if("strong".equals(type)) {
+          return new Span.Strong(start, end);
+        }
 
-      if("hyperlink".equals(type)) {
-        String linkType = data.path("type").asText();
-        JsonNode value = data.with("value");
-        Link link = null;
-        if("Link.web".equals(linkType)) {
-          link = Link.WebLink.parse(value);
+        if("em".equals(type)) {
+          return new Span.Em(start, end);
         }
-        else if("Link.document".equals(linkType)) {
-          link = Link.DocumentLink.parse(value);
+
+        if("hyperlink".equals(type)) {
+          String linkType = data.path("type").asText();
+          JsonNode value = data.with("value");
+          Link link = null;
+          if("Link.web".equals(linkType)) {
+            link = Link.WebLink.parse(value);
+          }
+          else if("Link.document".equals(linkType)) {
+            link = Link.DocumentLink.parse(value);
+          }
+          else if("Link.file".equals(linkType)) {
+            link = Link.MediaLink.parse(value);
+          }
+          if(link != null) {
+            return new Span.Hyperlink(start, end, link);
+          }
         }
-        else if("Link.file".equals(linkType)) {
-          link = Link.MediaLink.parse(value);
-        }
-        if(link != null) {
-          return new Span.Hyperlink(start, end, link);
-        }
+
       }
 
       return null;
