@@ -20,7 +20,7 @@ The kit coordinates are:
 <dependency>
   <groupId>io.prismic</groupId>
   <artifactId>java-kit</artifactId>
-  <version>1.0-M4</version>
+  <version>1.0-M5</version>
 </dependency>
 ```
 
