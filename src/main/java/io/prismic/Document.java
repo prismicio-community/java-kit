@@ -320,6 +320,12 @@ public class Document {
     else if("Link.document".equals(type)) {
       return Fragment.Link.DocumentLink.parse(json);
     }
+    else if("Link.file".equals(type)) {
+      return Fragment.Link.FileLink.parse(json);
+    }
+    else if("Link.image".equals(type)) {
+      return Fragment.Link.ImageLink.parse(json);
+    }
     else if("Text".equals(type)) {
       return Fragment.Text.parse(json);
     }
