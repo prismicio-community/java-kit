@@ -279,7 +279,7 @@ public class Form {
         }
         List<Document> documents = new ArrayList<Document>();
         while (results.hasNext()) {
-          documents.add(Document.parse(results.next()));
+          documents.add(Document.parse(results.next(), api.getFragmentParser()));
         }
         return documents;
       } else {

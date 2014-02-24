@@ -47,15 +47,20 @@ public class Api {
    *
    * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
-   * @param cache the instantiation of a class that implements the {@link Cache} interface, and will handle the cache
-   * @param logger the instantiaction of a class that implements the {@link Logger} interface, and will handle the logging
+   * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
+   * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
+   * @param fragmentParser instance of a class that implements the {@link FragmentParser} interface, and will handle the JSON to {@link Fragment} conversion.
    * @return the usable API object
    */
-  public static Api get(String url, String accessToken, Cache cache, Logger logger) {
+  public static Api get(String url, String accessToken, Cache cache, Logger logger, FragmentParser fragmentParser) {
     String fetchUrl = (accessToken == null ? url : (url + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = HttpClient.fetch(fetchUrl, logger, cache);
     ApiData apiData = ApiData.parse(json);
-    return new Api(apiData, accessToken, cache, logger);
+    return new Api(apiData, accessToken, cache, logger, fragmentParser);
+  }
+
+  public static Api get(String url, String accessToken, Cache cache, Logger logger) {
+    return get(url, accessToken, cache, logger, new FragmentParser.Default());
   }
 
   /**
@@ -87,6 +92,7 @@ public class Api {
   final private String accessToken;
   final private Cache cache;
   final private Logger logger;
+  final private FragmentParser fragmentParser;
 
   /**
    * Constructor to build a proper {@link API} object. This is not to build an {@link API} object
@@ -94,15 +100,17 @@ public class Api {
    *
    * @param apiData the data retrieved from the API document, ready to be stored in memory
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
-   * @param cache the instantiation of a class that implements the {@link Cache} interface, and will handle the cache
-   * @param logger the instantiaction of a class that implements the {@link Logger} interface, and will handle the logging
+   * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
+   * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
+   * @param fragmentParser instance of a class that implements the {@link FragmentParser} interface, and will handle the JSON to {@link Fragment} conversion.
    * @return the usable API object
    */
-  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger) {
+  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger, FragmentParser fragmentParser) {
     this.apiData = apiData;
     this.accessToken = accessToken;
     this.cache = cache;
     this.logger = logger;
+    this.fragmentParser = fragmentParser;
   }
 
   public Logger getLogger() {
@@ -115,6 +123,10 @@ public class Api {
 
   public Cache getCache() {
     return cache;
+  }
+
+  public FragmentParser getFragmentParser() {
+    return fragmentParser;
   }
 
   /**
