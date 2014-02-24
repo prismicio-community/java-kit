@@ -3,6 +3,10 @@ package io.prismic;
 public abstract class DocumentLinkResolver {
   
   public abstract String resolve(Fragment.DocumentLink link);
+  
+  public String getTitle(Fragment.DocumentLink link) {
+    return null;
+  }
 
   public String resolve(Document document) {
     return resolve(asLink(document));

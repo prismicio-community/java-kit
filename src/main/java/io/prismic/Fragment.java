@@ -329,7 +329,7 @@ public interface Fragment {
     }
 
     public String asHtml(DocumentLinkResolver linkResolver) {
-      return ("<a href=\"" + linkResolver.resolve(this) + "\">" + slug + "</a>");
+      return ("<a " + (linkResolver.getTitle(this) == null ? "" : "title=\"" + linkResolver.getTitle(this) + "\" ") + "href=\"" + linkResolver.resolve(this) + "\">" + slug + "</a>");
     }
 
     // --
@@ -767,92 +767,90 @@ public interface Fragment {
     }
 
     class Tuple<X, Y> { 
-        public final X x; 
-        public final Y y; 
-        public Tuple(X x, Y y) { 
-            this.x = x; 
-            this.y = y; 
-        } 
+      public final X x; 
+      public final Y y; 
+      public Tuple(X x, Y y) { 
+        this.x = x; 
+        this.y = y; 
+      } 
     } 
 
-      private Tuple<String,String> getStartAndEnd(Span span, DocumentLinkResolver linkResolver) {
-          if(span instanceof Span.Strong) {
-              return new Tuple("<strong>", "</strong>");
-          }
-          if(span instanceof Span.Em) {
-              return new Tuple("<em>", "</em>");
-          }
-          if(span instanceof Span.Hyperlink) {
-              Span.Hyperlink hyperlink = (Span.Hyperlink)span;
-              if(hyperlink.link instanceof WebLink) {
-                  WebLink webLink = (WebLink)hyperlink.getLink();
-                  return new Tuple("<a href=\""+ webLink.getUrl() + "\">", "</a>");
-              }
-              else if(hyperlink.link instanceof FileLink) {
-                  FileLink fileLink = (FileLink)hyperlink.getLink();
-                  return new Tuple("<a href=\""+ fileLink.getUrl() + "\">", "</a>");
-              }
-              else if(hyperlink.link instanceof ImageLink) {
-                  ImageLink imageLink = (ImageLink)hyperlink.getLink();
-                  return new Tuple("<a href=\""+ imageLink.getUrl() + "\">", "</a>");
-              }
-              else if(hyperlink.link instanceof Link.DocumentLink) {
-                  DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
-                  String url = linkResolver.resolveLink(documentLink);
-                  return new Tuple("<a href=\""+ url+ "\">", "</a>");
-              }
-          }
-          return new Tuple("","");
+    private Tuple<String,String> getStartAndEnd(Span span, DocumentLinkResolver linkResolver) {
+      if(span instanceof Span.Strong) {
+        return new Tuple("<strong>", "</strong>");
+      }
+      if(span instanceof Span.Em) {
+        return new Tuple("<em>", "</em>");
+      }
+      if(span instanceof Span.Hyperlink) {
+        Span.Hyperlink hyperlink = (Span.Hyperlink)span;
+        if(hyperlink.link instanceof WebLink) {
+          WebLink webLink = (WebLink)hyperlink.getLink();
+          return new Tuple("<a href=\""+ webLink.getUrl() + "\">", "</a>");
+        }
+        else if(hyperlink.link instanceof FileLink) {
+          FileLink fileLink = (FileLink)hyperlink.getLink();
+          return new Tuple("<a href=\""+ fileLink.getUrl() + "\">", "</a>");
+        }
+        else if(hyperlink.link instanceof ImageLink) {
+          ImageLink imageLink = (ImageLink)hyperlink.getLink();
+          return new Tuple("<a href=\""+ imageLink.getUrl() + "\">", "</a>");
+        }
+        else if(hyperlink.link instanceof Link.DocumentLink) {
+          DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
+          String url = linkResolver.resolveLink(documentLink);
+          return new Tuple("<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\">", "</a>");
+        }
+      }
+      return new Tuple("","");
     }
 
     Integer peekStart(Stack<Span> span){
-
-        return span.empty()? Integer.MAX_VALUE : span.peek().getStart();
-
+      return span.empty()? Integer.MAX_VALUE : span.peek().getStart();
     }
+
     Integer peekEnd(Stack<Span> span){
-
-        return span.empty()? Integer.MAX_VALUE : span.peek().getEnd();
-
+      return span.empty()? Integer.MAX_VALUE : span.peek().getEnd();
     }
-    public String asHtml(String text, List<Span> spans, DocumentLinkResolver linkResolver) {
-        Stack<Span> starts = new Stack<Span>();
-        for(int i = spans.size() - 1; i >= 0; i--) {
-            starts.add(spans.get(i));
-        }
-        Stack<Span> endings = new Stack<Span>();
-        StringBuffer result = new StringBuffer();
-        Integer pos = 0;
 
-        if(!spans.isEmpty()) {
-            while(!(starts.empty() && endings.empty())){
-                int next = Math.min(peekStart(starts), peekEnd(endings));
-                if(next > pos){
-                    result.append(text.substring(0,next-pos));
-                    text = text.substring(next-pos);
-                    pos = next;
-                }
-                else{
-                    StringBuffer spansToApply = new StringBuffer();
-                    while(Math.min(peekStart(starts), peekEnd(endings)) == pos){
-                        // Always close endings before looking into starts
-                        if (!endings.empty() && endings.peek().getEnd() == pos){
-                            spansToApply.append(getStartAndEnd(endings.pop(), linkResolver).y);
-                        }
-                        // Once we closed Endings we add starts and we add their endings to Endings
-                        else if (!starts.empty() && starts.peek().getStart() == pos) {
-                            Span start = starts.pop();
-                            endings.push(start);
-                            spansToApply.append(getStartAndEnd(start, linkResolver).x);
-                        }
-                    }
-                    result.append(spansToApply);
-                }
+    public String asHtml(String text, List<Span> spans, DocumentLinkResolver linkResolver) {
+      Stack<Span> starts = new Stack<Span>();
+      for(int i = spans.size() - 1; i >= 0; i--) {
+        starts.add(spans.get(i));
+      }
+      Stack<Span> endings = new Stack<Span>();
+      StringBuffer result = new StringBuffer();
+      Integer pos = 0;
+
+      if(!spans.isEmpty()) {
+        while(!(starts.empty() && endings.empty())){
+          int next = Math.min(peekStart(starts), peekEnd(endings));
+          if(next > pos){
+            result.append(text.substring(0,next-pos));
+            text = text.substring(next-pos);
+            pos = next;
+          }
+          else{
+            StringBuffer spansToApply = new StringBuffer();
+            while(Math.min(peekStart(starts), peekEnd(endings)) == pos){
+              // Always close endings before looking into starts
+              if (!endings.empty() && endings.peek().getEnd() == pos){
+                spansToApply.append(getStartAndEnd(endings.pop(), linkResolver).y);
+              }
+              // Once we closed Endings we add starts and we add their endings to Endings
+              else if (!starts.empty() && starts.peek().getStart() == pos) {
+                Span start = starts.pop();
+                endings.push(start);
+                spansToApply.append(getStartAndEnd(start, linkResolver).x);
+              }
             }
-            return result.toString() + (text.length() > 0 ? text : "");
-        } else {
-            return text;
+            result.append(spansToApply);
+          }
         }
+        return result.toString() + (text.length() > 0 ? text : "");
+      } else {
+        return text;
+      }
     }
 
     public String asHtml(DocumentLinkResolver linkResolver) {
