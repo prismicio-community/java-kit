@@ -180,9 +180,9 @@ public interface Fragment {
 
     public String asHtml() {
       return ("<div data-oembed=\"" + url + "\" data-oembed-type=\"" + type.toLowerCase() + "\" data-oembed-provider=\"" + provider.toLowerCase() + "\">" + html + "</div>");
-    } 
+    }
 
-    // -- 
+    // --
 
     static Embed parse(JsonNode json) {
       JsonNode oembedJson = json.with("oembed");
@@ -357,11 +357,15 @@ public interface Fragment {
       private final String url;
       private final int width;
       private final int height;
+      private final String alt;
+      private final String copyright;
 
-      public View(String url, int width, int height) {
+      public View(String url, int width, int height, String alt, String copyright) {
         this.url = url;
         this.width = width;
         this.height = height;
+        this.alt = alt;
+        this.copyright = copyright;
       }
 
       public String getUrl() {
@@ -376,12 +380,20 @@ public interface Fragment {
         return height;
       }
 
+      public String getAlt() {
+        return alt;
+      }
+
+      public String getCopyright() {
+        return copyright;
+      }
+
       public double ratio() {
         return width / height;
       }
 
       public String asHtml() {
-        return ("<img src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\">");
+        return ("<img src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" alt=\"" + alt + "\">");
       }
 
       //
@@ -390,7 +402,9 @@ public interface Fragment {
         String url = json.path("url").asText();
         int width = json.with("dimensions").path("width").intValue();
         int height = json.with("dimensions").path("height").intValue();
-        return new View(url, width, height);
+        String alt = json.path("alt").asText();
+        String copyright = json.path("copyright").asText();
+        return new View(url, width, height, alt, copyright);
       }
 
     }
@@ -766,14 +780,14 @@ public interface Fragment {
       return "";
     }
 
-    class Tuple<X, Y> { 
-      public final X x; 
-      public final Y y; 
-      public Tuple(X x, Y y) { 
-        this.x = x; 
-        this.y = y; 
-      } 
-    } 
+    class Tuple<X, Y> {
+      public final X x;
+      public final Y y;
+      public Tuple(X x, Y y) {
+        this.x = x;
+        this.y = y;
+      }
+    }
 
     private Tuple<String,String> getStartAndEnd(Span span, DocumentLinkResolver linkResolver) {
       if(span instanceof Span.Strong) {
