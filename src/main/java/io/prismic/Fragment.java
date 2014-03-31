@@ -693,21 +693,21 @@ public interface Fragment {
       return null;
     }
 
-    private static class Group {
+    private static class BlockGroup {
       final String tag;
       final List<Block> blocks;
 
-      public Group(String tag, List<Block> blocks) {
+      public BlockGroup(String tag, List<Block> blocks) {
         this.tag = tag;
         this.blocks = blocks;
       }
     }
 
     public String asHtml(List<Block> blocks, DocumentLinkResolver linkResolver) {
-      List<Group> groups = new ArrayList<Group>();
+      List<BlockGroup> blockGroups = new ArrayList<BlockGroup>();
       for(Block block: blocks) {
-        if(groups.size() > 0) {
-          Group lastOne = groups.get(groups.size() - 1);
+        if(blockGroups.size() > 0) {
+          BlockGroup lastOne = blockGroups.get(blockGroups.size() - 1);
           if("ul".equals(lastOne.tag) && block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
             lastOne.blocks.add(block);
           }
@@ -715,36 +715,36 @@ public interface Fragment {
             lastOne.blocks.add(block);
           }
           else if(block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
-            Group newGroup = new Group("ul", new ArrayList<Block>());
-            newGroup.blocks.add(block);
-            groups.add(newGroup);
+            BlockGroup newBlockGroup = new BlockGroup("ul", new ArrayList<Block>());
+            newBlockGroup.blocks.add(block);
+            blockGroups.add(newBlockGroup);
           }
           else if(block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
-            Group newGroup = new Group("ol", new ArrayList<Block>());
-            newGroup.blocks.add(block);
-            groups.add(newGroup);
+            BlockGroup newBlockGroup = new BlockGroup("ol", new ArrayList<Block>());
+            newBlockGroup.blocks.add(block);
+            blockGroups.add(newBlockGroup);
           }
           else {
-            Group newGroup = new Group(null, new ArrayList<Block>());
-            newGroup.blocks.add(block);
-            groups.add(newGroup);
+            BlockGroup newBlockGroup = new BlockGroup(null, new ArrayList<Block>());
+            newBlockGroup.blocks.add(block);
+            blockGroups.add(newBlockGroup);
           }
         } else {
-          Group newGroup = new Group(null, new ArrayList<Block>());
-          newGroup.blocks.add(block);
-          groups.add(newGroup);
+          BlockGroup newBlockGroup = new BlockGroup(null, new ArrayList<Block>());
+          newBlockGroup.blocks.add(block);
+          blockGroups.add(newBlockGroup);
         }
       }
       StringBuilder html = new StringBuilder();
-      for(Group group: groups) {
-        if(group.tag != null) {
-          html.append("<" + group.tag + ">");
-          for(Block block: group.blocks) {
+      for(BlockGroup blockGroup: blockGroups) {
+        if(blockGroup.tag != null) {
+          html.append("<" + blockGroup.tag + ">");
+          for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver));
           }
-          html.append("</" + group.tag + ">");
+          html.append("</" + blockGroup.tag + ">");
         } else {
-          for(Block block: group.blocks) {
+          for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver));
           }
         }
