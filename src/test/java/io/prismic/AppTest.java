@@ -12,6 +12,7 @@ public class AppTest
 {
 
   Api lbc_api;
+  Api micro_api;
 
   /**
    * Create the test case
@@ -22,6 +23,7 @@ public class AppTest
   {
     super( testName );
     this.lbc_api = Api.get("https://lesbonneschoses.prismic.io/api");
+    this.micro_api = Api.get("https://micro.prismic.io/api");
   }
 
   /**
@@ -98,6 +100,40 @@ public class AppTest
       "HTML serialization of article \"Get the right approach to ganache\"",
       article2_expected,
       article2_retrieved
+    );
+  }
+
+  public void testGroupFragments() {
+    Document docchapter = micro_api.getForm("everything")
+      .query("[[:d = at(document.type, \"docchapter\")]]")
+      .set("orderings", "[my.docchapter.priority]")
+      .ref(micro_api.getMaster())
+      .submit().get(0);
+    String docchapter_retrieved = docchapter.asHtml(new DocumentLinkResolver() {
+        public String resolve(Fragment.DocumentLink link) {
+          return "/"+link.getId()+"/"+link.getSlug();
+        }
+      });
+    String docchapter_expected = "<section data-field=\"docchapter.title\"><h1>Using meta-micro with other projects</h1></section>\n"
+      +"<section data-field=\"docchapter.intro\"><p>As advertised, meta-micro knows how to stay out of the way of the rest of your application. Here are some cases of how to use it with some of the most used open-source projects in JavaScript.</p></section>\n"
+      +"<section data-field=\"docchapter.priority\"><span class=\"number\">500.0</span></section>\n"
+      +"<section data-field=\"docchapter.docs\"><section data-field=\"linktodoc\"><a href=\"/UrDofwEAALAdpbNH/with-jquery\">with-jquery</a></section><section data-field=\"linktodoc\"><a href=\"/UrDp8AEAAPUdpbNL/with-bootstrap\">with-bootstrap</a></section></section>";
+    assertEquals(
+      "HTML serialization of docchapter \"Using meta-micro\"",
+      docchapter_expected,
+      docchapter_retrieved
+    );
+
+    Fragment.Group docchapterGroup = docchapter.getGroup("docchapter.docs");
+    assertTrue(
+      "Group finds the proper amount of elements",
+      docchapterGroup.toMapList().size() == 2
+    );
+
+    assertEquals(
+      "Properly browsing the group until inside a subfragment",
+      ((Fragment.DocumentLink)docchapterGroup.toMapList().get(0).get("linktodoc")).getId(),
+      "UrDofwEAALAdpbNH"
     );
   }
 }

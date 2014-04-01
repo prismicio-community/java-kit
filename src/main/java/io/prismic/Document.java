@@ -163,6 +163,9 @@ public class Document {
     else if(fragment != null && fragment instanceof Fragment.DocumentLink) {
       return ((Fragment.DocumentLink)fragment).asHtml(linkResolver);
     }
+    else if(fragment != null && fragment instanceof Fragment.Group) {
+      return ((Fragment.Group)fragment).asHtml(linkResolver);
+    }
     return "";
   }
 
@@ -242,6 +245,14 @@ public class Document {
       }
     }
     return false;
+  }
+
+  public Fragment.Group getGroup(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Group) {
+      return (Fragment.Group)fragment;
+    }
+    return null;
   }
 
   public String asHtml(DocumentLinkResolver linkResolver) {
