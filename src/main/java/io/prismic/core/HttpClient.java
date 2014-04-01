@@ -15,36 +15,48 @@ public class HttpClient {
     try {
 
       JsonNode cachedResult = cache.get(url);
-      if(cachedResult != null) {
+      if (cachedResult != null) {
         return cachedResult;
       }
 
       URLConnection connection = new URL(url).openConnection();
-      HttpURLConnection httpConnection = (HttpURLConnection)connection;
+      HttpURLConnection httpConnection = (HttpURLConnection) connection;
       InputStream response;
 
       connection.setRequestProperty("Accept", "application/json");
-
       try {
         logger.log("DEBUG", "Making request: " + url);
         response = connection.getInputStream();
-        if(httpConnection.getResponseCode() == 200) {
+        if (httpConnection.getResponseCode() == 200) {
           JsonNode value = new ObjectMapper().readTree(response);
-
           String cacheHeader = httpConnection.getHeaderField("Cache-Control");
-          if(cacheHeader != null && cacheHeader.matches("max-age=\\d+")) {
+          if (cacheHeader != null && cacheHeader.matches("max-age=\\d+")) {
             Long expiration = System.currentTimeMillis() + Long.parseLong(cacheHeader.substring(8)) * 1000;
             cache.set(url, expiration, value);
           }
 
           return value;
         } else {
-          throw new Exception("Oops)");
+          throw new Exception("Oops");
         }
-      } catch(Exception e) {
-        throw new Exception("Got an HTTP error " + httpConnection.getResponseCode() + " (" + httpConnection.getResponseMessage() + ")");
+      } catch (Exception e) {
+        JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
+        String errorText = errorJson.get("error").asText();
+        switch(httpConnection.getResponseCode()) {
+          case 401:
+            if ("Invalid access token".equals(errorText)) {
+              throw new Api.Error(Api.Error.Code.INVALID_TOKEN, errorText);
+            } else {
+              throw new Api.Error(Api.Error.Code.AUTHORIZATION_NEEDED, errorText);
+            }
+          default:
+            throw new Exception("Got an HTTP error " + httpConnection.getResponseCode() + " (" + httpConnection.getResponseMessage() + ")");
+        }
       }
-
+    } catch(Api.Error e) {
+      throw e;
+    } catch (MalformedURLException e) {
+      throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
     } catch(Exception e) {
       throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
     }
