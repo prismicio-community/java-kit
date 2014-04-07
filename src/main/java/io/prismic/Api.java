@@ -17,9 +17,10 @@ public class Api {
   public static class Error extends RuntimeException {
 
     public enum Code {
+      MALFORMED_URL,
       AUTHORIZATION_NEEDED, 
-      INVALID_TOKEN, 
-      UNEXPECTED 
+      INVALID_TOKEN,
+      UNEXPECTED
     }
 
     final private Code code;

@@ -10,7 +10,7 @@ You can find this library in our own Maven repository (hosted on Github).
 <repository>
   <id>prismicio</id>
   <name>prismic.io Repository</name>
-  <url>https://github.com/prismicio/repository/raw/master/maven/</url>
+  <url>https://s3.amazonaws.com/prismic-maven-kits/repository/maven/</url>
 </repository>
 ```
 
@@ -20,7 +20,7 @@ The kit coordinates are:
 <dependency>
   <groupId>io.prismic</groupId>
   <artifactId>java-kit</artifactId>
-  <version>1.0-M7</version>
+  <version>1.0-M7-SNAPSHOT</version>
 </dependency>
 ```
 
