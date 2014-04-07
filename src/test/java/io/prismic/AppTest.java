@@ -100,4 +100,22 @@ public class AppTest
       article2_retrieved
     );
   }
+
+  public void testPreformattedSerialization() {
+    Document installingMetaMicro = micro_api.getForm("everything")
+      .query("[[:d = at(document.id, \"UrDejAEAAFwMyrW9\")]]")
+      .ref(micro_api.getMaster())
+      .submit().get(0);
+    String retrieved = installingMetaMicro.getStructuredText("doc.content").asHtml(new DocumentLinkResolver() {
+        public String resolve(Fragment.DocumentLink link) {
+          return "/"+link.getId()+"/"+link.getSlug();
+        }
+      });
+    String expected = "<p>Meta-micro gets installed pretty much like any javascript library:</p><ol><li><a href=\"/Uqp2hAEAALk9kmkR/download-meta-micro\">download</a> the .js file: get the minified one, unless the framework you're using minifies your .js files automatically.</li><li>add a link towards the file in your webpage's head.</li></ol><p>The link might look like this, anywhere inside your head tag:</p><pre><script type=\"text/javascript\" src=\"meta-micro.min.js\"></script></pre><p>You're all set!</p>";
+    assertEquals(
+      "Properly performs serialization of a preformatted text block",
+      expected,
+      retrieved
+    );
+  }
 }
