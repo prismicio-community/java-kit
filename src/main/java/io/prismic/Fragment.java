@@ -706,30 +706,24 @@ public interface Fragment {
     public String asHtml(List<Block> blocks, DocumentLinkResolver linkResolver) {
       List<Group> groups = new ArrayList<Group>();
       for(Block block: blocks) {
-        if(groups.size() > 0) {
-          Group lastOne = groups.get(groups.size() - 1);
-          if("ul".equals(lastOne.tag) && block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
-            lastOne.blocks.add(block);
-          }
-          else if("ol".equals(lastOne.tag) && block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
-            lastOne.blocks.add(block);
-          }
-          else if(block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
-            Group newGroup = new Group("ul", new ArrayList<Block>());
-            newGroup.blocks.add(block);
-            groups.add(newGroup);
-          }
-          else if(block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
-            Group newGroup = new Group("ol", new ArrayList<Block>());
-            newGroup.blocks.add(block);
-            groups.add(newGroup);
-          }
-          else {
-            Group newGroup = new Group(null, new ArrayList<Block>());
-            newGroup.blocks.add(block);
-            groups.add(newGroup);
-          }
-        } else {
+        Group lastOne = groups.isEmpty() ? null : groups.get(groups.size() - 1);
+        if(lastOne != null && "ul".equals(lastOne.tag) && block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
+          lastOne.blocks.add(block);
+        }
+        else if(lastOne != null && "ol".equals(lastOne.tag) && block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
+          lastOne.blocks.add(block);
+        }
+        else if(block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
+          Group newGroup = new Group("ul", new ArrayList<Block>());
+          newGroup.blocks.add(block);
+          groups.add(newGroup);
+        }
+        else if(block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
+          Group newGroup = new Group("ol", new ArrayList<Block>());
+          newGroup.blocks.add(block);
+          groups.add(newGroup);
+        }
+        else {
           Group newGroup = new Group(null, new ArrayList<Block>());
           newGroup.blocks.add(block);
           groups.add(newGroup);
