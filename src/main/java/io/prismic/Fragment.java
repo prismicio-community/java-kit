@@ -2,6 +2,8 @@ package io.prismic;
 
 import java.util.*;
 
+import java.lang.StringBuffer;
+
 import org.joda.time.*;
 import org.joda.time.format.*;
 
@@ -693,20 +695,20 @@ public interface Fragment {
       return null;
     }
 
-    private static class Group {
+    private static class BlockGroup {
       final String tag;
       final List<Block> blocks;
 
-      public Group(String tag, List<Block> blocks) {
+      public BlockGroup(String tag, List<Block> blocks) {
         this.tag = tag;
         this.blocks = blocks;
       }
     }
 
     public String asHtml(List<Block> blocks, DocumentLinkResolver linkResolver) {
-      List<Group> groups = new ArrayList<Group>();
+      List<BlockGroup> blockGroups = new ArrayList<BlockGroup>();
       for(Block block: blocks) {
-        Group lastOne = groups.isEmpty() ? null : groups.get(groups.size() - 1);
+        BlockGroup lastOne = blockGroups.isEmpty() ? null : blockGroups.get(blockGroups.size() - 1);
         if(lastOne != null && "ul".equals(lastOne.tag) && block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
           lastOne.blocks.add(block);
         }
@@ -714,31 +716,31 @@ public interface Fragment {
           lastOne.blocks.add(block);
         }
         else if(block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
-          Group newGroup = new Group("ul", new ArrayList<Block>());
-          newGroup.blocks.add(block);
-          groups.add(newGroup);
+          BlockGroup newBlockGroup = new BlockGroup("ul", new ArrayList<Block>());
+          newBlockGroup.blocks.add(block);
+          blockGroups.add(newBlockGroup);
         }
         else if(block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
-          Group newGroup = new Group("ol", new ArrayList<Block>());
-          newGroup.blocks.add(block);
-          groups.add(newGroup);
+          BlockGroup newBlockGroup = new BlockGroup("ol", new ArrayList<Block>());
+          newBlockGroup.blocks.add(block);
+          blockGroups.add(newBlockGroup);
         }
         else {
-          Group newGroup = new Group(null, new ArrayList<Block>());
-          newGroup.blocks.add(block);
-          groups.add(newGroup);
+          BlockGroup newBlockGroup = new BlockGroup(null, new ArrayList<Block>());
+          newBlockGroup.blocks.add(block);
+          blockGroups.add(newBlockGroup);
         }
       }
       StringBuilder html = new StringBuilder();
-      for(Group group: groups) {
-        if(group.tag != null) {
-          html.append("<" + group.tag + ">");
-          for(Block block: group.blocks) {
+      for(BlockGroup blockGroup: blockGroups) {
+        if(blockGroup.tag != null) {
+          html.append("<" + blockGroup.tag + ">");
+          for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver));
           }
-          html.append("</" + group.tag + ">");
+          html.append("</" + blockGroup.tag + ">");
         } else {
-          for(Block block: group.blocks) {
+          for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver));
           }
         }
@@ -983,6 +985,95 @@ public interface Fragment {
         }
       }
       return new StructuredText(blocks);
+    }
+
+  }
+
+  /**
+   * Represents a Group fragment.
+   */
+  public static class Group implements Fragment {
+    private final List<Map<String, Fragment>> fragmentMapList;
+
+    public Group(List<Map<String, Fragment>> fragmentMapList) {
+      this.fragmentMapList = fragmentMapList;
+    }
+
+    /**
+     * Turning the Group as a List of Map of Fragment objects.
+     * This is the way to access and manipulate the sub-fragments.
+     *
+     * @return the usable list of map of fragments.
+     */
+    public List<Map<String, Fragment>> toMapList() {
+      return this.fragmentMapList;
+    }
+
+    public String asHtml(DocumentLinkResolver linkResolver) {
+      StringBuffer sb = new StringBuffer();
+      for(Map<String, Fragment> fragmentMap : fragmentMapList) {
+        for(String fragmentName : fragmentMap.keySet()) {
+          sb.append("<section data-field=\""+fragmentName+"\">");
+          Fragment fragment = fragmentMap.get(fragmentName);
+          if(fragment != null && fragment instanceof Fragment.StructuredText) {
+            sb.append(((Fragment.StructuredText)fragment).asHtml(linkResolver));
+          }
+          else if(fragment != null && fragment instanceof Fragment.Number) {
+            sb.append(((Fragment.Number)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.Color) {
+            sb.append(((Fragment.Color)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.Text) {
+            sb.append(((Fragment.Text)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.Date) {
+            sb.append(((Fragment.Date)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.Embed) {
+            sb.append(((Fragment.Embed)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.Image) {
+            sb.append(((Fragment.Image)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.WebLink) {
+            sb.append(((Fragment.WebLink)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.DocumentLink) {
+            sb.append(((Fragment.DocumentLink)fragment).asHtml(linkResolver));
+          }
+          sb.append("</section>");
+        }
+      }
+      return sb.toString();
+    }
+
+    // --
+
+    /**
+     * Static method to parse JSON into a proper Fragment.Group object.
+     *
+     * @param json the Jackson json node
+     * @param fragmentParser the fragment parser passed from the Api object, needed to parse the sub-fragment
+     * @return the properly initialized Fragment.Group object
+     */
+    static Group parse(JsonNode json, FragmentParser fragmentParser) {
+      List<Map<String, Fragment>> fragmentMapList = new ArrayList<Map<String, Fragment>>();
+      for(JsonNode groupJson : json) {
+        // each groupJson looks like this: { "somelink" : { "type" : "Link.document", { ... } }, "someimage" : { ... } }
+        Iterator<String> dataJson = groupJson.fieldNames();
+        Map<String, Fragment> fragmentMap = new HashMap<String, Fragment>();
+        while (dataJson.hasNext()) {
+          String field = dataJson.next();
+          JsonNode fieldJson = groupJson.path(field);
+          String fragmentType = fieldJson.path("type").asText();
+          JsonNode fragmentValue = fieldJson.path("value");
+          Fragment fragment = fragmentParser.parse(fragmentType, fragmentValue);
+          if (fragment != null) fragmentMap.put(field, fragment);
+        }
+        fragmentMapList.add(fragmentMap);
+      }
+      return new Group(fragmentMapList);
     }
 
   }
