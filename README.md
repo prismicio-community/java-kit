@@ -4,7 +4,7 @@
 
 ### Install the kit for your project through [Maven](http://maven.apache.org/)
 
-You can find this library in our own Maven repository (hosted on Github).
+You can find this library in our own Maven repository (hosted on S3).
 
 ```
 <repository>
