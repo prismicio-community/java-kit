@@ -114,7 +114,7 @@ public class AppTest
           return "/"+link.getId()+"/"+link.getSlug();
         }
       });
-    String docchapter_expected = "<section data-field=\"docchapter.title\"><h1>Using meta-micro with other projects</h1></section>\n"
+    String docchapter_expected = "<section data-field=\"docchapter.title\"><h1>Using with other projects</h1></section>\n"
       +"<section data-field=\"docchapter.intro\"><p>As advertised, meta-micro knows how to stay out of the way of the rest of your application. Here are some cases of how to use it with some of the most used open-source projects in JavaScript.</p></section>\n"
       +"<section data-field=\"docchapter.priority\"><span class=\"number\">500.0</span></section>\n"
       +"<section data-field=\"docchapter.docs\"><section data-field=\"linktodoc\"><a href=\"/UrDofwEAALAdpbNH/with-jquery\">with-jquery</a></section><section data-field=\"linktodoc\"><a href=\"/UrDp8AEAAPUdpbNL/with-bootstrap\">with-bootstrap</a></section></section>";
@@ -147,7 +147,7 @@ public class AppTest
           return "/"+link.getId()+"/"+link.getSlug();
         }
       });
-    String expected = "<p>Meta-micro gets installed pretty much like any javascript library:</p><ol><li><a href=\"/Uqp2hAEAALk9kmkR/download-meta-micro\">download</a> the .js file: get the minified one, unless the framework you're using minifies your .js files automatically.</li><li>add a link towards the file in your webpage's head.</li></ol><p>The link might look like this, anywhere inside your head tag:</p><pre><script type=\"text/javascript\" src=\"meta-micro.min.js\"></script></pre><p>You're all set!</p>";
+    String expected = "<p>Meta-micro gets installed pretty much like any javascript library:</p><ol><li><a href=\"/U0w8OwEAACoAQEvB/download-meta-micro\">download</a> the .js file: get the minified one, unless the framework you're using minifies your .js files automatically.</li><li>add a link towards the file in your webpage's head.</li></ol><p>The link might look like this, anywhere inside your head tag:</p><pre><script type=\"text/javascript\" src=\"meta-micro.min.js\"></script></pre><p>You're all set!</p>";
     assertEquals(
       "Properly performs serialization of a preformatted text block",
       expected,
