@@ -31,7 +31,7 @@ public class HttpClient {
           JsonNode value = new ObjectMapper().readTree(response);
           String cacheHeader = httpConnection.getHeaderField("Cache-Control");
           if (cacheHeader != null && cacheHeader.matches("max-age=\\d+")) {
-            Long expiration = System.currentTimeMillis() + Long.parseLong(cacheHeader.substring(8)) * 1000;
+            Long expiration = Long.parseLong(cacheHeader.substring(8)) * 1000;
             cache.set(url, expiration, value);
           }
 

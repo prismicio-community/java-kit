@@ -46,16 +46,25 @@ public class Api {
    * Entry point to get an {@link API} object.
    * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null, new Cache.BuiltInCache(999), new Logger.PrintlnLogger());</code>
    *
-   * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
+   * @param endpoint the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
    * @param fragmentParser instance of a class that implements the {@link FragmentParser} interface, and will handle the JSON to {@link Fragment} conversion.
    * @return the usable API object
    */
-  public static Api get(String url, String accessToken, Cache cache, Logger logger, FragmentParser fragmentParser) {
-    String fetchUrl = (accessToken == null ? url : (url + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
-    JsonNode json = HttpClient.fetch(fetchUrl, logger, cache);
+  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger, FragmentParser fragmentParser) {
+    final String url = (accessToken == null ? endpoint : (endpoint + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
+    JsonNode json = cache.getOrSet(
+        url,
+        5000L,
+        new Cache.Callback() {
+            public JsonNode execute() {
+                return HttpClient.fetch(url, logger, cache);
+            }
+        }
+    );
+
     ApiData apiData = ApiData.parse(json);
     return new Api(apiData, accessToken, cache, logger, fragmentParser);
   }
@@ -73,7 +82,7 @@ public class Api {
    * @return the usable API object
    */
   public static Api get(String url, String accessToken) {
-    return get(url, accessToken, new Cache.NoCache(), new Logger.NoLogger());
+      return get(url, accessToken, Cache.DefaultCache.getInstance(), new Logger.NoLogger());
   }
 
   /**
