@@ -221,4 +221,27 @@ public class AppTest
       "https://lesbonneschoses.prismic.io/api/documents/search?ref=UkL0hcuvzYUANCrm&page=1&pageSize=20"
     );
   }
+
+  public void testSearchFormFunctions() {
+    Documents docsInt = lbc_api.getForm("everything").pageSize(15).page(2).ref(lbc_api.getMaster()).submit();
+    assertTrue(
+      "The page and pageSize functions work well with an integer",
+      docsInt.getPage() == 2
+        && docsInt.getResultsPerPage() == 15
+        && docsInt.getResults().size() == 15
+    );
+    Documents docsStr = lbc_api.getForm("everything").pageSize("15").page("2").ref(lbc_api.getMaster()).submit();
+    assertTrue(
+      "The page and pageSize functions work well with a String",
+      docsStr.getPage() == 2
+        && docsStr.getResultsPerPage() == 15
+        && docsStr.getResults().size() == 15
+    );
+    Documents orderedProducts = lbc_api.getForm("products").orderings("[my.product.price]").ref(lbc_api.getMaster()).submit();
+    assertEquals(
+      "The orderings work well",
+      orderedProducts.getResults().get(0).getId(),
+      "UkL0gMuvzYUANCpQ"
+    );
+  }
 }

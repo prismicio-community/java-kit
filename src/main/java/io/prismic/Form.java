@@ -219,6 +219,74 @@ public class Form {
       return set("ref", ref);
     }
 
+    /**
+     * Allows to set the size of the pagination of the query's response.
+     *
+     * The default value is 20; a call with a different page size will look like:
+     * <code>api.getForm("everything").pageSize("15").ref(ref).submit();</code>.
+     *
+     * @param pageSize the size of the pagination you wish
+     * @return the current form, in order to chain those calls
+     */
+    public Search pageSize(String pageSize) {
+      return set("pageSize", pageSize);
+    }
+
+    /**
+     * Allows to set the size of the pagination of the query's response.
+     *
+     * The default value is 20; a call with a different page size will look like:
+     * <code>api.getForm("everything").pageSize(15).ref(ref).submit();</code>.
+     *
+     * @param pageSize the size of the pagination you wish
+     * @return the current form, in order to chain those calls
+     */
+    public Search pageSize(int pageSize) {
+      return set("pageSize", pageSize);
+    }
+
+    /**
+     * Allows to set which page you want to get for your query.
+     *
+     * The default value is 1; a call for a different page will look like:
+     * <code>api.getForm("everything").page("2").ref(ref).submit();</code>
+     * (do remember that the default size of a page is 20, you can change it with <code>pageSize</code>)
+     *
+     * @param page the page number
+     * @return the current form, in order to chain those calls
+     */
+    public Search page(String page) {
+      return set("page", page);
+    }
+
+    /**
+     * Allows to set which page you want to get for your query.
+     *
+     * The default value is 1; a call for a different page will look like:
+     * <code>api.getForm("everything").page(2).ref(ref).submit();</code>
+     * (do remember that the default size of a page is 20, you can change it with <code>pageSize</code>)
+     *
+     * @param page the page number
+     * @return the current form, in order to chain those calls
+     */
+    public Search page(int page) {
+      return set("page", page);
+    }
+
+    /**
+     * Allows to set which ordering you want for your query.
+     *
+     * A call will look like:
+     * <code>api.getForm("products").orderings("[my.product.price]").ref(ref).submit();</code>
+     * Read prismic.io's API documentation to learn more about how to write orderings.
+     *
+     * @param orderings the orderings
+     * @return the current form, in order to chain those calls
+     */
+    public Search orderings(String orderings) {
+      return set("orderings", orderings);
+    }
+
     // Temporary hack for Backward compatibility
     private String strip(String q) {
       if(q == null) return "";
