@@ -272,11 +272,7 @@ public class Form {
         }
         JsonNode json = HttpClient.fetch(url.toString(), api.getLogger(), api.getCache());
         Iterator<JsonNode> results = null;
-        if(json.isArray()) {
-          results = json.elements();
-        } else {
-          results = json.path("results").elements();
-        }
+        results = json.path("results").elements();
         List<Document> documents = new ArrayList<Document>();
         while (results.hasNext()) {
           documents.add(Document.parse(results.next(), api.getFragmentParser()));
