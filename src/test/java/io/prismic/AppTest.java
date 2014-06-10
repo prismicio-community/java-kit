@@ -56,7 +56,7 @@ public class AppTest
   public void testApiQueryWorks(){
     assertEquals(
       "SearchForm query does not return the right amount of documents.",
-      lbc_api.getForm("products").ref(lbc_api.getMaster()).submit().size(),
+      lbc_api.getForm("products").ref(lbc_api.getMaster()).submit().getResults().size(),
       16
     );
   }
@@ -70,6 +70,7 @@ public class AppTest
     .query("[[:d = at(document.id, \"UkL0gMuvzYUANCps\")]]")
     .ref(lbc_api.getMaster())
     .submit()
+    .getResults()
     .get(0)
     .asHtml(new DocumentLinkResolver() {
       public String resolve(Fragment.DocumentLink link) {
@@ -89,6 +90,7 @@ public class AppTest
     .query("[[:d = at(document.id, \"UkL0gMuvzYUANCpr\")]]")
     .ref(lbc_api.getMaster())
     .submit()
+    .getResults()
     .get(0)
     .asHtml(new DocumentLinkResolver() {
       public String resolve(Fragment.DocumentLink link) {
@@ -109,7 +111,7 @@ public class AppTest
       .query("[[:d = at(document.type, \"docchapter\")]]")
       .set("orderings", "[my.docchapter.priority]")
       .ref(micro_api.getMaster())
-      .submit().get(0);
+      .submit().getResults().get(0);
     String docchapter_retrieved = docchapter.asHtml(new DocumentLinkResolver() {
         public String resolve(Fragment.DocumentLink link) {
           return "/"+link.getId()+"/"+link.getSlug();
@@ -142,7 +144,7 @@ public class AppTest
     Document installingMetaMicro = micro_api.getForm("everything")
       .query("[[:d = at(document.id, \"UrDejAEAAFwMyrW9\")]]")
       .ref(micro_api.getMaster())
-      .submit().get(0);
+      .submit().getResults().get(0);
     String retrieved = installingMetaMicro.getStructuredText("doc.content").asHtml(new DocumentLinkResolver() {
         public String resolve(Fragment.DocumentLink link) {
           return "/"+link.getId()+"/"+link.getSlug();
