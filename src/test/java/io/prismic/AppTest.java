@@ -157,4 +157,68 @@ public class AppTest
       retrieved
     );
   }
+
+  public void testPagination() {
+    assertEquals(
+      "Page number is right if page 1 requested",
+      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getPage(),
+      1
+    );
+    assertEquals(
+      "Results per page is right if page 1 requested",
+      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getResultsPerPage(),
+      20
+    );
+    assertEquals(
+      "Total results size is right if page 1 requested",
+      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getTotalResultsSize(),
+      40
+    );
+    assertEquals(
+      "Total pages is right if page 1 requested",
+      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getTotalPages(),
+      2
+    );
+    assertEquals(
+      "Next page is right if page 1 requested",
+      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getNextPage(),
+      "https://lesbonneschoses.prismic.io/api/documents/search?ref=UkL0hcuvzYUANCrm&page=2&pageSize=20"
+    );
+    assertEquals(
+      "Previous page is right if page 1 requested",
+      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getPrevPage(),
+      null
+    );
+
+    assertEquals(
+      "Page number is right if page 2 requested",
+      lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getPage(),
+      2
+    );
+    assertEquals(
+      "Results per page is right if page 2 requested",
+      lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getResultsPerPage(),
+      20
+    );
+    assertEquals(
+      "Total results size is right if page 2 requested",
+      lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getTotalResultsSize(),
+      40
+    );
+    assertEquals(
+      "Total pages is right if page 2 requested",
+      lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getTotalPages(),
+      2
+    );
+    assertEquals(
+      "Next page is right if page 2 requested",
+      lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getNextPage(),
+      null
+    );
+    assertEquals(
+      "Previous page is right if page 2 requested",
+      lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getPrevPage(),
+      "https://lesbonneschoses.prismic.io/api/documents/search?ref=UkL0hcuvzYUANCrm&page=1&pageSize=20"
+    );
+  }
 }
