@@ -14,7 +14,7 @@ public class Main {
     products.ref(ref).query("[[:d = at(document.tags, [\"Macaron\"])]]");
     System.out.println(products);
 
-    List<Document> documents = products.submit();
+    List<Document> documents = products.submit().getResults();
 
     for(Document doc: documents) {
       System.out.println(doc + " -> ");
