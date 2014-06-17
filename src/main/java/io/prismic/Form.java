@@ -325,7 +325,7 @@ public class Form {
      *
      * @return the list of documents, that can be directly used as such.
      */
-    public Documents submit() {
+    public Response submit() {
       if("GET".equals(form.getMethod()) && "application/x-www-form-urlencoded".equals(form.getEnctype())) {
         StringBuilder url = new StringBuilder(form.getAction());
         String sep = form.getAction().contains("?") ? "&" : "?";
@@ -339,7 +339,7 @@ public class Form {
           }
         }
         JsonNode json = HttpClient.fetch(url.toString(), api.getLogger(), api.getCache());
-        return Documents.parse(json, api.getFragmentParser());
+        return Response.parse(json, api.getFragmentParser());
       } else {
         throw new Api.Error(Api.Error.Code.UNEXPECTED, "Form type not supported");
       }

@@ -4,7 +4,7 @@ import java.util.*;
 
 import com.fasterxml.jackson.databind.*;
 
-public class Documents {
+public class Response {
 
 	List<Document> results;
 	int page;
@@ -15,7 +15,7 @@ public class Documents {
 	String next_page;
 	String prev_page;
 
-	public Documents(List<Document> results, int page, int results_per_page, int total_results_size, int total_pages, String next_page, String prev_page){
+	public Response(List<Document> results, int page, int results_per_page, int total_results_size, int total_pages, String next_page, String prev_page){
 		this.results = results;
 		this.page = page;
 		this.results_per_page = results_per_page;
@@ -47,14 +47,14 @@ public class Documents {
 		return this.prev_page;
 	}
 
-	static Documents parse(JsonNode json, FragmentParser fragmentParser) {
+	static Response parse(JsonNode json, FragmentParser fragmentParser) {
 		Iterator<JsonNode> resultsJson = null;
 		resultsJson = json.path("results").elements();
 		List<Document> results = new ArrayList<Document>();
 		while (resultsJson.hasNext()) {
 			results.add(Document.parse(resultsJson.next(), fragmentParser));
 		}
-		return new Documents(results,
+		return new Response(results,
 			Integer.parseInt(json.path("page").asText()),
 			Integer.parseInt(json.path("results_per_page").asText()),
 			Integer.parseInt(json.path("total_results_size").asText()),
