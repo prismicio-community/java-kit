@@ -45,6 +45,7 @@ You can find the documentation on [this Javadoc](http://prismicio.github.io/java
 
 Through Java's syntax, this kit contains some mild differences and syntastic sugar over the section of our documentation that tells you [how to use prismic.io kits](https://developers.prismic.io/documentation/UjBe8bGIJ3EKtgBZ/api-documentation#kits-and-helpers) in general (which you should read first). The differences are listed here:
  * Traditional POJO getter-and-setter syntaxes are applied; therefore, one calls a SearchForm like this: ```api.getForm("everything")```
+ * The class usually called `SearchForm` is a nested class here, which is called `Form.Search`.
 
 ### Changelog
 
