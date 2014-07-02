@@ -232,21 +232,21 @@ public class AppTest
   }
 
   public void testSearchFormFunctions() {
-    Documents docsInt = lbc_api.getForm("everything").pageSize(15).page(2).ref(lbc_api.getMaster()).submit();
+    Response docsInt = lbc_api.getForm("everything").pageSize(15).page(2).ref(lbc_api.getMaster()).submit();
     assertTrue(
       "The page and pageSize functions work well with an integer",
       docsInt.getPage() == 2
         && docsInt.getResultsPerPage() == 15
         && docsInt.getResults().size() == 15
     );
-    Documents docsStr = lbc_api.getForm("everything").pageSize("15").page("2").ref(lbc_api.getMaster()).submit();
+    Response docsStr = lbc_api.getForm("everything").pageSize("15").page("2").ref(lbc_api.getMaster()).submit();
     assertTrue(
       "The page and pageSize functions work well with a String",
       docsStr.getPage() == 2
         && docsStr.getResultsPerPage() == 15
         && docsStr.getResults().size() == 15
     );
-    Documents orderedProducts = lbc_api.getForm("products").orderings("[my.product.price]").ref(lbc_api.getMaster()).submit();
+    Response orderedProducts = lbc_api.getForm("products").orderings("[my.product.price]").ref(lbc_api.getMaster()).submit();
     assertEquals(
       "The orderings work well",
       orderedProducts.getResults().get(0).getId(),
