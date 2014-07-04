@@ -45,6 +45,9 @@ public interface FragmentParser {
     else if("Embed".equals(type)) {
       return Fragment.Embed.parse(json);
     }
+    else if("GeoPoint".equals(type)) {
+        return Fragment.GeoPoint.parse(json);
+    }
     else if("Group".equals(type)) {
       return Fragment.Group.parse(json, this);
     }

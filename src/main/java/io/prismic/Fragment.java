@@ -131,6 +131,40 @@ public interface Fragment {
 
   }
 
+    // -- GeoPoint
+
+    public static class GeoPoint implements Fragment {
+
+        private final Double latitude;
+        private final Double longitude;
+
+        public GeoPoint(Double latitude, Double longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+
+        public Double getLatitude() {
+            return latitude;
+        }
+
+        public Double getLongitude() {
+            return longitude;
+        }
+
+        // --
+
+        static GeoPoint parse(JsonNode json) {
+            try {
+                Double latitude = json.has("latitude") && json.path("latitude").isNumber() ? json.path("latitude").doubleValue() : null;
+                Double longitude = json.has("longitude") && json.path("longitude").isNumber() ? json.path("longitude").doubleValue() : null;
+                return new GeoPoint(latitude, longitude);
+            } catch(Exception e) {
+                return null;
+            }
+        }
+
+    }
+
   // -- Embed
 
   public static class Embed implements Fragment {

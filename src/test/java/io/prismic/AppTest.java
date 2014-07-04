@@ -253,4 +253,29 @@ public class AppTest
       "UlfoxUnM0wkXYXbK"
     );
   }
+    
+  public void testGetGeoPoint() {
+
+    Document doc = lbc_api.getForm("everything")
+        .query("[[:d = at(document.id, \"UlfoxUnM0wkXYXbb\")]]")
+        .ref(lbc_api.getMaster())
+        .submit()
+        .getResults()
+        .get(0);
+
+    assertNotNull(
+      "The geopoint retrieval work well",
+      doc.getGeoPoint("store.coordinates")
+    );
+    assertEquals(
+      "The geopoint latitude retrieval work well",
+      doc.getGeoPoint("store.coordinates").getLatitude(),
+      48.877108d
+    );
+    assertEquals(
+      "The geopoint longitude retrieval work well",
+      doc.getGeoPoint("store.coordinates").getLongitude(),
+      2.3338790d
+    );
+  }
 }
