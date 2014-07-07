@@ -226,6 +226,14 @@ public class Document {
     return null;
   }
 
+  public Fragment.GeoPoint getGeoPoint(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.GeoPoint) {
+      return (Fragment.GeoPoint)fragment;
+    }
+    return null;
+  }
+
   public String getDate(String field, String pattern) {
     Fragment.Date date = getDate(field);
     if(date != null) {
