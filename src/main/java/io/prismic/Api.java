@@ -161,6 +161,30 @@ public class Api {
   }
 
   /**
+   * From a properly built {@link API} object, returns the map associating the type names to their readable text.
+   *
+   * Therefore, to get a type's readable text, it will look like this: <code>api.getTypes().get("blog")</code>
+   *
+   * @return the map &lt;name, text&gt;
+   */
+  public Map<String,String> getTypes() {
+    return apiData.getTypes();
+  }
+  
+  
+  /**
+   * From a properly built {@link API} object, returns the list of available tags.
+   *
+   * Therefore, to get all available tags, it will look like this: <code>api.getTags()</code>
+   *
+   * @return the list of tags
+   */
+  public List<String> getTags() {
+    return apiData.getTags();
+  }
+
+
+  /**
    * From a properly built {@link API} object, return a Form object that will allow to perform queries.
    * Currently, all the forms offered by prismic.io are SearchForms, but this will change.
    *
