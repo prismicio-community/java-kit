@@ -183,6 +183,17 @@ public class Api {
     return apiData.getTags();
   }
 
+ /**
+  * From a properly built {@link API} object, returns the list of available tags.
+  *
+  * Therefore, to get all available forms to query, it will look like this <code>api.getForms().keySet()</code>
+  *
+  * @return the map &lt;name, form&gt;
+  */
+  public Map<String, Form> getForms() {
+      return apiData.getForms();
+  }
+
 
   /**
    * From a properly built {@link API} object, return a Form object that will allow to perform queries.
