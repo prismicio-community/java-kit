@@ -1,5 +1,7 @@
 package io.prismic;
 
+import java.util.Map;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -252,5 +254,19 @@ public class AppTest
       orderedProducts.getResults().get(0).getId(),
       "UlfoxUnM0wkXYXbK"
     );
+  }
+  
+  public void testFormNames() {
+      Map<String, String> formNames = lbc_api.getFormNames();
+      assertTrue(
+        "The correct number of form names is returned",
+        formNames.size() == 10
+      );
+      
+      assertEquals(
+          "Form names are populated with accurate data",
+          formNames.get("cupcakes"),
+          "Cupcakes"
+      );
   }
 }

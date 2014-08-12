@@ -1,6 +1,7 @@
 package io.prismic;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import io.prismic.core.*;
 
@@ -182,6 +183,19 @@ public class Api {
   public List<String> getTags() {
     return apiData.getTags();
   }
+  
+  /**
+   * From a properly built {@link API} object, returns the Map of available form names.
+   *
+   * @return the map &lt;name, proper_name&gt;
+   */
+  public Map<String, String> getFormNames() {
+      Map<String, String> formNames = new HashMap<String, String>();
+      if (apiData.getForms() != null)
+          for(Entry<String, Form> formEntry : apiData.getForms().entrySet()) 
+              formNames.put(formEntry.getKey(), formEntry.getValue().getName()); 
+      return formNames;
+  }
 
 
   /**
@@ -197,6 +211,7 @@ public class Api {
   public Form.SearchForm getForm(String form) {
     return new Form.SearchForm(this, apiData.getForms().get(form));
   }
+
 
   /**
    * From a properly built {@link API} object, returns the ref ID (points in a prismic.io repository's timeline,
