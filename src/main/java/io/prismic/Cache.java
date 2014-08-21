@@ -21,7 +21,7 @@ public interface Cache {
     }
 
     public JsonNode getOrSet(String key, Long ttl, Callback f) {
-      return null;
+      return f.execute();
     }
 
     public Boolean isExpired(String key) {
@@ -29,7 +29,7 @@ public interface Cache {
     }
 
     public Boolean isPending(String key) {
-      return true;
+      return false;
     }
   }
 

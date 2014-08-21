@@ -12,8 +12,9 @@ public class HttpClient {
   ObjectMapper mapper = new ObjectMapper();
 
   public static JsonNode fetch(String url, Logger logger, Cache cache) {
+    logger = (logger!=null) ? logger : new Logger.NoLogger();
+    cache = (cache!=null) ? cache : new Cache.NoCache();
     try {
-
       JsonNode cachedResult = cache.get(url);
       if (cachedResult != null) {
         return cachedResult;

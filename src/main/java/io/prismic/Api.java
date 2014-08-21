@@ -61,7 +61,7 @@ public class Api {
         5000L,
         new Cache.Callback() {
             public JsonNode execute() {
-                return HttpClient.fetch(url, logger, cache);
+                return HttpClient.fetch(url, logger, null);
             }
         }
     );

@@ -269,4 +269,16 @@ public class AppTest
           "Cupcakes"
       );
   }
+
+ /**
+   * Tests NoCache implementation.
+   */
+  public void testNoCacheImplWorks(){
+    Api api = Api.get("https://lesbonneschoses.prismic.io/api", null, new Cache.NoCache(), null, new FragmentParser.Default());
+    assertEquals(
+      "NoCache implementation should be transparent.",
+      api.getForm("products").ref(api.getMaster()).submit().getResults().size(),
+      16
+    );
+  }
 }
