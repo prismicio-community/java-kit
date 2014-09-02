@@ -1,5 +1,7 @@
 package io.prismic;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -14,6 +16,25 @@ import com.fasterxml.jackson.databind.*;
  * at the very beginning of the webpage, and then used for every subsequent document query.
  */
 public class Api {
+
+  /**
+   * @return the kit version as declared in the pom.xml
+   */
+  public static String getVersion() {
+    String path = "/version.properties";
+    InputStream stream = Api.class.getResourceAsStream(path);
+    if (stream == null) {
+      return "UNKNOWN";
+    }
+    Properties props = new Properties();
+    try {
+      props.load(stream);
+      stream.close();
+      return (String) props.get("version");
+    } catch (IOException e) {
+      return "UNKNOWN";
+    }
+  }
 
   public static class Error extends RuntimeException {
 

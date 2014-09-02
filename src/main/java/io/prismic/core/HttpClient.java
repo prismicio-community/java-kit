@@ -9,8 +9,6 @@ import com.fasterxml.jackson.databind.*;
 
 public class HttpClient {
 
-  ObjectMapper mapper = new ObjectMapper();
-
   public static JsonNode fetch(String url, Logger logger, Cache cache) {
     logger = (logger!=null) ? logger : new Logger.NoLogger();
     cache = (cache!=null) ? cache : new Cache.NoCache();
@@ -25,6 +23,8 @@ public class HttpClient {
       InputStream response;
 
       connection.setRequestProperty("Accept", "application/json");
+      connection.setRequestProperty("User-Agent", "Prismic-java-kit/" + Api.getVersion() + " JVM/" + System.getProperty("java.version"));
+
       try {
         logger.log("DEBUG", "Making request: " + url);
         response = connection.getInputStream();
