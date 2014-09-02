@@ -120,7 +120,7 @@ public class Form {
    * There is one named "everything", that allow to query through the while repository, and there is also one per collection
    * created by prismic.io administrators in the writing-room.
    *
-   * From an {@link API} object, you get a SearchForm form like this: <code>api.getForm("everything");</code>
+   * From an {@link Api} object, you get a SearchForm form like this: <code>api.getForm("everything");</code>
    *
    * Then, from a SearchForm form, you query like this: <code>search.query("[[:d = at(document.type, "Product")]]").ref(ref).submit();</code>
    */
@@ -175,6 +175,9 @@ public class Form {
 
     /**
      * A simple helper to set numeric value; see set(String,String).
+     * @param field the name of the field to set
+     * @param value target value
+     * @return the current form, in order to chain those calls
      */
     public SearchForm set(String field, Integer value) {
       Field fieldDesc = form.getFields().get(field);
@@ -305,6 +308,7 @@ public class Form {
      * Beware: a query is a list of predicates, therefore, it always starts with "[[" and ends with "]]".
      *
      * @param q the query to pass
+     * @return the current form, in order to chain those calls
      */
     public SearchForm query(String q) {
       Field fieldDesc = form.getFields().get("q");

@@ -65,7 +65,7 @@ public class Api {
   // --
 
   /**
-   * Entry point to get an {@link API} object.
+   * Entry point to get an {@link Api} object.
    * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null, new Cache.BuiltInCache(999), new Logger.PrintlnLogger());</code>
    *
    * @param endpoint the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
@@ -96,7 +96,7 @@ public class Api {
   }
 
   /**
-   * Entry point to get an {@link API} object.
+   * Entry point to get an {@link Api} object.
    * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null);</code>
    *
    * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
@@ -108,7 +108,7 @@ public class Api {
   }
 
   /**
-   * Entry point to get an {@link API} object.
+   * Entry point to get an {@link Api} object.
    * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api");</code>
    *
    * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
@@ -127,15 +127,14 @@ public class Api {
   final private FragmentParser fragmentParser;
 
   /**
-   * Constructor to build a proper {@link API} object. This is not to build an {@link API} object
-   * from an {@link API} endpoint (the most usual case). In this case, you'll use the <code>API.get</code> method.
+   * Constructor to build a proper {@link Api} object. This is not to build an {@link Api} object
+   * from an {@link Api} endpoint (the most usual case). In this case, you'll use the <code>API.get</code> method.
    *
    * @param apiData the data retrieved from the API document, ready to be stored in memory
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
    * @param fragmentParser instance of a class that implements the {@link FragmentParser} interface, and will handle the JSON to {@link Fragment} conversion.
-   * @return the usable API object
    */
   public Api(ApiData apiData, String accessToken, Cache cache, Logger logger, FragmentParser fragmentParser) {
     this.apiData = apiData;
@@ -162,7 +161,7 @@ public class Api {
   }
 
   /**
-   * From a properly built {@link API} object, returns the ref IDs (points in a prismic.io repository's timeline,
+   * From a properly built {@link Api} object, returns the ref IDs (points in a prismic.io repository's timeline,
    * whether in the past, in the present, or in the future) to which the passed credentials give access.
    *
    * @return the list of ref IDs
@@ -172,7 +171,7 @@ public class Api {
   }
 
   /**
-   * From a properly built {@link API} object, returns the map associating the bookmark names to their document IDs.
+   * From a properly built {@link Api} object, returns the map associating the bookmark names to their document IDs.
    *
    * Therefore, to get a bookmarked document's ID, it will look like this: <code>api.getBookmarks().get("home")</code>
    *
@@ -183,7 +182,7 @@ public class Api {
   }
 
   /**
-   * From a properly built {@link API} object, returns the map associating the type names to their readable text.
+   * From a properly built {@link Api} object, returns the map associating the type names to their readable text.
    *
    * Therefore, to get a type's readable text, it will look like this: <code>api.getTypes().get("blog")</code>
    *
@@ -195,7 +194,7 @@ public class Api {
   
   
   /**
-   * From a properly built {@link API} object, returns the list of available tags.
+   * From a properly built {@link Api} object, returns the list of available tags.
    *
    * Therefore, to get all available tags, it will look like this: <code>api.getTags()</code>
    *
@@ -206,7 +205,7 @@ public class Api {
   }
   
   /**
-   * From a properly built {@link API} object, returns the Map of available form names.
+   * From a properly built {@link Api} object, returns the Map of available form names.
    *
    * @return the map &lt;name, proper_name&gt;
    */
@@ -220,7 +219,7 @@ public class Api {
 
 
   /**
-   * From a properly built {@link API} object, return a Form object that will allow to perform queries.
+   * From a properly built {@link Api} object, return a Form object that will allow to perform queries.
    * Currently, all the forms offered by prismic.io are SearchForms, but this will change.
    *
    * To use it: <code>api.get("everything").query(.....)......</code>
@@ -235,7 +234,7 @@ public class Api {
 
 
   /**
-   * From a properly built {@link API} object, returns the ref ID (points in a prismic.io repository's timeline,
+   * From a properly built {@link Api} object, returns the ref ID (points in a prismic.io repository's timeline,
    * whether in the past, in the present, or in the future) of the master ref (the one presently live).
    *
    * @return the ref object representing the master ref
