@@ -6,17 +6,7 @@
 
 ### Install the kit for your project through [Maven](http://maven.apache.org/)
 
-You can find this library in our own Maven repository (hosted on S3).
-
-```
-<repository>
-  <id>prismicio</id>
-  <name>prismic.io Repository</name>
-  <url>https://s3.amazonaws.com/prismic-maven-kits/repository/maven/</url>
-</repository>
-```
-
-The kit coordinates are:
+This library is on Maven Central. The kit coordinates are:
 
 ```
 <dependency>
