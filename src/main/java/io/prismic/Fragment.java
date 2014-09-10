@@ -857,22 +857,23 @@ public interface Fragment {
           return customHtml;
         }
       }
+      String classCode = block.getLabel() == null ? "" : (" class=\"" + block.getLabel() + "\"");
       if(block instanceof StructuredText.Block.Heading) {
         StructuredText.Block.Heading heading = (StructuredText.Block.Heading)block;
-        return ("<h" + heading.getLevel() + ">" + content + "</h" + heading.getLevel() + ">");
+        return ("<h" + heading.getLevel() + classCode + ">" + content + "</h" + heading.getLevel() + ">");
       }
       else if(block instanceof StructuredText.Block.Paragraph) {
-        return ("<p>" + content + "</p>");
+        return ("<p" + classCode + ">" + content + "</p>");
       }
       else if(block instanceof StructuredText.Block.Preformatted) {
-        return ("<pre>" + content + "</pre>");
+        return ("<pre" + classCode + ">" + content + "</pre>");
       }
       else if(block instanceof StructuredText.Block.ListItem) {
-        return ("<li>" + content + "</li>");
+        return ("<li" + classCode + ">" + content + "</li>");
       }
       else if(block instanceof StructuredText.Block.Image) {
         StructuredText.Block.Image image = (StructuredText.Block.Image)block;
-        return ("<p>" + image.getView().asHtml() + "</p>");
+        return ("<p" + classCode + ">" + image.getView().asHtml() + "</p>");
       }
       else if(block instanceof StructuredText.Block.Embed) {
         StructuredText.Block.Embed embed = (StructuredText.Block.Embed)block;
@@ -897,33 +898,34 @@ public interface Fragment {
           return customHtml;
         }
       }
+      String classCode = span.getLabel() == null ? "" : (" class=\"" + span.getLabel() + "\"");
       if (span instanceof Span.Strong) {
-        return "<strong>" + content + "</strong>";
+        return "<strong" + classCode + ">" + content + "</strong>";
       }
       if (span instanceof Span.Em) {
-        return "<em>" + content + "</em>";
+        return "<em" + classCode + ">" + content + "</em>";
       }
       if (span instanceof Span.Hyperlink) {
         Span.Hyperlink hyperlink = (Span.Hyperlink)span;
         if(hyperlink.link instanceof WebLink) {
           WebLink webLink = (WebLink)hyperlink.getLink();
-          return "<a href=\""+ webLink.getUrl() + "\">" + content + "</a>";
+          return "<a href=\""+ webLink.getUrl() + "\""+ classCode +">" + content + "</a>";
         }
         else if(hyperlink.link instanceof FileLink) {
           FileLink fileLink = (FileLink)hyperlink.getLink();
-          return "<a href=\"" + fileLink.getUrl() + "\">" + content + "</a>";
+          return "<a href=\"" + fileLink.getUrl() + "\"" + classCode + ">" + content + "</a>";
         }
         else if(hyperlink.link instanceof ImageLink) {
           ImageLink imageLink = (ImageLink)hyperlink.getLink();
-          return "<a href=\""+ imageLink.getUrl() + "\">" + content + "</a>";
+          return "<a href=\""+ imageLink.getUrl() + "\"" + classCode + ">" + content + "</a>";
         }
         else if(hyperlink.link instanceof Link.DocumentLink) {
           DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
           String url = linkResolver.resolveLink(documentLink);
-          return "<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\">" + content + "</a>";
+          return "<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\"" + classCode + ">" + content + "</a>";
         }
       }
-      return "<span>" + content + "</span>";
+      return "<span" + classCode + ">" + content + "</span>";
     }
 
     private String insertSpans(String text, List<Span> spans, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
