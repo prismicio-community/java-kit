@@ -141,9 +141,13 @@ public class Document {
   }
 
   public String getHtml(String field, DocumentLinkResolver linkResolver) {
+    return getHtml(field, linkResolver, null);
+  }
+
+  public String getHtml(String field, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.StructuredText) {
-      return ((Fragment.StructuredText)fragment).asHtml(linkResolver);
+      return ((Fragment.StructuredText)fragment).asHtml(linkResolver, htmlSerializer);
     }
     else if(fragment != null && fragment instanceof Fragment.Number) {
       return ((Fragment.Number)fragment).asHtml();
@@ -270,10 +274,14 @@ public class Document {
   }
 
   public String asHtml(DocumentLinkResolver linkResolver) {
+    return asHtml(linkResolver, null);
+  }
+
+  public String asHtml(DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     StringBuilder html = new StringBuilder();
     for(Map.Entry<String,Fragment> fragment: fragments.entrySet()) {
       html.append("<section data-field=\"" + fragment.getKey() + "\">");
-      html.append(getHtml(fragment.getKey(), linkResolver));
+      html.append(getHtml(fragment.getKey(), linkResolver, htmlSerializer));
       html.append("</section>\n");
     }
     return html.toString().trim();

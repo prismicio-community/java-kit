@@ -487,7 +487,11 @@ public interface Fragment {
 
   public static class StructuredText implements Fragment {
 
-    public static interface Block {
+    public static interface Element {
+      public String getLabel();
+    }
+
+    public static interface Block extends Element {
 
       public static interface Text extends Block {
         public String getText();
@@ -498,11 +502,13 @@ public interface Fragment {
         private final String text;
         private final List<Span> spans;
         private final int level;
+        private final String label;
 
-        public Heading(String text, List<Span> spans, int level) {
+        public Heading(String text, List<Span> spans, int level, String label) {
           this.text = text;
           this.spans = spans;
           this.level = level;
+          this.label = label;
         }
 
         public String getText() {
@@ -517,15 +523,21 @@ public interface Fragment {
           return level;
         }
 
+        public String getLabel() {
+          return label;
+        }
+
       }
 
       public static class Paragraph implements Text {
         private final String text;
         private final List<Span> spans;
+        private final String label;
 
-        public Paragraph(String text, List<Span> spans) {
+        public Paragraph(String text, List<Span> spans, String label) {
           this.text = text;
           this.spans = spans;
+          this.label = label;
         }
 
         public String getText() {
@@ -536,15 +548,18 @@ public interface Fragment {
           return spans;
         }
 
+        public String getLabel() { return label; }
       }
 
       public static class Preformatted implements Text {
         private final String text;
         private final List<Span> spans;
+        private final String label;
 
-        public Preformatted(String text, List<Span> spans) {
+        public Preformatted(String text, List<Span> spans, String label) {
           this.text = text;
           this.spans = spans;
+          this.label = label;
         }
 
         public String getText() {
@@ -555,17 +570,22 @@ public interface Fragment {
           return spans;
         }
 
-      }
+        public String getLabel() {
+          return label;
+        }
+       }
 
       public static class ListItem implements Text {
         private final String text;
         private final List<Span> spans;
         private final boolean ordered;
+        private final String label;
 
-        public ListItem(String text, List<Span> spans, boolean ordered) {
+        public ListItem(String text, List<Span> spans, boolean ordered, String label) {
           this.text = text;
           this.spans = spans;
           this.ordered = ordered;
+          this.label = label;
         }
 
         public String getText() {
@@ -580,13 +600,18 @@ public interface Fragment {
           return ordered;
         }
 
+        public String getLabel() {
+          return label;
+        }
       }
 
       public static class Image implements Block {
         private final Fragment.Image.View view;
+        private final String label;
 
-        public Image(Fragment.Image.View view) {
+        public Image(Fragment.Image.View view, String label) {
           this.view = view;
+          this.label = label;
         }
 
         public Fragment.Image.View getView() {
@@ -605,33 +630,44 @@ public interface Fragment {
           return view.getHeight();
         }
 
+        public String getLabel() {
+          return label;
+        }
       }
 
       public static class Embed implements Block {
         private final Fragment.Embed obj;
+        private final String label;
 
-        public Embed(Fragment.Embed obj) {
+        public Embed(Fragment.Embed obj, String label) {
           this.obj = obj;
+          this.label = label;
         }
 
         public Fragment.Embed getObj() {
           return obj;
         }
+
+        public String getLabel() {
+          return label;
+        }
       }
 
     }
 
-    public static interface Span {
+    public static interface Span extends Element {
       public int getStart();
       public int getEnd();
 
       public static class Em implements Span {
         private final int start;
         private final int end;
+        private final String label;
 
-        public Em(int start, int end) {
+        public Em(int start, int end, String label) {
           this.start = start;
           this.end = end;
+          this.label = label;
         }
 
         public int getStart() {
@@ -642,15 +678,20 @@ public interface Fragment {
           return end;
         }
 
+        public String getLabel() {
+          return label;
+        }
       }
 
       public static class Strong implements Span {
         private final int start;
         private final int end;
+        private final String label;
 
-        public Strong(int start, int end) {
+        public Strong(int start, int end, String label) {
           this.start = start;
           this.end = end;
+          this.label = label;
         }
 
         public int getStart() {
@@ -661,17 +702,22 @@ public interface Fragment {
           return end;
         }
 
+        public String getLabel() {
+          return label;
+        }
       }
 
       public static class Hyperlink implements Span {
         private final int start;
         private final int end;
         private final Link link;
+        private final String label;
 
-        public Hyperlink(int start, int end, Link link) {
+        public Hyperlink(int start, int end, Link link, String label) {
           this.start = start;
           this.end = end;
           this.link = link;
+          this.label = label;
         }
 
         public int getStart() {
@@ -684,6 +730,10 @@ public interface Fragment {
 
         public Link getLink() {
           return link;
+        }
+
+        public String getLabel() {
+          return label;
         }
       }
 
@@ -739,7 +789,7 @@ public interface Fragment {
       }
     }
 
-    public String asHtml(List<Block> blocks, DocumentLinkResolver linkResolver) {
+    public String asHtml(List<Block> blocks, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       List<BlockGroup> blockGroups = new ArrayList<BlockGroup>();
       for(Block block: blocks) {
         BlockGroup lastOne = blockGroups.isEmpty() ? null : blockGroups.get(blockGroups.size() - 1);
@@ -770,34 +820,55 @@ public interface Fragment {
         if(blockGroup.tag != null) {
           html.append("<" + blockGroup.tag + ">");
           for(Block block: blockGroup.blocks) {
-            html.append(asHtml(block, linkResolver));
+            html.append(asHtml(block, linkResolver, htmlSerializer));
           }
           html.append("</" + blockGroup.tag + ">");
         } else {
           for(Block block: blockGroup.blocks) {
-            html.append(asHtml(block, linkResolver));
+            html.append(asHtml(block, linkResolver, htmlSerializer));
           }
         }
       }
       return html.toString();
     }
 
-    public String asHtml(Block block, DocumentLinkResolver linkResolver) {
+    public String asHtml(Block block, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+      String content = "";
       if(block instanceof StructuredText.Block.Heading) {
         StructuredText.Block.Heading heading = (StructuredText.Block.Heading)block;
-        return ("<h" + heading.getLevel() + ">" + asHtml(heading.getText(), heading.getSpans(), linkResolver) + "</h" + heading.getLevel() + ">");
+        content = insertSpans(heading.getText(), heading.getSpans(), linkResolver, htmlSerializer);
       }
       else if(block instanceof StructuredText.Block.Paragraph) {
         StructuredText.Block.Paragraph paragraph = (StructuredText.Block.Paragraph)block;
-        return ("<p>" + asHtml(paragraph.getText(), paragraph.getSpans(), linkResolver) + "</p>");
+        content = insertSpans(paragraph.getText(), paragraph.getSpans(), linkResolver, htmlSerializer);
       }
       else if(block instanceof StructuredText.Block.Preformatted) {
         StructuredText.Block.Preformatted paragraph = (StructuredText.Block.Preformatted)block;
-        return ("<pre>" + asHtml(paragraph.getText(), paragraph.getSpans(), linkResolver) + "</pre>");
+        content = insertSpans(paragraph.getText(), paragraph.getSpans(), linkResolver, htmlSerializer);
       }
       else if(block instanceof StructuredText.Block.ListItem) {
         StructuredText.Block.ListItem listItem = (StructuredText.Block.ListItem)block;
-        return ("<li>" + asHtml(listItem.getText(), listItem.getSpans(), linkResolver) + "</li>");
+        content = insertSpans(listItem.getText(), listItem.getSpans(), linkResolver, htmlSerializer);
+      }
+
+      if (htmlSerializer != null) {
+        String customHtml = htmlSerializer.serialize(block, content);
+        if (customHtml != null) {
+          return customHtml;
+        }
+      }
+      if(block instanceof StructuredText.Block.Heading) {
+        StructuredText.Block.Heading heading = (StructuredText.Block.Heading)block;
+        return ("<h" + heading.getLevel() + ">" + content + "</h" + heading.getLevel() + ">");
+      }
+      else if(block instanceof StructuredText.Block.Paragraph) {
+        return ("<p>" + content + "</p>");
+      }
+      else if(block instanceof StructuredText.Block.Preformatted) {
+        return ("<pre>" + content + "</pre>");
+      }
+      else if(block instanceof StructuredText.Block.ListItem) {
+        return ("<li>" + content + "</li>");
       }
       else if(block instanceof StructuredText.Block.Image) {
         StructuredText.Block.Image image = (StructuredText.Block.Image)block;
@@ -819,86 +890,108 @@ public interface Fragment {
       }
     }
 
-    private Tuple<String,String> getStartAndEnd(Span span, DocumentLinkResolver linkResolver) {
-      if(span instanceof Span.Strong) {
-        return new Tuple("<strong>", "</strong>");
+    private static String serialize(Span span, String content, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+      if (htmlSerializer != null) {
+        String customHtml = htmlSerializer.serialize(span, content);
+        if (customHtml != null) {
+          return customHtml;
+        }
       }
-      if(span instanceof Span.Em) {
-        return new Tuple("<em>", "</em>");
+      if (span instanceof Span.Strong) {
+        return "<strong>" + content + "</strong>";
       }
-      if(span instanceof Span.Hyperlink) {
+      if (span instanceof Span.Em) {
+        return "<em>" + content + "</em>";
+      }
+      if (span instanceof Span.Hyperlink) {
         Span.Hyperlink hyperlink = (Span.Hyperlink)span;
         if(hyperlink.link instanceof WebLink) {
           WebLink webLink = (WebLink)hyperlink.getLink();
-          return new Tuple("<a href=\""+ webLink.getUrl() + "\">", "</a>");
+          return "<a href=\""+ webLink.getUrl() + "\">" + content + "</a>";
         }
         else if(hyperlink.link instanceof FileLink) {
           FileLink fileLink = (FileLink)hyperlink.getLink();
-          return new Tuple("<a href=\""+ fileLink.getUrl() + "\">", "</a>");
+          return "<a href=\"" + fileLink.getUrl() + "\">" + content + "</a>";
         }
         else if(hyperlink.link instanceof ImageLink) {
           ImageLink imageLink = (ImageLink)hyperlink.getLink();
-          return new Tuple("<a href=\""+ imageLink.getUrl() + "\">", "</a>");
+          return "<a href=\""+ imageLink.getUrl() + "\">" + content + "</a>";
         }
         else if(hyperlink.link instanceof Link.DocumentLink) {
           DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
           String url = linkResolver.resolveLink(documentLink);
-          return new Tuple("<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\">", "</a>");
+          return "<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\">" + content + "</a>";
         }
       }
-      return new Tuple("","");
+      return "<span>" + content + "</span>";
     }
 
-    Integer peekStart(Stack<Span> span){
-      return span.empty()? Integer.MAX_VALUE : span.peek().getStart();
-    }
-
-    Integer peekEnd(Stack<Span> span){
-      return span.empty()? Integer.MAX_VALUE : span.peek().getEnd();
-    }
-
-    public String asHtml(String text, List<Span> spans, DocumentLinkResolver linkResolver) {
-      Stack<Span> starts = new Stack<Span>();
-      for(int i = spans.size() - 1; i >= 0; i--) {
-        starts.add(spans.get(i));
-      }
-      Stack<Span> endings = new Stack<Span>();
-      StringBuffer result = new StringBuffer();
-      Integer pos = 0;
-
-      if(!spans.isEmpty()) {
-        while(!(starts.empty() && endings.empty())){
-          int next = Math.min(peekStart(starts), peekEnd(endings));
-          if(next > pos){
-            result.append(text.substring(0,next-pos));
-            text = text.substring(next-pos);
-            pos = next;
-          }
-          else{
-            StringBuffer spansToApply = new StringBuffer();
-            while(Math.min(peekStart(starts), peekEnd(endings)) == pos){
-              // Always close endings before looking into starts
-              if (!endings.empty() && endings.peek().getEnd() == pos){
-                spansToApply.append(getStartAndEnd(endings.pop(), linkResolver).y);
-              }
-              // Once we closed Endings we add starts and we add their endings to Endings
-              else if (!starts.empty() && starts.peek().getStart() == pos) {
-                Span start = starts.pop();
-                endings.push(start);
-                spansToApply.append(getStartAndEnd(start, linkResolver).x);
-              }
-            }
-            result.append(spansToApply);
-          }
-        }
-        return result.toString() + (text.length() > 0 ? text : "");
-      } else {
+    private String insertSpans(String text, List<Span> spans, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+      if (spans.isEmpty()) {
         return text;
       }
-    }
+
+      Map<Integer, List<Span>> tagsStart = new HashMap<Integer, List<Span>>();
+      Map<Integer, List<Span>> tagsEnd = new HashMap<Integer, List<Span>>();
+
+      for (Span span: spans) {
+        if (!tagsStart.containsKey(span.getStart())) {
+          tagsStart.put(span.getStart(), new ArrayList<Span>());
+        }
+        if (!tagsEnd.containsKey(span.getEnd())) {
+          tagsEnd.put(span.getEnd(), new ArrayList<Span>());
+        }
+        tagsStart.get(span.getStart()).add(span);
+        tagsEnd.get(span.getEnd()).add(span);
+      }
+
+      char c;
+      String html = "";
+      Stack<Tuple<Span, String>> stack = new Stack<Tuple<Span, String>>();
+      for (int pos = 0, len = text.length() + 1; pos < len; pos++) { // Looping to length + 1 to catch closing tags
+        if (tagsEnd.containsKey(pos)) {
+          for (Span span: tagsEnd.get(pos)) {
+            // Close a tag
+            Tuple<Span, String> tag = stack.pop();
+            String innerHtml = serialize(tag.x, tag.y, linkResolver, htmlSerializer);
+            if (stack.isEmpty()) {
+              // The tag was top level
+              html += innerHtml;
+            } else {
+              // Add the content to the parent tag
+              Tuple<Span, String> head = stack.pop();
+              stack.push(new Tuple<Span, String>(head.x, head.y + innerHtml));
+            }
+          }
+        }
+        if (tagsStart.containsKey(pos)) {
+          for (Span span: tagsStart.get(pos)) {
+            // Open a tag
+            stack.push(new Tuple<Span, String>(span, ""));
+          }
+        }
+        if (pos < text.length()) {
+          c = text.charAt(pos);
+          if (stack.isEmpty()) {
+            // Top-level text
+            html += c;
+          } else {
+            // Inner text of a span
+            Tuple<Span, String> head = stack.pop();
+            stack.push(new Tuple<Span, String>(head.x, head.y + c));
+          }
+        }
+      }
+
+      return html;
+   }
 
     public String asHtml(DocumentLinkResolver linkResolver) {
-      return asHtml(getBlocks(), linkResolver);
+      return asHtml(linkResolver, null);
+    }
+
+    public String asHtml(DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+      return asHtml(getBlocks(), linkResolver, htmlSerializer);
     }
 
     // --
@@ -907,15 +1000,16 @@ public interface Fragment {
       String type = json.path("type").asText();
       int start = json.path("start").intValue();
       int end = json.path("end").intValue();
+      String label = json.path("label").textValue();
       JsonNode data = json.with("data");
 
       if (end > start) {
 
         if("strong".equals(type)) {
-          return new Span.Strong(start, end);
+          return new Span.Strong(start, end, label);
         }
         if("em".equals(type)) {
-          return new Span.Em(start, end);
+          return new Span.Em(start, end, label);
         }
         if("hyperlink".equals(type)) {
           String linkType = data.path("type").asText();
@@ -934,7 +1028,7 @@ public interface Fragment {
             link = Link.ImageLink.parse(value);
           }
           if(link != null) {
-            return new Span.Hyperlink(start, end, link);
+            return new Span.Hyperlink(start, end, link, label);
           }
         }
 
@@ -967,45 +1061,46 @@ public interface Fragment {
 
     static Block parseBlock(JsonNode json) {
       String type = json.path("type").asText();
+      String label = json.path("label").textValue();
       if("heading1".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 1);
+        return new Block.Heading(p.text, p.spans, 1, label);
       }
       else if("heading2".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 2);
+        return new Block.Heading(p.text, p.spans, 2, label);
       }
       else if("heading3".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 3);
+        return new Block.Heading(p.text, p.spans, 3, label);
       }
       else if("heading4".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 4);
+        return new Block.Heading(p.text, p.spans, 4, label);
       }
       else if("paragraph".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.Paragraph(p.text, p.spans);
+        return new Block.Paragraph(p.text, p.spans, label);
       }
       else if("preformatted".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.Preformatted(p.text, p.spans);
+        return new Block.Preformatted(p.text, p.spans, label);
       }
       else if("list-item".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.ListItem(p.text, p.spans, false);
+        return new Block.ListItem(p.text, p.spans, false, label);
       }
       else if("o-list-item".equals(type)) {
         ParsedText p = parseText(json);
-        return new Block.ListItem(p.text, p.spans, true);
+        return new Block.ListItem(p.text, p.spans, true, label);
       }
       else if("image".equals(type)) {
         Image.View view = Image.View.parse(json);
-        return new Block.Image(view);
+        return new Block.Image(view, label);
       }
       else if("embed".equals(type)) {
         Embed obj = Embed.parse(json);
-        return new Block.Embed(obj);
+        return new Block.Embed(obj, label);
       }
       return null;
     }
