@@ -36,6 +36,9 @@ public interface FragmentParser {
     else if("Date".equals(type)) {
       return Fragment.Date.parse(json);
     }
+    else if("Timestamp".equals(type)) {
+      return Fragment.Timestamp.parse(json);
+    }
     else if("Number".equals(type)) {
       return Fragment.Number.parse(json);
     }

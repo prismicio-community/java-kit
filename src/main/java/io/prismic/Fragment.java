@@ -39,9 +39,42 @@ public interface Fragment {
   // -- Date
 
   public static class Date implements Fragment {
+    private final LocalDate value;
+
+    public Date(LocalDate value) {
+      this.value = value;
+    }
+
+    public LocalDate getValue() {
+      return value;
+    }
+
+    public String asText(String pattern) {
+      return value.toString(pattern);
+    }
+
+    public String asHtml() {
+      return ("<time>" + value + "</time>");
+    }
+
+    // --
+
+    static Date parse(JsonNode json) {
+      try {
+        return new Date(LocalDate.parse(json.asText(), DateTimeFormat.forPattern("yyyy-MM-dd")));
+      } catch(Exception e) {
+        return null;
+      }
+    }
+
+  }
+
+   // -- Timestamp
+
+  public static class Timestamp implements Fragment {
     private final DateTime value;
 
-    public Date(DateTime value) {
+    public Timestamp(DateTime value) {
       this.value = value;
     }
 
@@ -59,9 +92,11 @@ public interface Fragment {
 
     // --
 
-    static Date parse(JsonNode json) {
+    private static DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+
+    static Timestamp parse(JsonNode json) {
       try {
-        return new Date(DateTime.parse(json.asText(), DateTimeFormat.forPattern("yyyy-MM-dd")));
+        return new Timestamp(DateTime.parse(json.asText(), isoFormat));
       } catch(Exception e) {
         return null;
       }
@@ -1160,6 +1195,9 @@ public interface Fragment {
           }
           else if(fragment != null && fragment instanceof Fragment.Date) {
             sb.append(((Fragment.Date)fragment).asHtml());
+          }
+          else if(fragment != null && fragment instanceof Fragment.Timestamp) {
+            sb.append(((Fragment.Timestamp)fragment).asHtml());
           }
           else if(fragment != null && fragment instanceof Fragment.Embed) {
             sb.append(((Fragment.Embed)fragment).asHtml());
