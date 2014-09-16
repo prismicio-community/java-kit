@@ -9,9 +9,7 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class AppTest
-  extends TestCase
-{
+public class AppTest extends TestCase {
 
   Api lbc_api;
   Api micro_api;
@@ -21,8 +19,7 @@ public class AppTest
    *
    * @param testName name of the test case
    */
-  public AppTest( String testName )
-  {
+  public AppTest( String testName ) {
     super( testName );
     this.lbc_api = Api.get("https://lesbonneschoses.prismic.io/api");
     this.micro_api = Api.get("https://micro.prismic.io/api");
@@ -50,6 +47,21 @@ public class AppTest
       lbc_api.getMaster().getRef(),
       "UlfoxUnM08QWYXdl"
     );
+  }
+
+  /**
+   * Make sure a call to a private repository without a token returns the expected error
+   */
+  public void testInvalidToken() {
+    boolean thrown = false;
+    try {
+      Api api = Api.get("https://private-test.prismic.io/api");
+    } catch (Api.Error error) {
+      if (error.getCode() == Api.Error.Code.INVALID_TOKEN) {
+        thrown = true;
+      }
+    }
+    assertTrue(thrown);
   }
 
   /**
