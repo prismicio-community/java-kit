@@ -430,13 +430,15 @@ public interface Fragment {
       private final int height;
       private final String alt;
       private final String copyright;
+      private final Link linkTo;
 
-      public View(String url, int width, int height, String alt, String copyright) {
+      public View(String url, int width, int height, String alt, String copyright, Link linkTo) {
         this.url = url;
         this.width = width;
         this.height = height;
         this.alt = alt;
         this.copyright = copyright;
+        this.linkTo = linkTo;
       }
 
       public String getUrl() {
@@ -463,8 +465,23 @@ public interface Fragment {
         return width / height;
       }
 
-      public String asHtml() {
-        return ("<img src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" alt=\"" + alt + "\">");
+      public String asHtml(DocumentLinkResolver linkResolver) {
+        String imgTag = "<img alt=\"" + alt + "\" src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" />";
+        if (this.linkTo != null) {
+          String url = "about:blank";
+          if (this.linkTo instanceof WebLink) {
+            url = ((WebLink) this.linkTo).getUrl();
+          } else if (this.linkTo instanceof ImageLink) {
+            url = ((ImageLink) this.linkTo).getUrl();
+          } else if (this.linkTo instanceof DocumentLink) {
+            url = ((DocumentLink)this.linkTo).isBroken()
+                ? "#broken"
+                : linkResolver.resolve((DocumentLink) this.linkTo);
+          }
+          return "<a href=\"" + url + "\">" + imgTag + "</a>";
+        } else {
+          return imgTag;
+        }
       }
 
       //
@@ -475,7 +492,8 @@ public interface Fragment {
         int height = json.with("dimensions").path("height").intValue();
         String alt = json.path("alt").asText();
         String copyright = json.path("copyright").asText();
-        return new View(url, width, height, alt, copyright);
+        Link linkTo = StructuredText.parseLink(json.path("linkTo"));
+        return new View(url, width, height, alt, copyright, linkTo);
       }
 
     }
@@ -499,8 +517,8 @@ public interface Fragment {
       return views.get(view);
     }
 
-    public String asHtml() {
-      return getView("main").asHtml();
+    public String asHtml(DocumentLinkResolver linkResolver) {
+      return getView("main").asHtml(linkResolver);
     }
 
     // --
@@ -908,7 +926,8 @@ public interface Fragment {
       }
       else if(block instanceof StructuredText.Block.Image) {
         StructuredText.Block.Image image = (StructuredText.Block.Image)block;
-        return ("<p" + classCode + ">" + image.getView().asHtml() + "</p>");
+        String labelCode = block.getLabel() == null ? "" : (" " + block.getLabel());
+        return ("<p class=\"block-img" + labelCode + "\">" + image.getView().asHtml(linkResolver) + "</p>");
       }
       else if(block instanceof StructuredText.Block.Embed) {
         StructuredText.Block.Embed embed = (StructuredText.Block.Embed)block;
@@ -1033,6 +1052,27 @@ public interface Fragment {
 
     // --
 
+    static Link parseLink(JsonNode json) {
+      if (json.isMissingNode()) {
+        return null;
+      }
+      String linkType = json.path("type").asText();
+      JsonNode value = json.with("value");
+      if("Link.web".equals(linkType)) {
+        return Link.WebLink.parse(value);
+      }
+      else if("Link.document".equals(linkType)) {
+        return Link.DocumentLink.parse(value);
+      }
+      else if("Link.file".equals(linkType)) {
+        return Link.FileLink.parse(value);
+      }
+      else if("Link.image".equals(linkType)) {
+        return Link.ImageLink.parse(value);
+      }
+      return null;
+    }
+
     static Span parseSpan(JsonNode json) {
       String type = json.path("type").asText();
       int start = json.path("start").intValue();
@@ -1049,21 +1089,7 @@ public interface Fragment {
           return new Span.Em(start, end, label);
         }
         if("hyperlink".equals(type)) {
-          String linkType = data.path("type").asText();
-          JsonNode value = data.with("value");
-          Link link = null;
-          if("Link.web".equals(linkType)) {
-            link = Link.WebLink.parse(value);
-          }
-          else if("Link.document".equals(linkType)) {
-            link = Link.DocumentLink.parse(value);
-          }
-          else if("Link.file".equals(linkType)) {
-            link = Link.FileLink.parse(value);
-          }
-          else if("Link.image".equals(linkType)) {
-            link = Link.ImageLink.parse(value);
-          }
+          Link link = parseLink(data);
           if(link != null) {
             return new Span.Hyperlink(start, end, link, label);
           }
@@ -1176,10 +1202,10 @@ public interface Fragment {
     }
 
     public String asHtml(DocumentLinkResolver linkResolver) {
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       for(Map<String, Fragment> fragmentMap : fragmentMapList) {
         for(String fragmentName : fragmentMap.keySet()) {
-          sb.append("<section data-field=\""+fragmentName+"\">");
+          sb.append("<section data-field=\"").append(fragmentName).append("\">");
           Fragment fragment = fragmentMap.get(fragmentName);
           if(fragment != null && fragment instanceof Fragment.StructuredText) {
             sb.append(((Fragment.StructuredText)fragment).asHtml(linkResolver));
@@ -1203,7 +1229,7 @@ public interface Fragment {
             sb.append(((Fragment.Embed)fragment).asHtml());
           }
           else if(fragment != null && fragment instanceof Fragment.Image) {
-            sb.append(((Fragment.Image)fragment).asHtml());
+            sb.append(((Fragment.Image)fragment).asHtml(linkResolver));
           }
           else if(fragment != null && fragment instanceof Fragment.WebLink) {
             sb.append(((Fragment.WebLink)fragment).asHtml());

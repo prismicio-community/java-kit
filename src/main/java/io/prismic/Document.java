@@ -165,7 +165,7 @@ public class Document {
       return ((Fragment.Embed)fragment).asHtml();
     }
     else if(fragment != null && fragment instanceof Fragment.Image) {
-      return ((Fragment.Image)fragment).asHtml();
+      return ((Fragment.Image)fragment).asHtml(linkResolver);
     }
     else if(fragment != null && fragment instanceof Fragment.WebLink) {
       return ((Fragment.WebLink)fragment).asHtml();
