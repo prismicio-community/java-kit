@@ -59,6 +59,17 @@ public class DocumentTest extends TestCase {
     );
   }
 
+  public void testProperEscape() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"type\": \"StructuredText\", \"value\": [ { \"type\": \"paragraph\", \"text\": \"<not a real tag>\", \"spans\": [] } ]}";
+    JsonNode json = mapper.readTree(jsonString);
+    Fragment.StructuredText text = Fragment.StructuredText.parse(json.path("value"));
+    assertEquals(
+      "<p>&lt;not a real tag&gt;</p>",
+      text.asHtml(linkResolver)
+    );
+  }
+
   /**
    * Return JSON node from resource
    * @param resource Json resource

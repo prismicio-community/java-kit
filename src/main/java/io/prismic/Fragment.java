@@ -984,7 +984,7 @@ public interface Fragment {
 
     private String insertSpans(String text, List<Span> spans, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       if (spans.isEmpty()) {
-        return text;
+        return escape(text);
       }
 
       Map<Integer, List<Span>> tagsStart = new HashMap<Integer, List<Span>>();
@@ -1028,13 +1028,14 @@ public interface Fragment {
         }
         if (pos < text.length()) {
           c = text.charAt(pos);
+          String escaped = escape(Character.toString(c));
           if (stack.isEmpty()) {
             // Top-level text
-            html += c;
+            html += escaped;
           } else {
             // Inner text of a span
             Tuple<Span, String> head = stack.pop();
-            stack.push(new Tuple<Span, String>(head.x, head.y + c));
+            stack.push(new Tuple<Span, String>(head.x, head.y + escaped));
           }
         }
       }
@@ -1048,6 +1049,10 @@ public interface Fragment {
 
     public String asHtml(DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       return asHtml(getBlocks(), linkResolver, htmlSerializer);
+    }
+
+    private static String escape(String input) {
+      return input.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     }
 
     // --
