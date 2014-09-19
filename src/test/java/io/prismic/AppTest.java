@@ -201,7 +201,12 @@ public class AppTest extends TestCase {
           return "/"+link.getId()+"/"+link.getSlug();
         }
       });
-    String expected = "<p>Meta-micro gets installed pretty much like any javascript library:</p><ol><li><a href=\"/U0w8OwEAACoAQEvB/download-meta-micro\">download</a> the .js file: get the minified one, unless the framework you're using minifies your .js files automatically.</li><li>add a link towards the file in your webpage's head.</li></ol><p>The link might look like this, anywhere inside your head tag:</p><pre><script type=\"text/javascript\" src=\"meta-micro.min.js\"></script></pre><p>You're all set!</p>";
+    String expected =
+      "<p>Meta-micro gets installed pretty much like any javascript library:</p>"
+        + "<ol><li><a href=\"/U0w8OwEAACoAQEvB/download-meta-micro\">download</a> the .js file: get the minified one, unless the framework you're using minifies your .js files automatically.</li>"
+        + "<li>add a link towards the file in your webpage's head.</li></ol>"
+        + "<p>The link might look like this, anywhere inside your head tag:</p>"
+        + "<pre>&lt;script type=\"text/javascript\" src=\"meta-micro.min.js\"&gt;&lt;/script&gt;</pre><p>You're all set!</p>";
     assertEquals(
       "Properly performs serialization of a preformatted text block",
       expected,
