@@ -323,6 +323,22 @@ public class Form {
     }
 
     /**
+     * Allows to set the query field of the current form, using Predicate objects. Example:
+     * <code>search.query(Predicates.at("document.type", "Product"));</code>
+     * See io.prismic.Predicates for more helper methods.
+     *
+     * @param predicates any number of predicate, is more than one is provided documents that satisfy all predicates will be returned ("AND" query)
+     * @return the current form, in order to chain those calls
+     */
+     public SearchForm query(Predicate... predicates) {
+      String result = "";
+      for (Predicate p: predicates) {
+        result += p.q();
+      }
+      return this.query("[" + result + "]");
+    }
+
+    /**
      * The method to call to perform and retrieve your query.
      *
      * Please make sure you're set a ref on this SearchForm form before querying, or the kit will complain!
