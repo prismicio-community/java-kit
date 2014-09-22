@@ -10,7 +10,6 @@ Features:
 
   - Links in images
   - Timestamp support
-  
 
 ### 1.0-M11 (2014-09-19)
 
