@@ -67,6 +67,11 @@ Please document any bugfix or new feature using the [Javadoc syntax](http://docs
 
 If you find existing code that is not optimally documented and wish to make it better, we really appreciate it; but you should document it on its own branch and its own pull request.
 
+#### Publish Javadoc
+
+(Only for Prismic.io developers)
+
+    mvn clean javadoc:javadoc scm-publish:publish-scm
 
 ### Licence
 
