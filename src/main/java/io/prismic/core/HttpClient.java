@@ -38,9 +38,11 @@ public class HttpClient {
 
           return value;
         } else {
-          throw new Exception("Oops");
+          throw new RuntimeException("Oops");
         }
-      } catch (Exception e) {
+      } catch (MalformedURLException e) {
+        throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
+      } catch (IOException e) {
         JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
         String errorText = errorJson.get("error").asText();
         switch(httpConnection.getResponseCode()) {
@@ -51,14 +53,12 @@ public class HttpClient {
               throw new Api.Error(Api.Error.Code.AUTHORIZATION_NEEDED, errorText);
             }
           default:
-            throw new Exception("Got an HTTP error " + httpConnection.getResponseCode() + " (" + httpConnection.getResponseMessage() + ")");
+            throw new RuntimeException("Got an HTTP error " + httpConnection.getResponseCode() + " (" + httpConnection.getResponseMessage() + ")");
         }
       }
     } catch(Api.Error e) {
       throw e;
-    } catch (MalformedURLException e) {
-      throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
-    } catch(Exception e) {
+    } catch(IOException e) {
       throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
     }
   }
