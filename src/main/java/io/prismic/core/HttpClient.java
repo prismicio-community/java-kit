@@ -27,6 +27,7 @@ public class HttpClient {
 
       try {
         logger.log("DEBUG", "Making request: " + url);
+        logger.log("DEBUG", "Result" + connection.getContent());
         response = connection.getInputStream();
         if (httpConnection.getResponseCode() == 200) {
           JsonNode value = new ObjectMapper().readTree(response);
@@ -43,6 +44,7 @@ public class HttpClient {
       } catch (MalformedURLException e) {
         throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
       } catch (IOException e) {
+        e.printStackTrace();
         JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
         String errorText = errorJson.get("error").asText();
         switch(httpConnection.getResponseCode()) {
@@ -59,6 +61,7 @@ public class HttpClient {
     } catch(Api.Error e) {
       throw e;
     } catch(IOException e) {
+      e.printStackTrace();
       throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
     }
   }
