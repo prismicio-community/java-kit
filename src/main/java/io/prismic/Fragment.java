@@ -540,11 +540,11 @@ public interface Fragment {
 
   public static class StructuredText implements Fragment {
 
-    public static interface Element {
-      public String getLabel();
-    }
+    public static interface Element {}
 
     public static interface Block extends Element {
+
+      public String getLabel();
 
       public static interface Text extends Block {
         public String getText();
@@ -715,12 +715,10 @@ public interface Fragment {
       public static class Em implements Span {
         private final int start;
         private final int end;
-        private final String label;
 
-        public Em(int start, int end, String label) {
+        public Em(int start, int end) {
           this.start = start;
           this.end = end;
-          this.label = label;
         }
 
         public int getStart() {
@@ -729,22 +727,16 @@ public interface Fragment {
 
         public int getEnd() {
           return end;
-        }
-
-        public String getLabel() {
-          return label;
         }
       }
 
       public static class Strong implements Span {
         private final int start;
         private final int end;
-        private final String label;
 
-        public Strong(int start, int end, String label) {
+        public Strong(int start, int end) {
           this.start = start;
           this.end = end;
-          this.label = label;
         }
 
         public int getStart() {
@@ -753,10 +745,6 @@ public interface Fragment {
 
         public int getEnd() {
           return end;
-        }
-
-        public String getLabel() {
-          return label;
         }
       }
 
@@ -764,13 +752,11 @@ public interface Fragment {
         private final int start;
         private final int end;
         private final Link link;
-        private final String label;
 
-        public Hyperlink(int start, int end, Link link, String label) {
+        public Hyperlink(int start, int end, Link link) {
           this.start = start;
           this.end = end;
           this.link = link;
-          this.label = label;
         }
 
         public int getStart() {
@@ -784,12 +770,31 @@ public interface Fragment {
         public Link getLink() {
           return link;
         }
+      }
+
+      public static class Label implements Span {
+        private final int start;
+        private final int end;
+        private final String label;
+
+        public Label(int start, int end, String label) {
+          this.start = start;
+          this.end = end;
+          this.label = label;
+        }
+
+        public int getStart() {
+          return start;
+        }
+
+        public int getEnd() {
+          return end;
+        }
 
         public String getLabel() {
           return label;
         }
       }
-
     }
 
     // --
@@ -952,34 +957,36 @@ public interface Fragment {
           return customHtml;
         }
       }
-      String classCode = span.getLabel() == null ? "" : (" class=\"" + span.getLabel() + "\"");
       if (span instanceof Span.Strong) {
-        return "<strong" + classCode + ">" + content + "</strong>";
+        return "<strong>" + content + "</strong>";
       }
       if (span instanceof Span.Em) {
-        return "<em" + classCode + ">" + content + "</em>";
+        return "<em>" + content + "</em>";
+      }
+      if (span instanceof Span.Label) {
+        return "<span class=\"" + ((Span.Label)span).getLabel() + "\">" + content + "</span>";
       }
       if (span instanceof Span.Hyperlink) {
         Span.Hyperlink hyperlink = (Span.Hyperlink)span;
         if(hyperlink.link instanceof WebLink) {
           WebLink webLink = (WebLink)hyperlink.getLink();
-          return "<a href=\""+ webLink.getUrl() + "\""+ classCode +">" + content + "</a>";
+          return "<a href=\""+ webLink.getUrl() + "\">" + content + "</a>";
         }
         else if(hyperlink.link instanceof FileLink) {
           FileLink fileLink = (FileLink)hyperlink.getLink();
-          return "<a href=\"" + fileLink.getUrl() + "\"" + classCode + ">" + content + "</a>";
+          return "<a href=\"" + fileLink.getUrl() + "\">" + content + "</a>";
         }
         else if(hyperlink.link instanceof ImageLink) {
           ImageLink imageLink = (ImageLink)hyperlink.getLink();
-          return "<a href=\""+ imageLink.getUrl() + "\"" + classCode + ">" + content + "</a>";
+          return "<a href=\""+ imageLink.getUrl() + "\">" + content + "</a>";
         }
         else if(hyperlink.link instanceof Link.DocumentLink) {
           DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
           String url = linkResolver.resolveLink(documentLink);
-          return "<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\"" + classCode + ">" + content + "</a>";
+          return "<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\">" + content + "</a>";
         }
       }
-      return "<span" + classCode + ">" + content + "</span>";
+      return "<span>" + content + "</span>";
     }
 
     private String insertSpans(String text, List<Span> spans, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
@@ -1004,7 +1011,7 @@ public interface Fragment {
       char c;
       String html = "";
       Stack<Tuple<Span, String>> stack = new Stack<Tuple<Span, String>>();
-      for (int pos = 0, len = text.length() + 1; pos < len; pos++) { // Looping to length + 1 to catch closing tags
+      for (int pos = 0, len = text.length(); pos < len; pos++) {
         if (tagsEnd.containsKey(pos)) {
           for (Span span: tagsEnd.get(pos)) {
             // Close a tag
@@ -1026,20 +1033,30 @@ public interface Fragment {
             stack.push(new Tuple<Span, String>(span, ""));
           }
         }
-        if (pos < text.length()) {
-          c = text.charAt(pos);
-          String escaped = escape(Character.toString(c));
-          if (stack.isEmpty()) {
-            // Top-level text
-            html += escaped;
-          } else {
-            // Inner text of a span
-            Tuple<Span, String> head = stack.pop();
-            stack.push(new Tuple<Span, String>(head.x, head.y + escaped));
-          }
+        c = text.charAt(pos);
+        String escaped = escape(Character.toString(c));
+        if (stack.isEmpty()) {
+          // Top-level text
+          html += escaped;
+        } else {
+          // Inner text of a span
+          Tuple<Span, String> head = stack.pop();
+          stack.push(new Tuple<Span, String>(head.x, head.y + escaped));
         }
       }
-
+      // Close remaining tags
+      while (!stack.empty()) {
+        Tuple<Span, String> tag = stack.pop();
+        String innerHtml = serialize(tag.x, tag.y, linkResolver, htmlSerializer);
+        if (stack.isEmpty()) {
+          // The tag was top level
+          html += innerHtml;
+        } else {
+          // Add the content to the parent tag
+          Tuple<Span, String> head = stack.pop();
+          stack.push(new Tuple<Span, String>(head.x, head.y + innerHtml));
+        }
+      }
       return html;
    }
 
@@ -1082,22 +1099,25 @@ public interface Fragment {
       String type = json.path("type").asText();
       int start = json.path("start").intValue();
       int end = json.path("end").intValue();
-      String label = json.path("label").textValue();
       JsonNode data = json.with("data");
 
       if (end > start) {
 
-        if("strong".equals(type)) {
-          return new Span.Strong(start, end, label);
+        if ("strong".equals(type)) {
+          return new Span.Strong(start, end);
         }
-        if("em".equals(type)) {
-          return new Span.Em(start, end, label);
+        if ("em".equals(type)) {
+          return new Span.Em(start, end);
         }
-        if("hyperlink".equals(type)) {
+        if ("hyperlink".equals(type)) {
           Link link = parseLink(data);
           if(link != null) {
-            return new Span.Hyperlink(start, end, link, label);
+            return new Span.Hyperlink(start, end, link);
           }
+        }
+        if ("label".equals(type)) {
+          String label = data.path("label").asText();
+          return new Span.Label(start, end, label);
         }
 
       }
