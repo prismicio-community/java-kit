@@ -5,3 +5,6 @@
 # Java / maven
 target
 
+# Node (used to publish Gists)
+node_modules/
+
