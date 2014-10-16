@@ -95,6 +95,10 @@ public class Api {
     return get(url, accessToken, cache, logger, new FragmentParser.Default());
   }
 
+  public static Api get(String url, Cache cache, Logger logger) {
+    return get(url, null, cache, logger, new FragmentParser.Default());
+  }
+
   /**
    * Entry point to get an {@link Api} object.
    * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null);</code>
@@ -168,6 +172,18 @@ public class Api {
    */
   public List<Ref> getRefs() {
     return apiData.getRefs();
+  }
+
+  /**
+   * From a properly built {@link Api} object, returns the ref with the corresponding label
+   *
+   * @return the Ref, or null if not found
+   */
+  public Ref getRef(String label) {
+    for (Ref ref: apiData.getRefs()) {
+      if (ref.getLabel().equals(label)) return ref;
+    }
+    return null;
   }
 
   /**

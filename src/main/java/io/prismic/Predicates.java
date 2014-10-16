@@ -37,11 +37,23 @@ public class Predicates {
     return new SimplePredicate("number.lt", fragment, lowerBound);
   }
 
+  public static Predicate lt(String fragment, Integer lowerBound) {
+    return lt(fragment, lowerBound.doubleValue());
+  }
+
   public static Predicate gt(String fragment, Double upperBound) {
     return new SimplePredicate("number.gt", fragment, upperBound);
   }
 
+  public static Predicate gt(String fragment, Integer upperBound) {
+    return gt(fragment, upperBound.doubleValue());
+  }
+
   public static Predicate inRange(String fragment, Integer lowerBound, Integer upperBound) {
+    return inRange(fragment, lowerBound.doubleValue(), upperBound.doubleValue());
+  }
+
+  public static Predicate inRange(String fragment, Double lowerBound, Double upperBound) {
     return new SimplePredicate("number.inRange", fragment, lowerBound, upperBound);
   }
 
@@ -69,6 +81,18 @@ public class Predicates {
     return new SimplePredicate("date.day-of-month-after", fragment, day);
   }
 
+  public static Predicate dayOfWeek(String fragment, DayOfWeek day) {
+    return new SimplePredicate("date.day-of-week", fragment, day);
+  }
+
+  public static Predicate dayOfWeekAfter(String fragment, DayOfWeek day) {
+    return new SimplePredicate("date.day-of-week-after", fragment, day);
+  }
+
+  public static Predicate dayOfWeekBefore(String fragment, DayOfWeek day) {
+    return new SimplePredicate("date.day-of-week-before", fragment, day);
+  }
+
   public static Predicate month(String fragment, Month month) {
     return new SimplePredicate("date.month", fragment, month);
   }
@@ -81,7 +105,12 @@ public class Predicates {
     return new SimplePredicate("date.month-after", fragment, month);
   }
 
+  @Deprecated
   public static Predicate dateYear(String fragment, Integer year) {
+    return year(fragment, year);
+  }
+
+  public static Predicate year(String fragment, Integer year) {
     return new SimplePredicate("date.year", fragment, year);
   }
 

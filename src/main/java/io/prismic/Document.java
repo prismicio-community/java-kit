@@ -140,6 +140,22 @@ public class Document {
     return null;
   }
 
+  public Fragment.Link getLink(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Link) {
+      return (Fragment.Link)fragment;
+    }
+    return null;
+  }
+
+  public Fragment.Embed getEmbed(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Embed) {
+      return (Fragment.Embed)fragment;
+    }
+    return null;
+  }
+
   public String getHtml(String field, DocumentLinkResolver linkResolver) {
     return getHtml(field, linkResolver, null);
   }
@@ -226,6 +242,14 @@ public class Document {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.Date) {
       return (Fragment.Date)fragment;
+    }
+    return null;
+  }
+
+  public Fragment.Timestamp getTimestamp(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.Timestamp) {
+      return (Fragment.Timestamp)fragment;
     }
     return null;
   }
@@ -320,7 +344,7 @@ public class Document {
     }
 
     Iterator<String> dataJson = json.with("data").with(type).fieldNames();
-    final Map<String,Fragment> fragments = new LinkedHashMap();
+    final Map<String, Fragment> fragments = new LinkedHashMap<String, Fragment>();
     while(dataJson.hasNext()) {
       String field = dataJson.next();
       JsonNode fieldJson = json.with("data").with(type).path(field);

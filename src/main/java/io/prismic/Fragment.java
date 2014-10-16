@@ -270,7 +270,9 @@ public interface Fragment {
 
   // -- Link
 
-  public static interface Link extends Fragment {};
+  public static interface Link extends Fragment {
+    public String getUrl(DocumentLinkResolver resolver);
+  };
 
   public static class WebLink implements Link {
     private final String url;
@@ -279,6 +281,10 @@ public interface Fragment {
     public WebLink(String url, String contentType) {
       this.url = url;
       this.contentType = contentType;
+    }
+
+    public String getUrl(DocumentLinkResolver resolver) {
+      return url;
     }
 
     public String getUrl() {
@@ -312,6 +318,10 @@ public interface Fragment {
       this.kind = kind;
       this.size = size;
       this.filename = filename;
+    }
+
+    public String getUrl(DocumentLinkResolver resolver) {
+      return url;
     }
 
     public String getUrl() {
@@ -350,6 +360,10 @@ public interface Fragment {
       this.url = url;
     }
 
+    public String getUrl(DocumentLinkResolver resolver) {
+      return url;
+    }
+
     public String getUrl() {
       return url;
     }
@@ -377,6 +391,10 @@ public interface Fragment {
       this.tags = tags;
       this.slug = slug;
       this.broken = broken;
+    }
+
+    public String getUrl(DocumentLinkResolver resolver) {
+      return resolver.resolve(this);
     }
 
     public String getId() {

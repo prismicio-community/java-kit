@@ -23,7 +23,7 @@ public class PredicateTest extends TestCase {
 
   public void testNumberInRange() throws Exception {
     Predicate p = Predicates.inRange("my.product.price", 2, 4);
-    assertEquals("[:d = number.inRange(my.product.price, 2, 4)]", p.q());
+    assertEquals("[:d = number.inRange(my.product.price, 2.0, 4.0)]", p.q());
   }
 
   public void testMonthAfter() throws Exception {
