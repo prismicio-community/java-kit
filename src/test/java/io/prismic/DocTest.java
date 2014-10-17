@@ -273,7 +273,7 @@ public class DocTest extends TestCase
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"video\":{\"type\":\"Embed\",\"value\":{\"oembed\":{\"provider_url\":\"http://www.youtube.com/\",\"type\":\"video\",\"thumbnail_height\":360,\"height\":270,\"thumbnail_url\":\"http://i1.ytimg.com/vi/baGfM6dBzs8/hqdefault.jpg\",\"width\":480,\"provider_name\":\"YouTube\",\"html\":\"<iframe width=\\\"480\\\" height=\\\"270\\\" src=\\\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\\\" frameborder=\\\"0\\\" allowfullscreen></iframe>\",\"author_name\":\"Siobhan Wilson\",\"version\":\"1.0\",\"author_url\":\"http://www.youtube.com/user/siobhanwilsonsongs\",\"thumbnail_width\":480,\"title\":\"Siobhan Wilson - All Dressed Up\",\"embed_url\":\"https://www.youtube.com/watch?v=baGfM6dBzs8\"}}}}}}";
     JsonNode json = mapper.readTree(jsonString);
     Document doc = Document.parse(json, new FragmentParser.Default());
-    // startgist:67b2d5f4094c54f3f5c0:prismic-embed.js
+    // startgist:11e0a18e3f6b82a04a51:prismic-embed.java
     Fragment.Embed video = doc.getEmbed("article.video");
     // Html is the code to include to embed the object, and depends on the embedded service
     String html = video.asHtml();
