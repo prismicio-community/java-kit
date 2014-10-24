@@ -12,7 +12,7 @@ This library is on Maven Central. The kit coordinates are:
 <dependency>
   <groupId>io.prismic</groupId>
   <artifactId>java-kit</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 
