@@ -246,10 +246,10 @@ public class DocTest extends TestCase
     Document doc = Document.parse(json, new FragmentParser.Default());
     // startgist:feb9f79a9f19f49586e0:prismic-group.java
     Fragment.Group group = doc.getGroup("article.documents");
-    for (Map<String, Fragment> groupdoc: group.toMapList()) {
-      // Desc and Link are Fragments, their type depending on what's declared in the Document Mask
-      Fragment.StructuredText desc = (Fragment.StructuredText)groupdoc.get("desc");
-      Fragment.Link link = (Fragment.Link)groupdoc.get("linktodoc");
+    for (GroupDoc groupdoc: group.getDocs()) {
+      // GroupDoc can be manipulated like a Document
+      Fragment.StructuredText desc = groupdoc.getStructuredText("desc");
+      Fragment.Link link = groupdoc.getLink("linktodoc");
     }
     // endgist
     Fragment.StructuredText firstDesc = (Fragment.StructuredText)group.toMapList().get(0).get("desc");
