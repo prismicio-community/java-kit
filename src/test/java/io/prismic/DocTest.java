@@ -24,14 +24,12 @@ public class DocTest extends TestCase
     }
   };
 
-  public DocTest(String testName)
-  {
+  public DocTest(String testName) {
     super(testName);
   }
 
-  public static Test suite()
-  {
-    return new TestSuite(CacheTest.class);
+  public static Test suite() {
+    return new TestSuite(DocTest.class);
   }
 
   public void testApi() {
@@ -51,7 +49,7 @@ public class DocTest extends TestCase
       Api api = Api.get("https://lesbonneschoses.prismic.io/api", "MC5-XXXXXXX-vRfvv70");
       // endgist
     } catch (Api.Error error) {
-      assertEquals(error.getMessage(), "Unexpected status code [401] on URL https://lesbonneschoses.prismic.io/api?access_token=MC5-XXXXXXX-vRfvv70"); // gisthide
+      assertEquals("Invalid access token", error.getMessage());
     }
   }
 
@@ -232,11 +230,13 @@ public class DocTest extends TestCase
 
     // Accessing Date and Timestamp fields
     LocalDate date = doc.getDate("blog-post.date").getValue();
-    Integer dateYear = date.getYear();
-    DateTime updateTime = doc.getTimestamp("blog-post.update").getValue();
-    Integer timeHour = updateTime.getHourOfDay();
+    int dateYear = date.getYear();
+    if (doc.getTimestamp("blog-post.update") != null) {
+      DateTime updateTime = doc.getTimestamp("blog-post.update").getValue();
+      Integer timeHour = updateTime.getHourOfDay();
+    }
     // endgist
-    assertEquals(year, 2013);
+    assertEquals(dateYear, 2013);
   }
 
   public void testGroup() throws Exception {
@@ -265,7 +265,7 @@ public class DocTest extends TestCase
     Fragment.Link source = doc.getLink("article.source");
     String url = source.getUrl(linkResolver);
     // endgist
-    assertEquals(url, "/testing_url/undefined/undefined");
+    assertEquals("/UlfoxUnM0wkXYXbE/dark-chocolate-macaron", url);
   }
 
   public void testEmbed() throws Exception {
@@ -278,7 +278,7 @@ public class DocTest extends TestCase
     // Html is the code to include to embed the object, and depends on the embedded service
     String html = video.asHtml();
     // endgist
-    assertEquals(html, "<iframe width=\"480\" height=\"270\" src=\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\" frameborder=\"0\" allowfullscreen></iframe>");
+    assertEquals("<div data-oembed=\"https://www.youtube.com/watch?v=baGfM6dBzs8\" data-oembed-type=\"video\" data-oembed-provider=\"youtube\"><iframe width=\"480\" height=\"270\" src=\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\" frameborder=\"0\" allowfullscreen></iframe></div>", html);
   }
 
   public void testColor() throws Exception {

@@ -42,9 +42,9 @@ public class CacheTest extends TestCase
 
     public void testNormalCache() throws InterruptedException {
         Cache cache = normalCache;
-        assertEquals("Normal cache should get existing entry", cache.get("/foo/2"), defaultValue());
+        assertEquals("Normal cache should get existing entry", defaultValue(), cache.get("/foo/2"));
         cache.set("/bar", ttl, defaultValue());
-        assertEquals("Normal cache should set & get new entry", cache.get("/bar"), defaultValue());
+        assertEquals("Normal cache should set & get new entry", defaultValue(), cache.get("/bar"));
         cache.set("/bar/1", ttl, defaultValue());
         Thread.sleep(1001);
         assertNull("Normal cache should discard old entries", cache.get("/bar/1"));
