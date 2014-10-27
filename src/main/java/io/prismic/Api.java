@@ -281,13 +281,22 @@ public class Api {
     final private Map<String,Form> forms;
     final private String oauthInitiateEndpoint;
     final private String oauthTokenEndpoint;
+    final private Experiments experiments;
 
-    public ApiData(List<Ref> refs, Map<String,String> bookmarks, Map<String,String> types, List<String> tags, Map<String,Form> forms, String oauthInitiateEndpoint, String oauthTokenEndpoint) {
+    public ApiData(List<Ref> refs,
+                   Map<String,String> bookmarks,
+                   Map<String,String> types,
+                   List<String> tags,
+                   Map<String,Form> forms,
+                   Experiments experiments,
+                   String oauthInitiateEndpoint,
+                   String oauthTokenEndpoint) {
       this.refs = Collections.unmodifiableList(refs);
       this.bookmarks = Collections.unmodifiableMap(bookmarks);
       this.types = Collections.unmodifiableMap(types);
       this.tags = Collections.unmodifiableList(tags);
       this.forms = Collections.unmodifiableMap(forms);
+      this.experiments = experiments;
       this.oauthInitiateEndpoint = oauthInitiateEndpoint;
       this.oauthTokenEndpoint = oauthTokenEndpoint;
     }
@@ -318,6 +327,10 @@ public class Api {
 
     public String getOAuthTokenEndpoint() {
       return oauthTokenEndpoint;
+    }
+
+    public Experiments getExperiments() {
+      return experiments;
     }
 
     // --
@@ -359,7 +372,9 @@ public class Api {
       String oauthInitiateEndpoint = json.path("oauth_initiate").asText();
       String oauthTokenEndpoint = json.path("oauth_token").asText();
 
-      return new ApiData(refs, bookmarks, types, tags, forms, oauthInitiateEndpoint, oauthTokenEndpoint);
+      Experiments experiments = Experiments.parse(json.path("experiments"));
+
+      return new ApiData(refs, bookmarks, types, tags, forms, experiments, oauthInitiateEndpoint, oauthTokenEndpoint);
     }
 
   }

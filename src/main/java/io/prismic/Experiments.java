@@ -55,7 +55,7 @@ public class Experiments {
   /**
    * Get the current running experiment variation ref from a cookie content
    */
-  String refFromCookie(String cookie) {
+  public String refFromCookie(String cookie) {
     if (cookie == null || "".equals(cookie)) {
       return null;
     }
@@ -65,10 +65,10 @@ public class Experiments {
       if (exp == null) {
         return null;
       }
-      int varIndexStr = Integer.parseInt(splitted[1]);
+      int varIndex = Integer.parseInt(splitted[1]);
       List<Variation> variations = exp.getVariations();
-      if (varIndexStr > -1 && varIndexStr < variations.size()) {
-        return variations.get(varIndexStr).getRef();
+      if (varIndex > -1 && varIndex < variations.size()) {
+        return variations.get(varIndex).getRef();
       }
     }
     return null;
@@ -76,15 +76,23 @@ public class Experiments {
 
   static Experiments parse(JsonNode json) {
     List<Experiment> draft = new ArrayList<Experiment>();
-    Iterator<JsonNode> draftJson = json.withArray("running").elements();
-    while(draftJson.hasNext()) {
-      draft.add(Experiment.parse(draftJson.next()));
+    List<Experiment> running = new ArrayList<Experiment>();
+    Iterator<JsonNode> it;
+
+    JsonNode draftJson = json.path("running");
+    if (!draftJson.isMissingNode()) {
+      it =  draftJson.elements();
+      while(it.hasNext()) {
+        draft.add(Experiment.parse(it.next()));
+      }
     }
 
-    List<Experiment> running = new ArrayList<Experiment>();
-    Iterator<JsonNode> runningJson = json.withArray("running").elements();
-    while(runningJson.hasNext()) {
-      running.add(Experiment.parse(runningJson.next()));
+    JsonNode runningJson = json.path("running");
+    if (!runningJson.isMissingNode()) {
+      it = runningJson.elements();
+      while (it.hasNext()) {
+        running.add(Experiment.parse(it.next()));
+      }
     }
 
     return new Experiments(draft, running);
