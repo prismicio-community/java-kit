@@ -309,6 +309,20 @@ public class DocTest extends TestCase
     assertEquals(coordinates, "48.877108,2.333879");
   }
 
+  public void testImage() {
+    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Document doc = api.getForm("everything")
+      .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
+      .results.get(0);
+    // startgist:d7cc82fbfb3574cd5868:prismic-images.java
+    // Accessing image fields
+    Fragment.Image image = doc.getImage("product.image");
+    // Most of the time you will be using the "main" view
+    String url = image.getView("main").getUrl();
+    // endgist
+    assertEquals(url, "https://prismic-io.s3.amazonaws.com/lesbonneschoses/f606ad513fcc2a73b909817119b84d6fd0d61a6d.png");
+  }
+
   public void testCache() {
     // startgist:1169febd1ccb6afd1273:prismic-cache.java
     Cache cache = new Cache() {
