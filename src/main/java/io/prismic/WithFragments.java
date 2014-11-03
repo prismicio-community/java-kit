@@ -72,9 +72,9 @@ public abstract class WithFragments {
 
   public List<Fragment.Image.View> getAllImages(String field, String view) {
     List<Fragment.Image.View> views = new ArrayList<Fragment.Image.View>();
-    for(Fragment.Image image: getAllImages(field)) {
+    for (Fragment.Image image: getAllImages(field)) {
       Fragment.Image.View imageView = image.getView(view);
-      if(imageView != null) {
+      if (imageView != null) {
         views.add(imageView);
       }
     }
@@ -213,7 +213,7 @@ public abstract class WithFragments {
 
   public String getDate(String field, String pattern) {
     Fragment.Date date = getDate(field);
-    if(date != null) {
+    if (date != null) {
       return date.asText(pattern);
     }
     return null;
@@ -221,7 +221,7 @@ public abstract class WithFragments {
 
   public String getNumber(String field, String pattern) {
     Fragment.Number number = getNumber(field);
-    if(number != null) {
+    if (number != null) {
       return number.asText(pattern);
     }
     return null;

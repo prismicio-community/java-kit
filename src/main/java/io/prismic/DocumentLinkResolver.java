@@ -26,10 +26,7 @@ public abstract class DocumentLinkResolver {
 
   public boolean isBookmark(Api api, Fragment.DocumentLink link, String bookmark) {
     String maybeId = api.getBookmarks().get(bookmark);
-    if(maybeId != null && maybeId.equals(link.getId())) {
-      return true;
-    }
-    return false;
+    return maybeId != null && maybeId.equals(link.getId());
   }
 
   private Fragment.DocumentLink asLink(Document document) {

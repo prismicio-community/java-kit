@@ -6,6 +6,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public class DocumentTest {
 
@@ -39,7 +40,7 @@ public class DocumentTest {
   }
 
   @Test
-  public void testImage() throws Exception {
+  public void image() {
     Api api = Api.get("https://test-public.prismic.io/api");
     Document doc =
       api.getForm("everything")
@@ -52,7 +53,21 @@ public class DocumentTest {
   }
 
   @Test
-  public void testLinksInImages() throws Exception {
+  public void allImages() {
+    Api api = Api.get("https://test-public.prismic.io/api");
+    Document doc =
+      api.getForm("everything")
+         .ref(api.getMaster())
+         .query(Predicates.at("document.id", "VFfjTSgAACYA86Zn"))
+         .submit().getResults().get(0);
+    List<Fragment.Image> images = doc.getAllImages("product.gallery");
+    List<Fragment.Image.View> icons = doc.getAllImages("product.gallery", "icon");
+    Assert.assertEquals(2, images.size());
+    Assert.assertEquals(2, icons.size());
+  }
+
+  @Test
+  public void linksInImages() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{ \"type\": \"StructuredText\", \"value\": [ { \"spans\": [], \"text\": \"Here is some introductory text.\", \"type\": \"paragraph\" }, { \"spans\": [], \"text\": \"The following image is linked.\", \"type\": \"paragraph\" }, { \"alt\": \"\", \"copyright\": \"\", \"dimensions\": { \"height\": 129, \"width\": 260 }, \"linkTo\": { \"type\": \"Link.web\", \"value\": { \"url\": \"http://google.com/\" } }, \"type\": \"image\", \"url\": \"http://fpoimg.com/129x260\" }, { \"spans\": [ { \"end\": 20, \"start\": 0, \"type\": \"strong\" } ], \"text\": \"More important stuff\", \"type\": \"paragraph\" }, { \"spans\": [], \"text\": \"The next is linked to a valid document:\", \"type\": \"paragraph\" }, { \"alt\": \"\", \"copyright\": \"\", \"dimensions\": { \"height\": 400, \"width\": 400 }, \"linkTo\": { \"type\": \"Link.document\", \"value\": { \"document\": { \"id\": \"UxCQFFFFFFFaaYAH\", \"slug\": \"something-fantastic\", \"type\": \"lovely-thing\" }, \"isBroken\": false } }, \"type\": \"image\", \"url\": \"http://fpoimg.com/400x400\" }, { \"spans\": [], \"text\": \"The next is linked to a broken document:\", \"type\": \"paragraph\" }, { \"alt\": \"\", \"copyright\": \"\", \"dimensions\": { \"height\": 250, \"width\": 250 }, \"linkTo\": { \"type\": \"Link.document\", \"value\": { \"document\": { \"id\": \"UxERPAEAAHQcsBUH\", \"slug\": \"-\", \"type\": \"event-calendar\" }, \"isBroken\": true } }, \"type\": \"image\", \"url\": \"http://fpoimg.com/250x250\" }, { \"spans\": [], \"text\": \"One more image, this one is not linked:\", \"type\": \"paragraph\" }, { \"alt\": \"\", \"copyright\": \"\", \"dimensions\": { \"height\": 199, \"width\": 300 }, \"type\": \"image\", \"url\": \"http://fpoimg.com/199x300\" } ] }";
     JsonNode json = mapper.readTree(jsonString);
@@ -64,7 +79,7 @@ public class DocumentTest {
   }
 
   @Test
-  public void testProperEscape() throws Exception {
+  public void properEscape() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{ \"type\": \"StructuredText\", \"value\": [ { \"type\": \"paragraph\", \"text\": \"<not a real tag>\", \"spans\": [] } ]}";
     JsonNode json = mapper.readTree(jsonString);
@@ -76,7 +91,7 @@ public class DocumentTest {
   }
 
   @Test
-  public void testLabelSpans() throws Exception {
+  public void labelSpans() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"type\":\"StructuredText\",\"value\":[{\"type\":\"paragraph\",\"text\":\"To query your API, you will need to specify a form and a reference in addition to your query.\",\"spans\":[{\"start\":46,\"end\":50,\"type\":\"strong\"},{\"start\":57,\"end\":67,\"type\":\"strong\"},{\"start\":78,\"end\":92,\"type\":\"strong\"}]},{\"type\":\"list-item\",\"text\":\"The operator: this is the function you call to build the predicate, for example Predicate.at.\",\"spans\":[{\"start\":4,\"end\":12,\"type\":\"em\"},{\"start\":80,\"end\":92,\"type\":\"label\",\"data\":{\"label\":\"codespan\"}}]},{\"type\":\"list-item\",\"text\":\"The fragment: the first argument you pass, for example document.id.\",\"spans\":[{\"start\":4,\"end\":12,\"type\":\"em\"},{\"start\":55,\"end\":67,\"type\":\"label\",\"data\":{\"label\":\"codespan\"}}]},{\"type\":\"list-item\",\"text\":\"The values: the other arguments you pass, usually one but it can be more for some predicates. For example product.\",\"spans\":[{\"start\":4,\"end\":10,\"type\":\"em\"},{\"start\":106,\"end\":113,\"type\":\"label\",\"data\":{\"label\":\"codespan\"}}]}]}";
     JsonNode json = mapper.readTree(jsonString);

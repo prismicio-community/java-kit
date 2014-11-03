@@ -32,7 +32,9 @@ public class ExperimentTest {
     JsonNode json = mapper.readTree(experimentsJson);
     Experiments experiments = Experiments.parse(json);
 
-    Experiment exp1 = experiments.getRunning().get(0);
+    Assert.assertEquals(2, experiments.getAll().size());
+
+    Experiment exp1 = experiments.getCurrent();
     Assert.assertEquals("VDUBBawGAKoGelsX", exp1.getId());
     Assert.assertEquals("_UQtin7EQAOH5M34RQq6Dg", exp1.getGoogleId());
     Assert.assertEquals("Exp 1", exp1.getName());

@@ -317,7 +317,7 @@ public class DocTest
   }
 
   @Test
-  public void testImage() {
+  public void image() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
