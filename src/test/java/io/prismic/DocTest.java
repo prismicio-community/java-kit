@@ -65,7 +65,7 @@ public class DocTest extends TestCase
     // The response object contains all documents of type "product"
     // including the new "Saint-Patrick's Cupcake"
     // endgist
-    assertEquals(response.results.size(), 17);
+    assertEquals(response.getResults().size(), 17);
   }
 
   public void testSimpleQuery() {
@@ -90,9 +90,9 @@ public class DocTest extends TestCase
       .orderings("[my.product.price desc]")
       .submit();
       // The products are now ordered by price, highest first
-      List<Document> results = response.results;
+      List<Document> results = response.getResults();
     // endgist
-    assertEquals(response.results_per_page, 100);
+    assertEquals(response.getResultsPerPage(), 100);
   }
 
   public void testPredicates() {
@@ -181,7 +181,7 @@ public class DocTest extends TestCase
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbl"))
       .ref(api.getMaster()).submit()
-      .results.get(0);
+      .getResults().get(0);
     // startgist:a16e6a29ad84110a46b8:prismic-getText.java
     String author = doc.getText("blog-post.author");
     // endgist
@@ -192,7 +192,7 @@ public class DocTest extends TestCase
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
-      .results.get(0);
+      .getResults().get(0);
     // startgist:a74e5e7850f2f202eb02:prismic-getNumber.java
     // Number predicates
     Predicate gt = Predicates.gt("my.product.price", 10);
@@ -208,7 +208,7 @@ public class DocTest extends TestCase
   public void testDateTimestamp() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything").query(Predicates.at("document.id", "UlfoxUnM0wkXYXbl"))
-      .ref(api.getMaster()).submit().results.get(0);
+      .ref(api.getMaster()).submit().getResults().get(0);
     // startgist:3297308d8a2395ff68b5:prismic-dateTimestamp.java
     // Date and Timestamp predicates
     Predicate dateBefore = Predicates.dateBefore("my.product.releaseDate", new DateTime(2014, 6, 1, 0, 0));
@@ -252,7 +252,7 @@ public class DocTest extends TestCase
       Fragment.Link link = groupdoc.getLink("linktodoc");
     }
     // endgist
-    Fragment.StructuredText firstDesc = (Fragment.StructuredText)group.toMapList().get(0).get("desc");
+    Fragment.StructuredText firstDesc = group.getDocs().get(0).getStructuredText("desc");
     assertEquals(firstDesc.asHtml(linkResolver), "<p>A detailed step by step point of view on how installing happens.</p>");
   }
 
@@ -313,7 +313,7 @@ public class DocTest extends TestCase
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
-      .results.get(0);
+      .getResults().get(0);
     // startgist:d7cc82fbfb3574cd5868:prismic-images.java
     // Accessing image fields
     Fragment.Image image = doc.getImage("product.image");

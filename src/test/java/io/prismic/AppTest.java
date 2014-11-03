@@ -181,12 +181,12 @@ public class AppTest extends TestCase {
     Fragment.Group docchapterGroup = docchapter.getGroup("docchapter.docs");
     assertTrue(
       "Group finds the proper amount of elements",
-      docchapterGroup.toMapList().size() == 2
+      docchapterGroup.getDocs().size() == 2
     );
 
     assertEquals(
       "Properly browsing the group until inside a subfragment",
-      ((Fragment.DocumentLink)docchapterGroup.toMapList().get(0).get("linktodoc")).getId(),
+      ((Fragment.DocumentLink)docchapterGroup.getDocs().get(0).getLink("linktodoc")).getId(),
       "UrDofwEAALAdpbNH"
     );
   }

@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.*;
 
 public class Response {
 
-  List<Document> results;
-  int page;
-  int results_per_page;
-  int results_size;
-  int total_results_size;
-  int total_pages;
-  String next_page;
-  String prev_page;
+  private final List<Document> results;
+  private final int page;
+  private final int results_per_page;
+  private final int total_results_size;
+  private final int total_pages;
+  private final String next_page;
+  private final String prev_page;
 
   public Response(List<Document> results, int page, int results_per_page, int total_results_size, int total_pages, String next_page, String prev_page){
     this.results = results;
@@ -63,4 +62,5 @@ public class Response {
       json.path("prev_page").asText().equals("null") ? null : json.path("prev_page").asText()
     );
   }
+
 }
