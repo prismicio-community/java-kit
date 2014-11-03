@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ public class AppTest {
    * and checks whether its master id is available and correct.
    */
   @Test
-  public void testApiIsInitialized() {
+  public void apiIsInitialized() {
     Assert.assertTrue(
       "Api object is null.",
       lbc_api != null
@@ -41,7 +42,7 @@ public class AppTest {
    * Make sure a call to a private repository without a token returns the expected error
    */
   @Test(expected = Api.Error.class)
-  public void testInvalidToken() {
+  public void invalidToken() {
     Api api = Api.get("https://private-test.prismic.io/api");
   }
 
@@ -49,7 +50,7 @@ public class AppTest {
    * Tests whether a simple query (all the products) works.
    */
   @Test
-  public void testApiQueryWorks(){
+  public void apiQueryWorks(){
     Assert.assertEquals(
       "SearchForm query does not return the right amount of documents.",
       lbc_api.getForm("products").ref(lbc_api.getMaster()).submit().getResults().size(),
@@ -62,7 +63,7 @@ public class AppTest {
    * This allows to test many fragment types in one shot.
    */
   @Test
-  public void testDocumentSerializationWorks() {
+  public void documentSerializationWorks() {
     String article1_retrieved = lbc_api.getForm("everything")
     .query("[[:d = at(document.id, \"UlfoxUnM0wkXYXbt\")]]")
     .ref(lbc_api.getMaster())
@@ -107,7 +108,7 @@ public class AppTest {
    * Tests usage of a custom html serializer
    */
   @Test
-  public void testHtmlSerializaterWorks() {
+  public void htmlSerializaterWorks() {
     String article2_retrieved = lbc_api.getForm("everything")
     .query("[[:d = at(document.id, \"UlfoxUnM0wkXYXbX\")]]")
     .ref(lbc_api.getMaster())
@@ -142,7 +143,7 @@ public class AppTest {
   }
 
   @Test
-  public void testGroupFragments() {
+  public void groupFragments() {
     Document docchapter = micro_api.getForm("everything")
       .query("[[:d = at(document.type, \"docchapter\")]]")
       .set("orderings", "[my.docchapter.priority]")
@@ -177,7 +178,7 @@ public class AppTest {
   }
 
   @Test
-  public void testPreformattedSerialization() {
+  public void preformattedSerialization() {
     Document installingMetaMicro = micro_api.getForm("everything")
       .query("[[:d = at(document.id, \"UrDejAEAAFwMyrW9\")]]")
       .ref(micro_api.getMaster())
@@ -201,7 +202,7 @@ public class AppTest {
   }
 
   @Test
-  public void testLinkedDocuments() {
+  public void linkedDocuments() {
     java.util.List<Document> documents = micro_api.getForm("everything").ref(micro_api.getMaster()).query("[[:d = any(document.type, [\"doc\",\"docchapter\"])]]").submit().getResults();
     Assert.assertEquals(
       "Have one linked document",
@@ -211,7 +212,7 @@ public class AppTest {
   }
 
   @Test
-  public void testPagination() {
+  public void pagination() {
     Assert.assertEquals(
       "Page number is right if page 1 requested",
       lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getPage(),
@@ -276,7 +277,7 @@ public class AppTest {
   }
 
   @Test
-  public void testSearchFormFunctions() {
+  public void searchFormFunctions() {
     Response docsInt = lbc_api.getForm("everything").pageSize(15).page(2).ref(lbc_api.getMaster()).submit();
     Assert.assertTrue(
       "The page and pageSize functions work well with an integer",
@@ -300,11 +301,12 @@ public class AppTest {
   }
 
   @Test
-  public void testFormNames() {
+  public void formNames() {
       Map<String, String> formNames = lbc_api.getFormNames();
-      Assert.assertTrue(
+      Assert.assertEquals(
         "The correct number of form names is returned",
-        formNames.size() == 10
+        10,
+        formNames.size()
       );
       
       Assert.assertEquals(
@@ -314,11 +316,21 @@ public class AppTest {
       );
   }
 
+  @Test
+  public void bookmarks() {
+    Map<String, String> bookmarks = lbc_api.getBookmarks();
+    Assert.assertEquals(
+      "The correct number of bookmarks is returned",
+      3,
+      bookmarks.size()
+    );
+  }
+
   /**
    * Tests NoCache implementation.
    */
   @Test
-  public void testNoCacheImplWorks(){
+  public void noCacheImplWorks(){
     Api api = Api.get("https://lesbonneschoses.prismic.io/api", null, new Cache.NoCache(), null, new FragmentParser.Default());
       Assert.assertEquals(
         "NoCache implementation should be transparent.",

@@ -21,7 +21,7 @@ public class Predicates {
     return new SimplePredicate("at", fragment, value);
   }
 
-  public static Predicate any(String fragment, List<String> values) {
+  public static Predicate any(String fragment, Iterable<String> values) {
     return new SimplePredicate("any", fragment, values);
   }
 

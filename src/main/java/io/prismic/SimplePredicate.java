@@ -2,6 +2,7 @@ package io.prismic;
 
 import org.joda.time.DateTime;
 
+import java.util.Iterator;
 import java.util.List;
 
 class SimplePredicate implements Predicate {
@@ -48,8 +49,8 @@ class SimplePredicate implements Predicate {
   }
 
   private static String serializeField(Object value) {
-    if (value instanceof List) {
-      return "[" + join((List)value, ",") + "]";
+    if (value instanceof Iterable) {
+      return "[" + join((Iterable)value, ",") + "]";
     } else if (value instanceof Predicates.Month) {
       return ("\"" + capitalize(((Predicates.Month) value).name()) + "\"");
     } else if (value instanceof Predicates.DayOfWeek) {
@@ -63,11 +64,11 @@ class SimplePredicate implements Predicate {
     }
   }
 
-  private static <T> String join(List<T> l, String sep) {
-    if (l.size() == 0) return "";
+  private static <T> String join(Iterable<T> elements, String sep) {
+    if (!elements.iterator().hasNext()) return "";
     String result = "";
     boolean first = true;
-    for (T elt: l) {
+    for (T elt: elements) {
       if (first) {
         first = false;
       } else {
