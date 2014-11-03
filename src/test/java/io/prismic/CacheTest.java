@@ -1,60 +1,54 @@
 package io.prismic;
 
-import java.util.Map;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.prismic.Cache.BuiltInCache;
+import junit.framework.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Unit test for Cache.
  */
-public class CacheTest extends TestCase
+public class CacheTest
 {
-    private Cache emptyCache = null;
-    private Cache normalCache = null;
-    private Cache fullCache = null;
-    private long ttl = 1000L;
+    private static Cache emptyCache;
+    private static Cache normalCache;
+    private static Cache fullCache;
+    private final static long TTL = 1000L;
 
-    public CacheTest(String testName)
-    {
-        super(testName);
-        this.emptyCache = fillCache(0);
-        this.normalCache = fillCache(5);
-        this.fullCache = fillCache(10);
+    @BeforeClass
+    public static void init() {
+        emptyCache = fillCache(0);
+        normalCache = fillCache(5);
+        fullCache = fillCache(10);
     }
 
-    public static Test suite()
-    {
-        return new TestSuite(CacheTest.class);
-    }
-
+    @Test
     public void testEmptyCache() {
         Cache cache = emptyCache;
-        assertNull("Empty cache should return empty result", cache.get("/foo"));
-        cache.set("/bar", ttl, defaultValue());
-        assertEquals("Empty cache should set & get new entry", cache.get("/bar"), defaultValue());
+        Assert.assertNull("Empty cache should return empty result", cache.get("/foo"));
+        cache.set("/bar", TTL, defaultValue());
+        Assert.assertEquals("Empty cache should set & get new entry", cache.get("/bar"), defaultValue());
     }
 
+    @Test
     public void testNormalCache() throws InterruptedException {
         Cache cache = normalCache;
-        assertEquals("Normal cache should get existing entry", defaultValue(), cache.get("/foo/2"));
-        cache.set("/bar", ttl, defaultValue());
-        assertEquals("Normal cache should set & get new entry", defaultValue(), cache.get("/bar"));
-        cache.set("/bar/1", ttl, defaultValue());
+        Assert.assertEquals("Normal cache should get existing entry", defaultValue(), cache.get("/foo/2"));
+        cache.set("/bar", TTL, defaultValue());
+        Assert.assertEquals("Normal cache should set & get new entry", defaultValue(), cache.get("/bar"));
+        cache.set("/bar/1", TTL, defaultValue());
         Thread.sleep(1001);
-        assertNull("Normal cache should discard old entries", cache.get("/bar/1"));
+        Assert.assertNull("Normal cache should discard old entries", cache.get("/bar/1"));
     }
 
+    @Test
     public void testFullCache() throws InterruptedException {
         Cache cache = fullCache;
-        cache.set("/bar/1", ttl, defaultValue());
-        assertEquals("Full cache should accept new entries", cache.get("/bar/1"), defaultValue());
-        assertNull("Full cache should discard old entries", cache.get("/foo/1"));
+        cache.set("/bar/1", TTL, defaultValue());
+        Assert.assertEquals("Full cache should accept new entries", cache.get("/bar/1"), defaultValue());
     }
 
     public static Cache fillCache(int nbDocuments)

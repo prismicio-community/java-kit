@@ -2,20 +2,18 @@ package io.prismic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import junit.framework.Assert;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Test snippets for the documentation
  */
-public class DocTest extends TestCase
+public class DocTest
 {
 
   DocumentLinkResolver linkResolver = new DocumentLinkResolver() {
@@ -24,14 +22,7 @@ public class DocTest extends TestCase
     }
   };
 
-  public DocTest(String testName) {
-    super(testName);
-  }
-
-  public static Test suite() {
-    return new TestSuite(DocTest.class);
-  }
-
+  @Test
   public void testApi() {
     // startgist:9b08c18ad53ba62736b7:prismic-api.java
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
@@ -39,9 +30,10 @@ public class DocTest extends TestCase
       System.out.println("Reference: " + ref);
     }
     // endgist
-    assertEquals(api.getRefs().size(), 1);
+    Assert.assertEquals(api.getRefs().size(), 1);
   }
 
+  @Test
   public void testApiPrivate() {
     try {
       // startgist:3ed369c967dbb931a9ab:prismic-apiPrivate.java
@@ -49,10 +41,11 @@ public class DocTest extends TestCase
       Api api = Api.get("https://lesbonneschoses.prismic.io/api", "MC5-XXXXXXX-vRfvv70");
       // endgist
     } catch (Api.Error error) {
-      assertEquals("Invalid access token", error.getMessage());
+      Assert.assertEquals("Invalid access token", error.getMessage());
     }
   }
 
+  @Test
   public void testReferences() {
     // startgist:b5c1ca7cc474c6456214:prismic-references.java
     String previewToken = "MC5VbDdXQmtuTTB6Z0hNWHF3.c--_vVbvv73vv73vv73vv71EA--_vS_vv73vv70T77-9Ke-_ve-_vWfvv70ebO-_ve-_ve-_vQN377-9ce-_vRfvv70";
@@ -65,9 +58,10 @@ public class DocTest extends TestCase
     // The response object contains all documents of type "product"
     // including the new "Saint-Patrick's Cupcake"
     // endgist
-    assertEquals(response.getResults().size(), 17);
+    Assert.assertEquals(response.getResults().size(), 17);
   }
 
+  @Test
   public void testSimpleQuery() {
     // startgist:e3f35b01edbd553ca60a:prismic-simplequery.java
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
@@ -77,9 +71,10 @@ public class DocTest extends TestCase
                            .query(Predicates.at("document.type", "product"))
                            .submit();
     // endgist
-    assertEquals(response.getTotalResultsSize(), 16);
+    Assert.assertEquals(response.getTotalResultsSize(), 16);
   }
 
+  @Test
   public void testOrderings() {
     // startgist:f5077e40997afd0008df:prismic-orderings.java
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
@@ -92,9 +87,10 @@ public class DocTest extends TestCase
       // The products are now ordered by price, highest first
       List<Document> results = response.getResults();
     // endgist
-    assertEquals(response.getResultsPerPage(), 100);
+    Assert.assertEquals(response.getResultsPerPage(), 100);
   }
 
+  @Test
   public void testPredicates() {
     // startgist:ad8134f5848d828fae50:prismic-predicates.java
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
@@ -106,9 +102,10 @@ public class DocTest extends TestCase
         Predicates.dateAfter("my.blog-post.date", new DateTime(2014, 6, 1, 0, 0))
       ).submit();
     // endgist
-    assertEquals(response.getTotalResultsSize(), 0);
+    Assert.assertEquals(response.getTotalResultsSize(), 0);
   }
 
+  @Test
   public void testAllPredicates() {
     // startgist:b16bf60f1f6f8cec55f5:prismic-allPredicates.java
     // "at" predicate: equality of a fragment to a value.
@@ -122,10 +119,11 @@ public class DocTest extends TestCase
     // "similar" predicate, with a document id as reference
     Predicate similar = Predicates.similar("UXasdFwe42D", 10);
     // endgist
-    assertEquals(at.q(), "[:d = at(document.type, \"article\")]");
-    assertEquals(any.q(), "[:d = any(document.type, [\"article\",\"blog-post\"])]");
+    Assert.assertEquals(at.q(), "[:d = at(document.type, \"article\")]");
+    Assert.assertEquals(any.q(), "[:d = any(document.type, [\"article\",\"blog-post\"])]");
   }
 
+  @Test
   public void testAsHtml() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Response response = api.getForm("everything")
@@ -141,9 +139,10 @@ public class DocTest extends TestCase
     };
     String html = doc.getStructuredText("blog-post.body").asHtml(resolver);
     // endgist
-    assertNotNull(html);
+    Assert.assertNotNull(html);
   }
 
+  @Test
   public void testHtmlSerializer() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Response response = api.getForm("everything")
@@ -173,9 +172,10 @@ public class DocTest extends TestCase
     };
     String html = doc.getStructuredText("blog-post.body").asHtml(resolver, serializer);
     // endgist
-    assertNotNull(html);
+    Assert.assertNotNull(html);
   }
 
+  @Test
   public void testText() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything")
@@ -185,9 +185,10 @@ public class DocTest extends TestCase
     // startgist:a16e6a29ad84110a46b8:prismic-getText.java
     String author = doc.getText("blog-post.author");
     // endgist
-    assertEquals(author, "John M. Martelle, Fine Pastry Magazine");
+    Assert.assertEquals(author, "John M. Martelle, Fine Pastry Magazine");
   }
 
+  @Test
   public void testGetNumber() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything")
@@ -202,9 +203,10 @@ public class DocTest extends TestCase
     // Accessing number fields
     Double price = doc.getNumber("product.price").getValue();
     // endgist
-    assertEquals(price, 2.5);
+    Assert.assertEquals(price, 2.5);
   }
 
+  @Test
   public void testDateTimestamp() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything").query(Predicates.at("document.id", "UlfoxUnM0wkXYXbl"))
@@ -236,9 +238,10 @@ public class DocTest extends TestCase
       Integer timeHour = updateTime.getHourOfDay();
     }
     // endgist
-    assertEquals(dateYear, 2013);
+    Assert.assertEquals(dateYear, 2013);
   }
 
+  @Test
   public void testGroup() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"documents\":{\"type\":\"Group\",\"value\":[{\"linktodoc\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UrDejAEAAFwMyrW9\",\"type\":\"doc\",\"tags\":[],\"slug\":\"installing-meta-micro\"},\"isBroken\":false}},\"desc\":{\"type\":\"StructuredText\",\"value\":[{\"type\":\"paragraph\",\"text\":\"A detailed step by step point of view on how installing happens.\",\"spans\":[]}]}},{\"linktodoc\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UrDmKgEAALwMyrXA\",\"type\":\"doc\",\"tags\":[],\"slug\":\"using-meta-micro\"},\"isBroken\":false}}}]}}}}";
@@ -253,9 +256,10 @@ public class DocTest extends TestCase
     }
     // endgist
     Fragment.StructuredText firstDesc = group.getDocs().get(0).getStructuredText("desc");
-    assertEquals(firstDesc.asHtml(linkResolver), "<p>A detailed step by step point of view on how installing happens.</p>");
+    Assert.assertEquals(firstDesc.asHtml(linkResolver), "<p>A detailed step by step point of view on how installing happens.</p>");
   }
 
+  @Test
   public void testLink() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"source\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UlfoxUnM0wkXYXbE\",\"type\":\"product\",\"tags\":[\"Macaron\"],\"slug\":\"dark-chocolate-macaron\"},\"isBroken\":false}}}}}";
@@ -265,9 +269,10 @@ public class DocTest extends TestCase
     Fragment.Link source = doc.getLink("article.source");
     String url = source.getUrl(linkResolver);
     // endgist
-    assertEquals("/UlfoxUnM0wkXYXbE/dark-chocolate-macaron", url);
+    Assert.assertEquals("/UlfoxUnM0wkXYXbE/dark-chocolate-macaron", url);
   }
 
+  @Test
   public void testEmbed() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"video\":{\"type\":\"Embed\",\"value\":{\"oembed\":{\"provider_url\":\"http://www.youtube.com/\",\"type\":\"video\",\"thumbnail_height\":360,\"height\":270,\"thumbnail_url\":\"http://i1.ytimg.com/vi/baGfM6dBzs8/hqdefault.jpg\",\"width\":480,\"provider_name\":\"YouTube\",\"html\":\"<iframe width=\\\"480\\\" height=\\\"270\\\" src=\\\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\\\" frameborder=\\\"0\\\" allowfullscreen></iframe>\",\"author_name\":\"Siobhan Wilson\",\"version\":\"1.0\",\"author_url\":\"http://www.youtube.com/user/siobhanwilsonsongs\",\"thumbnail_width\":480,\"title\":\"Siobhan Wilson - All Dressed Up\",\"embed_url\":\"https://www.youtube.com/watch?v=baGfM6dBzs8\"}}}}}}";
@@ -278,9 +283,10 @@ public class DocTest extends TestCase
     // Html is the code to include to embed the object, and depends on the embedded service
     String html = video.asHtml();
     // endgist
-    assertEquals("<div data-oembed=\"https://www.youtube.com/watch?v=baGfM6dBzs8\" data-oembed-type=\"video\" data-oembed-provider=\"youtube\"><iframe width=\"480\" height=\"270\" src=\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\" frameborder=\"0\" allowfullscreen></iframe></div>", html);
+    Assert.assertEquals("<div data-oembed=\"https://www.youtube.com/watch?v=baGfM6dBzs8\" data-oembed-type=\"video\" data-oembed-provider=\"youtube\"><iframe width=\"480\" height=\"270\" src=\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\" frameborder=\"0\" allowfullscreen></iframe></div>", html);
   }
 
+  @Test
   public void testColor() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"background\":{\"type\":\"Color\",\"value\":\"#000000\"}}}}";
@@ -290,9 +296,10 @@ public class DocTest extends TestCase
     Fragment.Color bgcolor = doc.getColor("article.background");
     String hexa = bgcolor.getHexValue();
     // endgist
-    assertEquals(hexa, "#000000");
+    Assert.assertEquals(hexa, "#000000");
   }
 
+  @Test
   public void testGeoPoint() throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"location\":{\"type\":\"GeoPoint\",\"value\":{\"latitude\":48.877108,\"longitude\":2.333879}}}}}";
@@ -306,9 +313,10 @@ public class DocTest extends TestCase
     Fragment.GeoPoint place = doc.getGeoPoint("article.location");
     String coordinates = place.getLatitude() + "," + place.getLongitude();
     // endgist
-    assertEquals(coordinates, "48.877108,2.333879");
+    Assert.assertEquals(coordinates, "48.877108,2.333879");
   }
 
+  @Test
   public void testImage() {
     Api api = Api.get("https://lesbonneschoses.prismic.io/api");
     Document doc = api.getForm("everything")
@@ -320,9 +328,10 @@ public class DocTest extends TestCase
     // Most of the time you will be using the "main" view
     String url = image.getView("main").getUrl();
     // endgist
-    assertEquals(url, "https://prismic-io.s3.amazonaws.com/lesbonneschoses/f606ad513fcc2a73b909817119b84d6fd0d61a6d.png");
+    Assert.assertEquals(url, "https://prismic-io.s3.amazonaws.com/lesbonneschoses/f606ad513fcc2a73b909817119b84d6fd0d61a6d.png");
   }
 
+  @Test
   public void testCache() {
     // startgist:1169febd1ccb6afd1273:prismic-cache.java
     Cache cache = new Cache() {
@@ -345,7 +354,7 @@ public class DocTest extends TestCase
     // Thi Api will use the custom cache object
     Api api = Api.get("https://lesbonneschoses.prismic.io/api", cache, null /* logger */);
     // endgist
-    assertNotNull(api);
+    Assert.assertNotNull(api);
   }
 
 }
