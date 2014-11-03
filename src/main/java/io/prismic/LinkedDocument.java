@@ -22,7 +22,7 @@ public class LinkedDocument {
   }
 
   public String getSlug() {
-    return this.id;
+    return this.slug;
   }
 
   public String getType() {
