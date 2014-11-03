@@ -2,8 +2,6 @@ package io.prismic;
 
 import java.util.*;
 
-import java.lang.StringBuffer;
-
 import org.joda.time.*;
 import org.joda.time.format.*;
 

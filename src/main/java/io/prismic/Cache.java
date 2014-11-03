@@ -1,6 +1,7 @@
 package io.prismic;
 
 import com.fasterxml.jackson.databind.*;
+import org.apache.commons.collections4.map.LRUMap;
 
 public interface Cache {
 
@@ -71,12 +72,12 @@ public interface Cache {
     }
 
     public BuiltInCache(int maxDocuments) {
-      this.cache = java.util.Collections.synchronizedMap(new org.apache.commons.collections.map.LRUMap(maxDocuments));
+      this.cache = java.util.Collections.synchronizedMap(new LRUMap<String, Entry>(maxDocuments));
       this.states = java.util.Collections.synchronizedMap(new java.util.HashMap<String, State>());
     }
 
     public JsonNode get(String key) {
-      Entry entry = (Entry)this.cache.get(key);
+      Entry entry = this.cache.get(key);
       Boolean isExpired = this.isExpired(key);
       Boolean isPending = this.isPending(key);
       if(entry != null && (!isExpired || (isExpired && isPending))) {
