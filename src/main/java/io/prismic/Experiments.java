@@ -79,7 +79,7 @@ public class Experiments {
     List<Experiment> running = new ArrayList<Experiment>();
     Iterator<JsonNode> it;
 
-    JsonNode draftJson = json.path("running");
+    JsonNode draftJson = json.path("draft");
     if (!draftJson.isMissingNode()) {
       it =  draftJson.elements();
       while(it.hasNext()) {
