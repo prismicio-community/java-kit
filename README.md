@@ -1,5 +1,6 @@
 ## Java development kit for prismic.io
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.prismic/java-kit/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.prismic/java-kit)
 [![Build Status](https://api.travis-ci.org/prismicio/java-kit.png)](https://travis-ci.org/prismicio/java-kit)
 
 ### Getting started
