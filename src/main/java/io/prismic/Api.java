@@ -262,6 +262,27 @@ public class Api {
     throw new Api.Error(Api.Error.Code.UNEXPECTED, "No master?");
   }
 
+  /**
+   * Return the URL to display a given preview
+   * @param token as received from Prismic server to identify the content to preview
+   * @param linkResolver the link resolver to build URL for your site
+   * @param defaultUrl the URL to default to return if the preview doesn't correspond to a document
+   *                (usually the home page of your site)
+   * @return a Future corresponding to the URL you should redirect the user to preview the requested change
+   */
+  public String previewSession(String token, DocumentLinkResolver linkResolver, String defaultUrl) {
+    JsonNode tokenJson = HttpClient.fetch(token, logger, cache);
+    JsonNode mainDocumentId = tokenJson.path("mainDocument");
+    if (!mainDocumentId.isTextual()) {
+      return defaultUrl;
+    }
+    Response resp = getForm("everything").query(Predicates.at("document.id", mainDocumentId.asText())).ref(token).submit();
+    if (resp.getResults().size() == 0) {
+      return defaultUrl;
+    }
+    return linkResolver.resolve(resp.getResults().get(0));
+  }
+
   public String getOAuthInitiateEndpoint() {
     return apiData.getOAuthInitiateEndpoint();
   }

@@ -13,7 +13,12 @@ public class Experiment {
   private final String name;
   private final List<Variation> variations;
 
-  public static String COOKIE_NAME = "io.primic.experiment";
+  /**
+   *
+   * @deprecated Use {@link #io.prismic.Prismic.EXPERIMENTS_COOKIE}
+   */
+  @Deprecated
+  public static String COOKIE_NAME = Prismic.EXPERIMENTS_COOKIE;
 
   public Experiment(String id, String googleId, String name, List<Variation> variations) {
     this.id = id;
