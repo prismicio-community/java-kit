@@ -177,6 +177,7 @@ public class Api {
   /**
    * From a properly built {@link Api} object, returns the ref with the corresponding label
    *
+   * @param label the ref label as defined in the Writing Room
    * @return the Ref, or null if not found
    */
   public Ref getRef(String label) {
@@ -248,6 +249,13 @@ public class Api {
     return new Form.SearchForm(this, apiData.getForms().get(form));
   }
 
+  /**
+   * Return the current experiments on the repository
+   * @return
+   */
+  public Experiments getExperiments() {
+    return apiData.getExperiments();
+  }
 
   /**
    * From a properly built {@link Api} object, returns the ref ID (points in a prismic.io repository's timeline,
@@ -268,7 +276,7 @@ public class Api {
    * @param linkResolver the link resolver to build URL for your site
    * @param defaultUrl the URL to default to return if the preview doesn't correspond to a document
    *                (usually the home page of your site)
-   * @return a Future corresponding to the URL you should redirect the user to preview the requested change
+   * @return the URL you should redirect the user to preview the requested change
    */
   public String previewSession(String token, DocumentLinkResolver linkResolver, String defaultUrl) {
     JsonNode tokenJson = HttpClient.fetch(token, logger, cache);

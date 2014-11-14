@@ -44,6 +44,7 @@ public class Experiments {
   /**
    * First running experiment. To be used as the current running experiment
    * null if no running experiment.
+   * @return the current experiment, or null if no experiment is running
    */
   public Experiment getCurrent() {
     if (this.running.size() > 0) {
@@ -54,6 +55,8 @@ public class Experiments {
 
   /**
    * Get the current running experiment variation ref from a cookie content
+   * @param cookie the value of the cookie received from the request
+   * @return the ref of the variation currently used by the user having the cookie
    */
   public String refFromCookie(String cookie) {
     if (cookie == null || "".equals(cookie)) {

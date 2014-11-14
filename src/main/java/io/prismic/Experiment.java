@@ -13,10 +13,6 @@ public class Experiment {
   private final String name;
   private final List<Variation> variations;
 
-  /**
-   *
-   * @deprecated Use {@link #io.prismic.Prismic.EXPERIMENTS_COOKIE}
-   */
   @Deprecated
   public static String COOKIE_NAME = Prismic.EXPERIMENTS_COOKIE;
 
