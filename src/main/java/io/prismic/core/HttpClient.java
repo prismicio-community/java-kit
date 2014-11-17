@@ -44,9 +44,13 @@ public class HttpClient {
       } catch (MalformedURLException e) {
         throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
       } catch (IOException e) {
-        e.printStackTrace();
-        JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
-        String errorText = errorJson.get("error").asText();
+        String errorText = "Unknown error";
+        try {
+          JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
+          errorText = errorJson.get("error").asText();
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
         switch(httpConnection.getResponseCode()) {
           case 401:
             if ("Invalid access token".equals(errorText)) {
