@@ -248,7 +248,11 @@ public interface Fragment {
     }
 
     public String asHtml() {
-      return ("<div data-oembed=\"" + url + "\" data-oembed-type=\"" + type.toLowerCase() + "\" data-oembed-provider=\"" + provider.toLowerCase() + "\">" + html + "</div>");
+      String providerTag = "";
+      if (provider != null) {
+        providerTag = " data-oembed-provider=\"" + provider.toLowerCase() + "\"";
+      }
+      return ("<div data-oembed=\"" + url + "\" data-oembed-type=\"" + type.toLowerCase() + "\"" + providerTag + ">" + html + "</div>");
     }
 
     // --
@@ -256,7 +260,7 @@ public interface Fragment {
     static Embed parse(JsonNode json) {
       JsonNode oembedJson = json.with("oembed");
       String type = oembedJson.path("type").asText();
-      String provider = oembedJson.path("provider_name").asText();
+      String provider = oembedJson.has("provider_name") ? oembedJson.path("provider_name").asText() : null;
       String url = oembedJson.path("embed_url").asText();
       Integer width = oembedJson.has("width") && oembedJson.path("width").isNumber() ? oembedJson.path("width").intValue() : null;
       Integer height = oembedJson.has("height") && oembedJson.path("height").isNumber() ? oembedJson.path("height").intValue() : null;
