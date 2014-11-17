@@ -1,5 +1,7 @@
 package io.prismic;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.*;
@@ -88,7 +90,12 @@ public class Document extends WithFragments {
     Iterator<JsonNode> slugsJson = json.withArray("slugs").elements();
     List<String> slugs = new ArrayList<String>();
     while(slugsJson.hasNext()) {
-      slugs.add(slugsJson.next().asText());
+      try {
+        slugs.add(URLDecoder.decode(slugsJson.next().asText(), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        // Never happens, UTF-8 is supported everywhere!
+        throw new RuntimeException(e);
+      }
     }
 
     List<LinkedDocument> linkedDocuments = new ArrayList<LinkedDocument>();
