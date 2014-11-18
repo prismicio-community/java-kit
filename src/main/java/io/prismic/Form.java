@@ -331,11 +331,11 @@ public class Form {
      * @return the current form, in order to chain those calls
      */
      public SearchForm query(Predicate... predicates) {
-      String result = "";
+      StringBuilder result = new StringBuilder();
       for (Predicate p: predicates) {
-        result += p.q();
+        result.append(p.q());
       }
-      return this.query("[" + result + "]");
+      return this.query("[" + result.toString() + "]");
     }
 
     /**

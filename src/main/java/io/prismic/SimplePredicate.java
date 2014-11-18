@@ -66,17 +66,17 @@ class SimplePredicate implements Predicate {
 
   private static <T> String join(Iterable<T> elements, String sep) {
     if (!elements.iterator().hasNext()) return "";
-    String result = "";
+    StringBuilder result = new StringBuilder();
     boolean first = true;
     for (T elt: elements) {
       if (first) {
         first = false;
       } else {
-        result += sep;
+        result.append(sep);
       }
-      result += "\"" + elt + "\"";
+      result.append("\"").append(elt).append("\"");
     }
-    return result;
+    return result.toString();
   }
 
   private static String capitalize(String line) {

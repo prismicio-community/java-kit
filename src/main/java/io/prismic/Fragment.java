@@ -482,7 +482,7 @@ public interface Fragment {
       }
 
       public double ratio() {
-        return width / height;
+        return (double)width / height;
       }
 
       public String asHtml(DocumentLinkResolver linkResolver) {
@@ -961,7 +961,7 @@ public interface Fragment {
       return "";
     }
 
-    class Tuple<X, Y> {
+    static class Tuple<X, Y> {
       public final X x;
       public final Y y;
       public Tuple(X x, Y y) {
