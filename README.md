@@ -19,7 +19,7 @@ This library is on Maven Central. The kit coordinates are:
 
 *(you may need to adapt the version number)*
 
-
+The kit requires **Java 7** or superior.
 
 #### Get started with prismic.io
 
@@ -30,7 +30,6 @@ You can find out [how to get started with prismic.io](https://developers.prismic
 Also on our [prismic.io developer's portal](https://developers.prismic.io/), on top of our full documentation, you will:
  * get a thorough introduction of [how to use prismic.io kits](https://developers.prismic.io/documentation/UjBe8bGIJ3EKtgBZ/api-documentation#kits-and-helpers), including this one.
  * see [what else is available for Java](https://developers.prismic.io/technologies/UjBh0MuvzeMJvE4g/java): starter projects, examples, ...
-
 
 #### Kit's detailed documentation
 
