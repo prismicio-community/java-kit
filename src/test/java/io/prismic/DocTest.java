@@ -30,7 +30,7 @@ public class DocTest
       System.out.println("Reference: " + ref);
     }
     // endgist
-    Assert.assertEquals(api.getRefs().size(), 1);
+    Assert.assertTrue(api.getRefs().size() > 0);
   }
 
   @Test
