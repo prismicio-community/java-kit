@@ -42,7 +42,7 @@ public class Form {
     static Field parse(JsonNode json) {
       String type = json.path("type").asText();
       String defaultValue = (json.has("default") ? json.path("default").asText() : null);
-      Boolean multiple = (json.has("multiple") ? json.path("multiple").asBoolean() : false);
+      Boolean multiple = (json.has("multiple") && json.path("multiple").asBoolean());
       return new Field(type, multiple, defaultValue);
     }
 
@@ -133,14 +133,13 @@ public class Form {
     public SearchForm(Api api, Form form) {
       this.api = api;
       this.form = form;
-      this.data = new HashMap<String,List<String>>();
-      for(Map.Entry<String,Field> field: form.getFields().entrySet()) {
-        if(field.getValue().getDefaultValue() != null) {
-          List<String> value = new ArrayList<String>(1);
+      this.data = new HashMap<>();
+      for(Map.Entry<String,Field> field: form.getFields().entrySet())
+        if (field.getValue().getDefaultValue() != null) {
+          List<String> value = new ArrayList<>(1);
           value.add(field.getValue().getDefaultValue());
           this.data.put(field.getKey(), value);
         }
-      }
     }
 
     /**
@@ -155,18 +154,21 @@ public class Form {
      */
     public SearchForm set(String field, String value) {
       Field fieldDesc = form.getFields().get(field);
-      if(fieldDesc == null) {
+      if (fieldDesc == null) {
         throw new RuntimeException("Unknown field " + field); 
       }
-      if(fieldDesc.isMultiple()) {
+      if (value == null) {
+        return this;
+      }
+      if (fieldDesc.isMultiple()) {
         List<String> existingValue = data.get(field);
         if(existingValue == null) {
-          existingValue = new ArrayList<String>();
+          existingValue = new ArrayList<>();
         }
         existingValue.add(value);
         data.put(field, existingValue);
       } else {
-        List<String> newValue = new ArrayList<String>();
+        List<String> newValue = new ArrayList<>();
         newValue.add(value);
         data.put(field, newValue);
       }
@@ -280,14 +282,21 @@ public class Form {
      * Allows to set which ordering you want for your query.
      *
      * A call will look like:
-     * <code>api.getForm("products").orderings("[my.product.price]").ref(ref).submit();</code>
+     * <code>api.getForm("products").orderings("my.product.price desc", "my.product.date").ref(ref).submit();</code>
      * Read prismic.io's API documentation to learn more about how to write orderings.
      *
-     * @param orderings the orderings
+     * @param orderings one or more ordering, as the name of a field optionally followed by "desc"
      * @return the current form, in order to chain those calls
      */
-    public SearchForm orderings(String orderings) {
-      return set("orderings", orderings);
+    public SearchForm orderings(String... orderings) {
+      switch (orderings.length) {
+        case 0: // Noop
+          return this;
+        case 1: // Strip for backward compatibility
+          return set("orderings", "[" + strip(orderings[0]) + "]");
+        default:
+          return set("orderings", "[" + Utils.mkString(orderings, ",") + "]");
+      }
     }
 
     // Temporary hack for Backward compatibility
@@ -351,10 +360,10 @@ public class Form {
         String sep = form.getAction().contains("?") ? "&" : "?";
         for(Map.Entry<String,List<String>> d: data.entrySet()) {
           for(String v: d.getValue()) {
-            url.append(sep);
-            url.append(d.getKey());
-            url.append("=");
-            url.append(HttpClient.encodeURIComponent(v));
+            url.append(sep)
+               .append(d.getKey())
+               .append("=")
+               .append(HttpClient.encodeURIComponent(v));
             sep = "&";
           }
         }
@@ -369,7 +378,7 @@ public class Form {
       StringBuilder dataStr = new StringBuilder();
       for(Map.Entry<String,List<String>> d: data.entrySet()) {
         for(String v: d.getValue()) {
-          dataStr.append(d.getKey() + "=" + v + " ");
+          dataStr.append(d.getKey()).append("=").append(v).append(" ");
         }
       }
       return form.toString() + " {" + dataStr.toString().trim() + "}";
