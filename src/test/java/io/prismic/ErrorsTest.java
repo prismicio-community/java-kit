@@ -15,7 +15,7 @@ public class ErrorsTest {
   @Test
   public void testInvalidTokenReported(){
     try {
-      Api api = Api.get("https://lesbonneschoses.prismic.io/api", "foobarisnotavalidtoken");
+      Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", "foobarisnotavalidtoken");
       Assert.fail("Should have thrown an Api.Error exception for invalid token");
     } catch(Api.Error error) {
       Assert.assertEquals(

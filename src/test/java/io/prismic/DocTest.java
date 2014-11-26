@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ public class DocTest
   @Test
   public void testApi() {
     // startgist:9b08c18ad53ba62736b7:prismic-api.java
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     for (Ref ref: api.getRefs()) {
       System.out.println("Reference: " + ref);
     }
@@ -38,7 +39,7 @@ public class DocTest
     try {
       // startgist:3ed369c967dbb931a9ab:prismic-apiPrivate.java
       // This will fail because the token is invalid, but this is how to access a private API
-      Api api = Api.get("https://lesbonneschoses.prismic.io/api", "MC5-XXXXXXX-vRfvv70");
+      Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", "MC5-XXXXXXX-vRfvv70");
       // endgist
     } catch (Api.Error error) {
       Assert.assertEquals("Invalid access token", error.getMessage());
@@ -49,7 +50,7 @@ public class DocTest
   public void testReferences() {
     // startgist:b5c1ca7cc474c6456214:prismic-references.java
     String previewToken = "MC5VbDdXQmtuTTB6Z0hNWHF3.c--_vVbvv73vv73vv73vv71EA--_vS_vv73vv70T77-9Ke-_ve-_vWfvv70ebO-_ve-_ve-_vQN377-9ce-_vRfvv70";
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api", previewToken);
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", previewToken);
     Ref stPatrickRef = api.getRef("St-Patrick specials");
     // Now we'll use this reference for all our calls
     Response response = api.getForm("everything")
@@ -64,7 +65,7 @@ public class DocTest
   @Test
   public void testSimpleQuery() {
     // startgist:e3f35b01edbd553ca60a:prismic-simplequery.java
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     // The response object contains all documents of type "product", paginated
     Response response = api.getForm("everything")
                            .ref(api.getMaster())
@@ -77,7 +78,7 @@ public class DocTest
   @Test
   public void testOrderings() {
     // startgist:f5077e40997afd0008df:prismic-orderings.java
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Response response = api.getForm("everything")
       .ref(api.getMaster())
       .query(Predicates.at("document.type", "product"))
@@ -93,7 +94,7 @@ public class DocTest
   @Test
   public void testPredicates() {
     // startgist:ad8134f5848d828fae50:prismic-predicates.java
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     // The response object contains all documents of type "product", paginated
     Response response = api.getForm("everything")
       .ref(api.getMaster())
@@ -125,7 +126,7 @@ public class DocTest
 
   @Test
   public void testAsHtml() {
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Response response = api.getForm("everything")
       .ref(api.getMaster())
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbX"))
@@ -144,7 +145,7 @@ public class DocTest
 
   @Test
   public void testHtmlSerializer() {
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Response response = api.getForm("everything")
       .ref(api.getMaster())
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbX"))
@@ -177,7 +178,7 @@ public class DocTest
 
   @Test
   public void testText() {
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbl"))
       .ref(api.getMaster()).submit()
@@ -190,7 +191,7 @@ public class DocTest
 
   @Test
   public void testGetNumber() {
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
       .getResults().get(0);
@@ -208,7 +209,7 @@ public class DocTest
 
   @Test
   public void testDateTimestamp() {
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Document doc = api.getForm("everything").query(Predicates.at("document.id", "UlfoxUnM0wkXYXbl"))
       .ref(api.getMaster()).submit().getResults().get(0);
     // startgist:3297308d8a2395ff68b5:prismic-dateTimestamp.java
@@ -318,7 +319,7 @@ public class DocTest
 
   @Test
   public void image() {
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api");
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
       .getResults().get(0);
@@ -328,7 +329,7 @@ public class DocTest
     // Most of the time you will be using the "main" view
     String url = image.getView("main").getUrl();
     // endgist
-    Assert.assertEquals(url, "https://prismic-io.s3.amazonaws.com/lesbonneschoses/f606ad513fcc2a73b909817119b84d6fd0d61a6d.png");
+    Assert.assertEquals(url, "https://lesbonneschoses.cdn.prismic.io/lesbonneschoses/f606ad513fcc2a73b909817119b84d6fd0d61a6d.png");
   }
 
   @Test
@@ -352,7 +353,7 @@ public class DocTest
       public Boolean isPending(String key) { return false; }
     };
     // Thi Api will use the custom cache object
-    Api api = Api.get("https://lesbonneschoses.prismic.io/api", cache, null /* logger */);
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", cache, null /* logger */);
     // endgist
     Assert.assertNotNull(api);
   }
