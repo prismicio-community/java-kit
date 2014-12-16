@@ -14,16 +14,14 @@ public class Document extends WithFragments {
   private final List<String> slugs;
   private final String type;
   private final Map<String, Fragment> fragments;
-  private final List<LinkedDocument> linkedDocuments;
 
-  public Document(String id, String type, String href, Set<String> tags, List<String> slugs, List<LinkedDocument> linkedDocuments, Map<String,Fragment> fragments) {
+  public Document(String id, String type, String href, Set<String> tags, List<String> slugs, Map<String,Fragment> fragments) {
     this.id = id;
     this.type = type;
     this.href = href;
     this.tags = Collections.unmodifiableSet(tags);
     this.slugs = Collections.unmodifiableList(slugs);
     this.fragments = Collections.unmodifiableMap(fragments);
-    this.linkedDocuments = Collections.unmodifiableList(linkedDocuments);
   }
 
   public String getId() {
@@ -51,10 +49,6 @@ public class Document extends WithFragments {
       return slugs.get(0);
     }
     return null;
-  }
-
-  public List<LinkedDocument> getLinkedDocuments() {
-    return this.linkedDocuments;
   }
 
   @Override
@@ -98,15 +92,6 @@ public class Document extends WithFragments {
       }
     }
 
-    List<LinkedDocument> linkedDocuments = new ArrayList<LinkedDocument>();
-    if(json.has("linked_documents")) {
-        Iterator<JsonNode> linkedDocumentsJson = json.withArray("linked_documents").elements();
-        while(linkedDocumentsJson.hasNext()) {
-            LinkedDocument linkedDocument = LinkedDocument.parse(linkedDocumentsJson.next());
-            linkedDocuments.add(linkedDocument);
-        }
-    }
-
     Iterator<String> dataJson = json.with("data").with(type).fieldNames();
     final Map<String, Fragment> fragments = new LinkedHashMap<String, Fragment>();
     while(dataJson.hasNext()) {
@@ -134,7 +119,7 @@ public class Document extends WithFragments {
       }
     }
 
-    return new Document(id, type, href, tags, slugs, linkedDocuments, fragments);
+    return new Document(id, type, href, tags, slugs, fragments);
   }
 
 }

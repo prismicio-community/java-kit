@@ -1,6 +1,7 @@
 package io.prismic;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +9,40 @@ public abstract class WithFragments {
 
   public abstract Map<String, Fragment> getFragments();
 
-    public Fragment get(String field) {
+  public List<LinkedDocument> getLinkedDocuments() {
+    List<LinkedDocument> result = new ArrayList<>();
+    for (Fragment fragment: getFragments().values()) {
+      if (fragment instanceof Fragment.DocumentLink) {
+        Fragment.DocumentLink link = (Fragment.DocumentLink)fragment;
+        result.add(new LinkedDocument(link.getId(), link.getSlug(), link.getType(), new HashSet<>(link.getTags())));
+      }
+      if (fragment instanceof Fragment.Group) {
+        for (GroupDoc doc: ((Fragment.Group) fragment).getDocs()) {
+          result.addAll(doc.getLinkedDocuments());
+        }
+      }
+      if (fragment instanceof Fragment.StructuredText) {
+        Fragment.StructuredText text = (Fragment.StructuredText)fragment;
+        for (Fragment.StructuredText.Block block: text.getBlocks()) {
+          if (block instanceof Fragment.StructuredText.Block.Text) {
+            Fragment.StructuredText.Block.Text textBlock = (Fragment.StructuredText.Block.Text)block;
+            for (Fragment.StructuredText.Span span: textBlock.getSpans()) {
+              if (span instanceof Fragment.StructuredText.Span.Hyperlink) {
+                Fragment.StructuredText.Span.Hyperlink hlink = (Fragment.StructuredText.Span.Hyperlink)span;
+                if (hlink.getLink() instanceof Fragment.DocumentLink) {
+                  Fragment.DocumentLink link = (Fragment.DocumentLink)hlink.getLink();
+                  result.add(new LinkedDocument(link.getId(), link.getSlug(), link.getType(), new HashSet<>(link.getTags())));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  public Fragment get(String field) {
     Fragment single = getFragments().get(field);
     if(single == null) {
       List<Fragment> multi = getAll(field);
