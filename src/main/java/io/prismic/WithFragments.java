@@ -9,12 +9,11 @@ public abstract class WithFragments {
 
   public abstract Map<String, Fragment> getFragments();
 
-  public List<LinkedDocument> getLinkedDocuments() {
-    List<LinkedDocument> result = new ArrayList<>();
+  public List<Fragment.DocumentLink> getLinkedDocuments() {
+    List<Fragment.DocumentLink> result = new ArrayList<>();
     for (Fragment fragment: getFragments().values()) {
       if (fragment instanceof Fragment.DocumentLink) {
-        Fragment.DocumentLink link = (Fragment.DocumentLink)fragment;
-        result.add(new LinkedDocument(link.getId(), link.getSlug(), link.getType(), new HashSet<>(link.getTags())));
+        result.add((Fragment.DocumentLink)fragment);
       }
       if (fragment instanceof Fragment.Group) {
         for (GroupDoc doc: ((Fragment.Group) fragment).getDocs()) {
@@ -30,8 +29,7 @@ public abstract class WithFragments {
               if (span instanceof Fragment.StructuredText.Span.Hyperlink) {
                 Fragment.StructuredText.Span.Hyperlink hlink = (Fragment.StructuredText.Span.Hyperlink)span;
                 if (hlink.getLink() instanceof Fragment.DocumentLink) {
-                  Fragment.DocumentLink link = (Fragment.DocumentLink)hlink.getLink();
-                  result.add(new LinkedDocument(link.getId(), link.getSlug(), link.getType(), new HashSet<>(link.getTags())));
+                  result.add((Fragment.DocumentLink)hlink.getLink());
                 }
               }
             }
