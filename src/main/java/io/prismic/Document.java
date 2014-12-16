@@ -9,14 +9,16 @@ import com.fasterxml.jackson.databind.*;
 public class Document extends WithFragments {
 
   private final String id;
+  private final String uid;
   private final String href;
   private final Set<String> tags;
   private final List<String> slugs;
   private final String type;
   private final Map<String, Fragment> fragments;
 
-  public Document(String id, String type, String href, Set<String> tags, List<String> slugs, Map<String,Fragment> fragments) {
+  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, Map<String,Fragment> fragments) {
     this.id = id;
+    this.uid = uid;
     this.type = type;
     this.href = href;
     this.tags = Collections.unmodifiableSet(tags);
@@ -26,6 +28,10 @@ public class Document extends WithFragments {
 
   public String getId() {
     return id;
+  }
+
+  public String getUid() {
+    return uid;
   }
 
   public String getType() {
@@ -72,8 +78,10 @@ public class Document extends WithFragments {
 
   static Document parse(JsonNode json, FragmentParser fragmentParser) {
     String id = json.path("id").asText();
+    String uid = json.has("uid") ? json.path("uid").asText() : null;
     String href = json.path("href").asText();
     String type = json.path("type").asText();
+
 
     Iterator<JsonNode> tagsJson = json.withArray("tags").elements();
     Set<String> tags = new HashSet<String>();
@@ -119,7 +127,7 @@ public class Document extends WithFragments {
       }
     }
 
-    return new Document(id, type, href, tags, slugs, fragments);
+    return new Document(id, uid, type, href, tags, slugs, fragments);
   }
 
 }
