@@ -25,6 +25,10 @@ public class Predicates {
     return new SimplePredicate("any", fragment, values);
   }
 
+  public static Predicate in(String fragment, Iterable<String> values) {
+    return new SimplePredicate("in", fragment, values);
+  }
+
   public static Predicate fulltext(String fragment, String value) {
     return new SimplePredicate("fulltext", fragment, value);
   }
