@@ -380,18 +380,28 @@ public interface Fragment {
     }
   }
 
-  public static class DocumentLink implements Link {
+  public static class DocumentLink extends WithFragments implements Link {
     private final String id;
+    private final String uid;
     private final String type;
     private final Set<String> tags;
     private final String slug;
     private final boolean broken;
+    private final Map<String, Fragment> fragments;
 
-    public DocumentLink(String id, String type, Set<String> tags, String slug, boolean broken) {
+    public DocumentLink(String id,
+                        String uid,
+                        String type,
+                        Set<String> tags,
+                        String slug,
+                        Map<String, Fragment> fragments,
+                        boolean broken) {
       this.id = id;
+      this.uid = uid;
       this.type = type;
       this.tags = tags;
       this.slug = slug;
+      this.fragments = fragments;
       this.broken = broken;
     }
 
@@ -419,23 +429,30 @@ public interface Fragment {
       return broken;
     }
 
+    @Override
+    public Map<String, Fragment> getFragments() {
+      return this.fragments;
+    }
+
     public String asHtml(DocumentLinkResolver linkResolver) {
       return ("<a " + (linkResolver.getTitle(this) == null ? "" : "title=\"" + linkResolver.getTitle(this) + "\" ") + "href=\"" + linkResolver.resolve(this) + "\">" + slug + "</a>");
     }
 
     // --
 
-    static DocumentLink parse(JsonNode json) {
+    static DocumentLink parse(JsonNode json, FragmentParser fragmentParser) {
       JsonNode document = json.with("document");
       boolean broken = json.path("isBroken").booleanValue();
       String id = document.path("id").asText();
+      String uid = document.path("uid").asText();
       String type = document.path("type").asText();
       String slug = document.path("slug").asText();
       Set<String> tags = new HashSet<String>();
       for(JsonNode tagJson: document.withArray("tags")) {
         tags.add(tagJson.asText());
       }
-      return new DocumentLink(id, type, tags, slug, broken);
+      Map<String, Fragment> fragments = Document.parseFragments(document.with("data").with(type), type, fragmentParser);
+      return new DocumentLink(id, uid, type, tags, slug, fragments, broken);
     }
 
   }
@@ -506,13 +523,13 @@ public interface Fragment {
 
       //
 
-      static View parse(JsonNode json) {
+      static View parse(JsonNode json, FragmentParser fragmentParser) {
         String url = json.path("url").asText();
         int width = json.with("dimensions").path("width").intValue();
         int height = json.with("dimensions").path("height").intValue();
         String alt = json.path("alt").asText();
         String copyright = json.path("copyright").asText();
-        Link linkTo = StructuredText.parseLink(json.path("linkTo"));
+        Link linkTo = StructuredText.parseLink(json.path("linkTo"), fragmentParser);
         return new View(url, width, height, alt, copyright, linkTo);
       }
 
@@ -543,13 +560,13 @@ public interface Fragment {
 
     // --
 
-    static Image parse(JsonNode json) {
-      View main = View.parse(json.with("main"));
+    static Image parse(JsonNode json, FragmentParser fragmentParser) {
+      View main = View.parse(json.with("main"), fragmentParser);
       Map<String,View> views = new HashMap<String,View>();
       Iterator<String> viewsJson = json.with("views").fieldNames();
       while(viewsJson.hasNext()) {
         String view = viewsJson.next();
-        views.put(view, View.parse(json.with("views").with(view)));
+        views.put(view, View.parse(json.with("views").with(view), fragmentParser));
       }
       return new Image(main, views);
     }
@@ -1094,7 +1111,7 @@ public interface Fragment {
 
     // --
 
-    static Link parseLink(JsonNode json) {
+    static Link parseLink(JsonNode json, FragmentParser fragmentParser) {
       if (json.isMissingNode()) {
         return null;
       }
@@ -1104,7 +1121,7 @@ public interface Fragment {
         return Link.WebLink.parse(value);
       }
       else if("Link.document".equals(linkType)) {
-        return Link.DocumentLink.parse(value);
+        return Link.DocumentLink.parse(value, fragmentParser);
       }
       else if("Link.file".equals(linkType)) {
         return Link.FileLink.parse(value);
@@ -1115,7 +1132,7 @@ public interface Fragment {
       return null;
     }
 
-    static Span parseSpan(JsonNode json) {
+    static Span parseSpan(JsonNode json, FragmentParser fragmentParser) {
       String type = json.path("type").asText();
       int start = json.path("start").intValue();
       int end = json.path("end").intValue();
@@ -1130,7 +1147,7 @@ public interface Fragment {
           return new Span.Em(start, end);
         }
         if ("hyperlink".equals(type)) {
-          Link link = parseLink(data);
+          Link link = parseLink(data, fragmentParser);
           if(link != null) {
             return new Span.Hyperlink(start, end, link);
           }
@@ -1155,11 +1172,11 @@ public interface Fragment {
       }
     }
 
-    static ParsedText parseText(JsonNode json) {
+    static ParsedText parseText(JsonNode json, FragmentParser fragmentParser) {
       String text = json.path("text").asText();
       List<Span> spans = new ArrayList<Span>();
       for(JsonNode spanJson: json.withArray("spans")) {
-        Span span = parseSpan(spanJson);
+        Span span = parseSpan(spanJson, fragmentParser);
         if(span != null) {
           spans.add(span);
         }
@@ -1167,43 +1184,43 @@ public interface Fragment {
       return new ParsedText(text, spans);
     }
 
-    static Block parseBlock(JsonNode json) {
+    static Block parseBlock(JsonNode json, FragmentParser fragmentParser) {
       String type = json.path("type").asText();
       String label = json.path("label").textValue();
       if("heading1".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.Heading(p.text, p.spans, 1, label);
       }
       else if("heading2".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.Heading(p.text, p.spans, 2, label);
       }
       else if("heading3".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.Heading(p.text, p.spans, 3, label);
       }
       else if("heading4".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.Heading(p.text, p.spans, 4, label);
       }
       else if("paragraph".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.Paragraph(p.text, p.spans, label);
       }
       else if("preformatted".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.Preformatted(p.text, p.spans, label);
       }
       else if("list-item".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.ListItem(p.text, p.spans, false, label);
       }
       else if("o-list-item".equals(type)) {
-        ParsedText p = parseText(json);
+        ParsedText p = parseText(json, fragmentParser);
         return new Block.ListItem(p.text, p.spans, true, label);
       }
       else if("image".equals(type)) {
-        Image.View view = Image.View.parse(json);
+        Image.View view = Image.View.parse(json, fragmentParser);
         return new Block.Image(view, label);
       }
       else if("embed".equals(type)) {
@@ -1213,10 +1230,10 @@ public interface Fragment {
       return null;
     }
 
-    static StructuredText parse(JsonNode json) {
+    static StructuredText parse(JsonNode json, FragmentParser fragmentParser) {
       List<Block> blocks = new ArrayList<Block>();
       for(JsonNode blockJson: json) {
-        Block block = parseBlock(blockJson);
+        Block block = parseBlock(blockJson, fragmentParser);
         if(block != null) {
           blocks.add(block);
         }

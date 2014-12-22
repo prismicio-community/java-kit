@@ -9,7 +9,7 @@ public abstract class DocumentLinkResolver {
   }
 
   public String resolve(Document document) {
-    return resolve(asLink(document));
+    return resolve(document.asDocumentLink());
   }
 
   public String resolveDocument(Document document) {
@@ -21,16 +21,12 @@ public abstract class DocumentLinkResolver {
   }
 
   public boolean isBookmark(Api api, Document document, String bookmark) {
-    return isBookmark(api, asLink(document), bookmark);
+    return isBookmark(api, document.asDocumentLink(), bookmark);
   }
 
   public boolean isBookmark(Api api, Fragment.DocumentLink link, String bookmark) {
     String maybeId = api.getBookmarks().get(bookmark);
     return maybeId != null && maybeId.equals(link.getId());
-  }
-
-  private Fragment.DocumentLink asLink(Document document) {
-    return new Fragment.DocumentLink(document.getId(), document.getType(), document.getTags(), document.getSlug(), false);
   }
 
 }

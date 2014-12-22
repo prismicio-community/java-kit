@@ -265,6 +265,36 @@ public class Form {
     }
 
     /**
+     * Restrict the document fragments to the set of fields specified.
+     *
+     * @param fields the fields to return
+     * @return the current form, in order to chain those calls
+     */
+    public SearchForm fetch(String... fields) {
+      switch (fields.length) {
+        case 0: // Noop
+          return this;
+        default:
+          return set("fetch", Utils.mkString(fields, ","));
+      }
+    }
+
+    /**
+     * Include the specified fragment in the details of DocumentLink
+     *
+     * @param fields the fields to return
+     * @return the current form, in order to chain those calls
+     */
+    public SearchForm fetchLinks(String... fields) {
+      switch (fields.length) {
+        case 0: // Noop
+          return this;
+        default:
+          return set("fetchLinks", Utils.mkString(fields, ","));
+      }
+    }
+
+    /**
      * Allows to set which page you want to get for your query.
      *
      * The default value is 1; a call for a different page will look like:
