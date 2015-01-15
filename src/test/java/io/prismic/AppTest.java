@@ -346,7 +346,7 @@ public class AppTest {
    */
   @Test
   public void noCacheImplWorks(){
-    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", null, new Cache.NoCache(), null, new FragmentParser.Default());
+    Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", null, new Cache.NoCache(), null);
       Assert.assertEquals(
         "NoCache implementation should be transparent.",
         api.getForm("products").ref(api.getMaster()).submit().getResults().size(),

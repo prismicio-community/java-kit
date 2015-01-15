@@ -72,10 +72,9 @@ public class Api {
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
-   * @param fragmentParser instance of a class that implements the {@link FragmentParser} interface, and will handle the JSON to {@link Fragment} conversion.
    * @return the usable API object
    */
-  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger, FragmentParser fragmentParser) {
+  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger) {
     final String url = (accessToken == null ? endpoint : (endpoint + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = cache.getOrSet(
         url,
@@ -88,15 +87,11 @@ public class Api {
     );
 
     ApiData apiData = ApiData.parse(json);
-    return new Api(apiData, accessToken, cache, logger, fragmentParser);
-  }
-
-  public static Api get(String url, String accessToken, Cache cache, Logger logger) {
-    return get(url, accessToken, cache, logger, new FragmentParser.Default());
+    return new Api(apiData, accessToken, cache, logger);
   }
 
   public static Api get(String url, Cache cache, Logger logger) {
-    return get(url, null, cache, logger, new FragmentParser.Default());
+    return get(url, null, cache, logger);
   }
 
   /**
@@ -128,7 +123,6 @@ public class Api {
   final private String accessToken;
   final private Cache cache;
   final private Logger logger;
-  final private FragmentParser fragmentParser;
 
   /**
    * Constructor to build a proper {@link Api} object. This is not to build an {@link Api} object
@@ -138,14 +132,12 @@ public class Api {
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
-   * @param fragmentParser instance of a class that implements the {@link FragmentParser} interface, and will handle the JSON to {@link Fragment} conversion.
    */
-  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger, FragmentParser fragmentParser) {
+  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger) {
     this.apiData = apiData;
     this.accessToken = accessToken;
     this.cache = cache;
     this.logger = logger;
-    this.fragmentParser = fragmentParser;
   }
 
   public Logger getLogger() {
@@ -158,10 +150,6 @@ public class Api {
 
   public Cache getCache() {
     return cache;
-  }
-
-  public FragmentParser getFragmentParser() {
-    return fragmentParser;
   }
 
   /**
@@ -251,7 +239,7 @@ public class Api {
 
   /**
    * Return the current experiments on the repository
-   * @return
+   * @return the Experiments object
    */
   public Experiments getExperiments() {
     return apiData.getExperiments();

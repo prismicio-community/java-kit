@@ -247,7 +247,7 @@ public class DocTest
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"documents\":{\"type\":\"Group\",\"value\":[{\"linktodoc\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UrDejAEAAFwMyrW9\",\"type\":\"doc\",\"tags\":[],\"slug\":\"installing-meta-micro\"},\"isBroken\":false}},\"desc\":{\"type\":\"StructuredText\",\"value\":[{\"type\":\"paragraph\",\"text\":\"A detailed step by step point of view on how installing happens.\",\"spans\":[]}]}},{\"linktodoc\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UrDmKgEAALwMyrXA\",\"type\":\"doc\",\"tags\":[],\"slug\":\"using-meta-micro\"},\"isBroken\":false}}}]}}}}";
     JsonNode json = mapper.readTree(jsonString);
-    Document doc = Document.parse(json, new FragmentParser.Default());
+    Document doc = Document.parse(json);
     // startgist:feb9f79a9f19f49586e0:prismic-group.java
     Fragment.Group group = doc.getGroup("article.documents");
     for (GroupDoc groupdoc: group.getDocs()) {
@@ -265,7 +265,7 @@ public class DocTest
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"source\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UlfoxUnM0wkXYXbE\",\"type\":\"product\",\"tags\":[\"Macaron\"],\"slug\":\"dark-chocolate-macaron\"},\"isBroken\":false}}}}}";
     JsonNode json = mapper.readTree(jsonString);
-    Document doc = Document.parse(json, new FragmentParser.Default());
+    Document doc = Document.parse(json);
     // startgist:6beab058b1f25fdc86d5:prismic-link.java
     Fragment.Link source = doc.getLink("article.source");
     String url = source.getUrl(linkResolver);
@@ -278,7 +278,7 @@ public class DocTest
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"video\":{\"type\":\"Embed\",\"value\":{\"oembed\":{\"provider_url\":\"http://www.youtube.com/\",\"type\":\"video\",\"thumbnail_height\":360,\"height\":270,\"thumbnail_url\":\"http://i1.ytimg.com/vi/baGfM6dBzs8/hqdefault.jpg\",\"width\":480,\"provider_name\":\"YouTube\",\"html\":\"<iframe width=\\\"480\\\" height=\\\"270\\\" src=\\\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\\\" frameborder=\\\"0\\\" allowfullscreen></iframe>\",\"author_name\":\"Siobhan Wilson\",\"version\":\"1.0\",\"author_url\":\"http://www.youtube.com/user/siobhanwilsonsongs\",\"thumbnail_width\":480,\"title\":\"Siobhan Wilson - All Dressed Up\",\"embed_url\":\"https://www.youtube.com/watch?v=baGfM6dBzs8\"}}}}}}";
     JsonNode json = mapper.readTree(jsonString);
-    Document doc = Document.parse(json, new FragmentParser.Default());
+    Document doc = Document.parse(json);
     // startgist:11e0a18e3f6b82a04a51:prismic-embed.java
     Fragment.Embed video = doc.getEmbed("article.video");
     // Html is the code to include to embed the object, and depends on the embedded service
@@ -292,7 +292,7 @@ public class DocTest
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"background\":{\"type\":\"Color\",\"value\":\"#000000\"}}}}";
     JsonNode json = mapper.readTree(jsonString);
-    Document doc = Document.parse(json, new FragmentParser.Default());
+    Document doc = Document.parse(json);
     // startgist:24f9be9a0f46a282716e:prismic-color.java
     Fragment.Color bgcolor = doc.getColor("article.background");
     String hexa = bgcolor.getHexValue();
@@ -305,7 +305,7 @@ public class DocTest
     ObjectMapper mapper = new ObjectMapper();
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"location\":{\"type\":\"GeoPoint\",\"value\":{\"latitude\":48.877108,\"longitude\":2.333879}}}}}";
     JsonNode json = mapper.readTree(jsonString);
-    Document doc = Document.parse(json, new FragmentParser.Default());
+    Document doc = Document.parse(json);
     // startgist:ba12f6d368bb0b5fba86:prismic-geopoint.java
     // "near" predicate for GeoPoint fragments
     Predicate near = Predicates.near("my.store.location", 48.8768767, 2.3338802, 10);

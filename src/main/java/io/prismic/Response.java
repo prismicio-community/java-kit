@@ -46,12 +46,12 @@ public class Response {
     return this.prev_page;
   }
 
-  static Response parse(JsonNode json, FragmentParser fragmentParser) {
+  static Response parse(JsonNode json) {
     Iterator<JsonNode> resultsJson = null;
     resultsJson = json.path("results").elements();
     List<Document> results = new ArrayList<Document>();
     while (resultsJson.hasNext()) {
-      results.add(Document.parse(resultsJson.next(), fragmentParser));
+      results.add(Document.parse(resultsJson.next()));
     }
     return new Response(results,
       Integer.parseInt(json.path("page").asText()),

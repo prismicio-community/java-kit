@@ -79,8 +79,56 @@ public class Document extends WithFragments {
   }
 
   // --
+  static Fragment parseFragment(String type, JsonNode json) {
+    if("StructuredText".equals(type)) {
+      return Fragment.StructuredText.parse(json);
+    }
+    else if("Image".equals(type)) {
+      return Fragment.Image.parse(json);
+    }
+    else if("Link.web".equals(type)) {
+      return Fragment.Link.WebLink.parse(json);
+    }
+    else if("Link.document".equals(type)) {
+      return Fragment.Link.DocumentLink.parse(json);
+    }
+    else if("Link.file".equals(type)) {
+      return Fragment.Link.FileLink.parse(json);
+    }
+    else if("Link.image".equals(type)) {
+      return Fragment.Link.ImageLink.parse(json);
+    }
+    else if("Text".equals(type)) {
+      return Fragment.Text.parse(json);
+    }
+    else if("Select".equals(type)) {
+      return Fragment.Text.parse(json);
+    }
+    else if("Date".equals(type)) {
+      return Fragment.Date.parse(json);
+    }
+    else if("Timestamp".equals(type)) {
+      return Fragment.Timestamp.parse(json);
+    }
+    else if("Number".equals(type)) {
+      return Fragment.Number.parse(json);
+    }
+    else if("Color".equals(type)) {
+      return Fragment.Color.parse(json);
+    }
+    else if("Embed".equals(type)) {
+      return Fragment.Embed.parse(json);
+    }
+    else if("GeoPoint".equals(type)) {
+        return Fragment.GeoPoint.parse(json);
+    }
+    else if("Group".equals(type)) {
+      return Fragment.Group.parse(json);
+    }
+    return null;
+  }
 
-  static Map<String, Fragment> parseFragments(JsonNode json, String type, FragmentParser fragmentParser) {
+  static Map<String, Fragment> parseFragments(JsonNode json, String type) {
     Iterator<String> dataJson = json.fieldNames();
     Map<String, Fragment> fragments = new LinkedHashMap<String, Fragment>();
     while(dataJson.hasNext()) {
@@ -92,7 +140,7 @@ public class Document extends WithFragments {
           String fragmentName = type + "." + field + "[" + i + "]";
           String fragmentType = fieldJson.path(i).path("type").asText();
           JsonNode fragmentValue = fieldJson.path(i).path("value");
-          Fragment fragment = fragmentParser.parse(fragmentType, fragmentValue);
+          Fragment fragment = parseFragment(fragmentType, fragmentValue);
           if(fragment != null) {
             fragments.put(fragmentName, fragment);
           }
@@ -101,7 +149,7 @@ public class Document extends WithFragments {
         String fragmentName = type + "." + field;
         String fragmentType = fieldJson.path("type").asText();
         JsonNode fragmentValue = fieldJson.path("value");
-        Fragment fragment = fragmentParser.parse(fragmentType, fragmentValue);
+        Fragment fragment = parseFragment(fragmentType, fragmentValue);
         if(fragment != null) {
           fragments.put(fragmentName, fragment);
         }
@@ -110,7 +158,7 @@ public class Document extends WithFragments {
     return fragments;
   }
 
-  static Document parse(JsonNode json, FragmentParser fragmentParser) {
+  static Document parse(JsonNode json) {
     String id = json.path("id").asText();
     String uid = json.has("uid") ? json.path("uid").asText() : null;
     String href = json.path("href").asText();
@@ -134,7 +182,7 @@ public class Document extends WithFragments {
       }
     }
 
-    Map<String, Fragment> fragments = parseFragments(json.with("data").with(type), type, fragmentParser);
+    Map<String, Fragment> fragments = parseFragments(json.with("data").with(type), type);
 
     return new Document(id, uid, type, href, tags, slugs, fragments);
   }
