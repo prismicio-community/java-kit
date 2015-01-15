@@ -413,6 +413,10 @@ public interface Fragment {
       return id;
     }
 
+    public String getUid() {
+      return uid;
+    }
+
     public String getType() {
       return type;
     }
