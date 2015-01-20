@@ -7,10 +7,16 @@ import org.joda.time.format.*;
 
 import com.fasterxml.jackson.databind.*;
 
+/**
+ * A generic fragment of document
+ */
 public interface Fragment {
 
   // -- Text
 
+  /**
+   * The Text type, represents a plain text
+   */
   public static class Text implements Fragment {
     private final String value;
 
@@ -36,6 +42,9 @@ public interface Fragment {
 
   // -- Date
 
+  /**
+   * A Date fragment. For date and time, see Timestamp.
+   */
   public static class Date implements Fragment {
     private final LocalDate value;
 
@@ -69,6 +78,9 @@ public interface Fragment {
 
    // -- Timestamp
 
+  /**
+   * Timestamp fragment: date with time. For just date, see Date.
+   */
   public static class Timestamp implements Fragment {
     private final DateTime value;
 
@@ -104,6 +116,9 @@ public interface Fragment {
 
   // -- Number
 
+  /**
+   * A Number fragment. Represented by a Double.
+   */
   public static class Number implements Fragment {
     private final Double value;
 
@@ -137,6 +152,9 @@ public interface Fragment {
 
   // -- Color
 
+  /**
+   * A CSS color, represented by its hexadecimal representation (ex: #FF0000)
+   */
   public static class Color implements Fragment {
     private final String hex;
 
@@ -164,42 +182,48 @@ public interface Fragment {
 
   }
 
-    // -- GeoPoint
+  // -- GeoPoint
 
-    public static class GeoPoint implements Fragment {
+  /**
+   * A geographical point fragment, represented by longitude and latitude
+   */
+  public static class GeoPoint implements Fragment {
 
-        private final Double latitude;
-        private final Double longitude;
+    private final Double latitude;
+    private final Double longitude;
 
-        public GeoPoint(Double latitude, Double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
-        public Double getLatitude() {
-            return latitude;
-        }
-
-        public Double getLongitude() {
-            return longitude;
-        }
-
-        // --
-
-        static GeoPoint parse(JsonNode json) {
-            try {
-                Double latitude = json.has("latitude") && json.path("latitude").isNumber() ? json.path("latitude").doubleValue() : null;
-                Double longitude = json.has("longitude") && json.path("longitude").isNumber() ? json.path("longitude").doubleValue() : null;
-                return new GeoPoint(latitude, longitude);
-            } catch(Exception e) {
-                return null;
-            }
-        }
-
+    public GeoPoint(Double latitude, Double longitude) {
+      this.latitude = latitude;
+      this.longitude = longitude;
     }
+
+    public Double getLatitude() {
+      return latitude;
+    }
+
+    public Double getLongitude() {
+      return longitude;
+    }
+
+    // --
+
+    static GeoPoint parse(JsonNode json) {
+      try {
+        Double latitude = json.has("latitude") && json.path("latitude").isNumber() ? json.path("latitude").doubleValue() : null;
+        Double longitude = json.has("longitude") && json.path("longitude").isNumber() ? json.path("longitude").doubleValue() : null;
+        return new GeoPoint(latitude, longitude);
+      } catch(Exception e) {
+        return null;
+      }
+    }
+
+  }
 
   // -- Embed
 
+  /**
+   * An embeded object, typically coming from a third party service (example: YouTube video)
+   */
   public static class Embed implements Fragment {
     private final String type;
     private final String provider;
@@ -272,9 +296,18 @@ public interface Fragment {
 
   // -- Link
 
+  /**
+   * A Link fragment
+   */
   public static interface Link extends Fragment {
+    /**
+     * Return the target URL of the link. For WebLink the URL is directly received from
+     * Prismic, for DocumentLink it is generated from the resolver you pass.
+     * @param resolver DocumentLinkResolver, only used for DocumentLink.
+     * @return target URL of the link
+     */
     public String getUrl(DocumentLinkResolver resolver);
-  };
+  }
 
   public static class WebLink implements Link {
     private final String url;
@@ -285,10 +318,18 @@ public interface Fragment {
       this.contentType = contentType;
     }
 
+    /**
+     * @param resolver not used, this method is present to implement the Link interface.
+     *                 If you know you're working on a WebLink, just use getUrl().
+     * @return the target URL of the link
+     */
     public String getUrl(DocumentLinkResolver resolver) {
       return url;
     }
 
+    /**
+     * @return the target URL of the link
+     */
     public String getUrl() {
       return url;
     }
@@ -309,6 +350,9 @@ public interface Fragment {
     }
   }
 
+  /**
+   * Link to a file uploaded to Prismic's Media Library, for example a PDF file.
+   */
   public static class FileLink implements Link {
     private final String url;
     private final String kind;
@@ -322,10 +366,18 @@ public interface Fragment {
       this.filename = filename;
     }
 
+    /**
+     * @param resolver not used, this method is present to implement the Link interface.
+     *                 If you know you're working on a WebLink, just use getUrl().
+     * @return the target URL of the link
+     */
     public String getUrl(DocumentLinkResolver resolver) {
       return url;
     }
 
+    /**
+     * @return the target URL of the link
+     */
     public String getUrl() {
       return url;
     }
@@ -355,6 +407,9 @@ public interface Fragment {
     }
   }
 
+  /**
+   * Link to an image uploaded to Prismic's Media Library
+   */
   public static class ImageLink implements Link {
     private final String url;
 
@@ -380,6 +435,11 @@ public interface Fragment {
     }
   }
 
+  /**
+   * Link to a document within the same Prismic repository. It extends WithFragments,
+   * but for Prismic to return any fragment you need to use the fetchLink parameter
+   * when querying your repository.
+   */
   public static class DocumentLink extends WithFragments implements Link {
     private final String id;
     private final String uid;
@@ -463,8 +523,15 @@ public interface Fragment {
 
   // -- Image
 
+  /**
+   * An image fragment. Image are composed of several views that correspond to different sizes
+   * of the same image.
+   */
   public static class Image implements Fragment {
 
+    /**
+     * A View is a representation of an image at a specific size
+     */
     public static class View {
       private final String url;
       private final int width;
@@ -551,6 +618,11 @@ public interface Fragment {
       this(main, new HashMap<String,View>());
     }
 
+    /**
+     * Get a specific size of the image
+     * @param view either "main", or a view as defined in the repository ("icon", "small", etc.)
+     * @return the view
+     */
     public View getView(String view) {
       if("main".equals(view)) {
         return main;
@@ -579,6 +651,10 @@ public interface Fragment {
 
   // -- StructuredText
 
+  /**
+   * A Structured text, typically a text including blocks, formatting, links, images... As created
+   * in the Writing Room.
+   */
   public static class StructuredText implements Fragment {
 
     public static interface Element {}
@@ -669,6 +745,9 @@ public interface Fragment {
         }
        }
 
+      /**
+       * A listitem, typically a "li" tag within a "ul" or "ol" (whether the ordered property is true or not)
+       */
       public static class ListItem implements Text {
         private final String text;
         private final List<Span> spans;
@@ -699,6 +778,9 @@ public interface Fragment {
         }
       }
 
+      /**
+       * An image within a StructuredText
+       */
       public static class Image implements Block {
         private final Fragment.Image.View view;
         private final String label;
@@ -729,6 +811,9 @@ public interface Fragment {
         }
       }
 
+      /**
+       * An embed within a StructuredText
+       */
       public static class Embed implements Block {
         private final Fragment.Embed obj;
         private final String label;
