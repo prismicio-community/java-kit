@@ -10,7 +10,7 @@ public abstract class WithFragments {
   public abstract Map<String, Fragment> getFragments();
 
   public List<Fragment.DocumentLink> getLinkedDocuments() {
-    List<Fragment.DocumentLink> result = new ArrayList<>();
+    List<Fragment.DocumentLink> result = new ArrayList<Fragment.DocumentLink>();
     for (Fragment fragment: getFragments().values()) {
       if (fragment instanceof Fragment.DocumentLink) {
         result.add((Fragment.DocumentLink)fragment);
