@@ -6,6 +6,7 @@ import java.net.*;
 import io.prismic.*;
 
 import com.fasterxml.jackson.databind.*;
+import org.apache.commons.io.IOUtils;
 
 public class HttpClient {
 
@@ -20,7 +21,7 @@ public class HttpClient {
 
       URLConnection connection = new URL(url).openConnection();
       HttpURLConnection httpConnection = (HttpURLConnection) connection;
-      InputStream response;
+      InputStream response = null;
 
       connection.setRequestProperty("Accept", "application/json");
       connection.setRequestProperty("User-Agent", "Prismic-java-kit/" + Api.getVersion() + " JVM/" + System.getProperty("java.version"));
@@ -36,14 +37,15 @@ public class HttpClient {
             Long expiration = Long.parseLong(cacheHeader.substring(8)) * 1000;
             cache.set(url, expiration, value);
           }
-
           return value;
         } else {
-          throw new RuntimeException("Oops");
+          String body = (response != null) ? IOUtils.toString(response) : "";
+          throw new Api.Error(Api.Error.Code.UNEXPECTED, httpConnection.getResponseCode() + " (" + body + ")");
         }
       } catch (MalformedURLException e) {
         throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
       } catch (IOException e) {
+        String body;
         String errorText = "Unknown error";
         try {
           JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
@@ -58,8 +60,12 @@ public class HttpClient {
             } else {
               throw new Api.Error(Api.Error.Code.AUTHORIZATION_NEEDED, errorText);
             }
+          case 429:
+            body = (response != null) ? IOUtils.toString(response) : "";
+            throw new Api.Error(Api.Error.Code.TOO_MANY_REQUESTS, "[429] " + body);
           default:
-            throw new RuntimeException("Got an HTTP error " + httpConnection.getResponseCode() + " (" + httpConnection.getResponseMessage() + ")");
+            body = (response != null) ? IOUtils.toString(response) : "";
+            throw new RuntimeException("HTTP error " + httpConnection.getResponseCode() + " (" + body + ")");
         }
       }
     } catch(Api.Error e) {

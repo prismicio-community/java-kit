@@ -42,6 +42,7 @@ public class Api {
       MALFORMED_URL,
       AUTHORIZATION_NEEDED, 
       INVALID_TOKEN,
+      TOO_MANY_REQUESTS,
       UNEXPECTED
     }
 
