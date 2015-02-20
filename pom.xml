@@ -99,7 +99,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- JDK 1.7 source and binary compatiblility -->
+            <!-- JDK 1.6 source and binary compatiblility -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
