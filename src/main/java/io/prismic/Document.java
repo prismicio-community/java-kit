@@ -158,7 +158,7 @@ public class Document extends WithFragments {
     return fragments;
   }
 
-  static Document parse(JsonNode json) {
+  public static Document parse(JsonNode json) {
     String id = json.path("id").asText();
     String uid = json.has("uid") ? json.path("uid").asText() : null;
     String href = json.path("href").asText();

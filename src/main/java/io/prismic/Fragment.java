@@ -34,7 +34,7 @@ public interface Fragment {
 
     // --
 
-    static Text parse(JsonNode json) {
+    public static Text parse(JsonNode json) {
       return new Text(json.asText());
     }
 
@@ -66,7 +66,7 @@ public interface Fragment {
 
     // --
 
-    static Date parse(JsonNode json) {
+    public static Date parse(JsonNode json) {
       try {
         return new Date(LocalDate.parse(json.asText(), DateTimeFormat.forPattern("yyyy-MM-dd")));
       } catch(Exception e) {
@@ -104,7 +104,7 @@ public interface Fragment {
 
     private static DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
-    static Timestamp parse(JsonNode json) {
+    public static Timestamp parse(JsonNode json) {
       try {
         return new Timestamp(DateTime.parse(json.asText(), isoFormat));
       } catch(Exception e) {
@@ -140,7 +140,7 @@ public interface Fragment {
 
     // --
 
-    static Number parse(JsonNode json) {
+    public static Number parse(JsonNode json) {
       try {
         return new Number(Double.parseDouble(json.asText()));
       } catch(Exception e) {
@@ -172,7 +172,7 @@ public interface Fragment {
 
     // --
 
-    static Color parse(JsonNode json) {
+    public static Color parse(JsonNode json) {
       String hex = json.asText();
       if(hex.matches("#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})")) {
         return new Color(hex);
@@ -207,7 +207,7 @@ public interface Fragment {
 
     // --
 
-    static GeoPoint parse(JsonNode json) {
+    public static GeoPoint parse(JsonNode json) {
       try {
         Double latitude = json.has("latitude") && json.path("latitude").isNumber() ? json.path("latitude").doubleValue() : null;
         Double longitude = json.has("longitude") && json.path("longitude").isNumber() ? json.path("longitude").doubleValue() : null;
@@ -281,7 +281,7 @@ public interface Fragment {
 
     // --
 
-    static Embed parse(JsonNode json) {
+    public static Embed parse(JsonNode json) {
       JsonNode oembedJson = json.with("oembed");
       String type = oembedJson.path("type").asText();
       String provider = oembedJson.has("provider_name") ? oembedJson.path("provider_name").asText() : null;
@@ -344,7 +344,7 @@ public interface Fragment {
 
     // --
 
-    static WebLink parse(JsonNode json) {
+    public static WebLink parse(JsonNode json) {
       String url = json.path("url").asText();
       return new WebLink(url, null);
     }
@@ -398,7 +398,7 @@ public interface Fragment {
       return ("<a href=\"" + url + "\">" + filename + "</a>");
     }
 
-    static FileLink parse(JsonNode json) {
+    public static FileLink parse(JsonNode json) {
       String url = json.path("file").path("url").asText();
       String kind = json.path("file").path("kind").asText();
       String size = json.path("file").path("size").asText();
@@ -429,7 +429,7 @@ public interface Fragment {
       return ("<a href=\"" + url + "\">" + url + "</a>");
     }
 
-    static ImageLink parse(JsonNode json) {
+    public static ImageLink parse(JsonNode json) {
       String url = json.path("image").path("url").asText();
       return new ImageLink(url);
     }
@@ -504,7 +504,7 @@ public interface Fragment {
 
     // --
 
-    static DocumentLink parse(JsonNode json) {
+    public static DocumentLink parse(JsonNode json) {
       JsonNode document = json.with("document");
       boolean broken = json.path("isBroken").booleanValue();
       String id = document.path("id").asText();
@@ -594,7 +594,7 @@ public interface Fragment {
 
       //
 
-      static View parse(JsonNode json) {
+      public static View parse(JsonNode json) {
         String url = json.path("url").asText();
         int width = json.with("dimensions").path("width").intValue();
         int height = json.with("dimensions").path("height").intValue();
@@ -636,7 +636,7 @@ public interface Fragment {
 
     // --
 
-    static Image parse(JsonNode json) {
+    public static Image parse(JsonNode json) {
       View main = View.parse(json.with("main"));
       Map<String,View> views = new HashMap<String,View>();
       Iterator<String> viewsJson = json.with("views").fieldNames();
@@ -1200,7 +1200,7 @@ public interface Fragment {
 
     // --
 
-    static Link parseLink(JsonNode json) {
+    public static Link parseLink(JsonNode json) {
       if (json.isMissingNode()) {
         return null;
       }
@@ -1221,7 +1221,7 @@ public interface Fragment {
       return null;
     }
 
-    static Span parseSpan(JsonNode json) {
+    public static Span parseSpan(JsonNode json) {
       String type = json.path("type").asText();
       int start = json.path("start").intValue();
       int end = json.path("end").intValue();
@@ -1261,7 +1261,7 @@ public interface Fragment {
       }
     }
 
-    static ParsedText parseText(JsonNode json) {
+    public static ParsedText parseText(JsonNode json) {
       String text = json.path("text").asText();
       List<Span> spans = new ArrayList<Span>();
       for(JsonNode spanJson: json.withArray("spans")) {
@@ -1273,7 +1273,7 @@ public interface Fragment {
       return new ParsedText(text, spans);
     }
 
-    static Block parseBlock(JsonNode json) {
+    public static Block parseBlock(JsonNode json) {
       String type = json.path("type").asText();
       String label = json.path("label").textValue();
       if("heading1".equals(type)) {
@@ -1319,7 +1319,7 @@ public interface Fragment {
       return null;
     }
 
-    static StructuredText parse(JsonNode json) {
+    public static StructuredText parse(JsonNode json) {
       List<Block> blocks = new ArrayList<Block>();
       for(JsonNode blockJson: json) {
         Block block = parseBlock(blockJson);
@@ -1379,7 +1379,7 @@ public interface Fragment {
      * @param fragmentParser the fragment parser passed from the Api object, needed to parse the sub-fragment
      * @return the properly initialized Fragment.Group object
      */
-    static Group parse(JsonNode json) {
+    public static Group parse(JsonNode json) {
       List<GroupDoc> groupDocs = new ArrayList<GroupDoc>();
       for(JsonNode groupJson : json) {
         // each groupJson looks like this: { "somelink" : { "type" : "Link.document", { ... } }, "someimage" : { ... } }
