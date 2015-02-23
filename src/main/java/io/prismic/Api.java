@@ -267,7 +267,7 @@ public class Api {
    *                (usually the home page of your site)
    * @return the URL you should redirect the user to preview the requested change
    */
-  public String previewSession(String token, SimpleLinkResolver linkResolver, String defaultUrl) {
+  public String previewSession(String token, LinkResolver linkResolver, String defaultUrl) {
     JsonNode tokenJson = HttpClient.fetch(token, logger, cache);
     JsonNode mainDocumentId = tokenJson.path("mainDocument");
     if (!mainDocumentId.isTextual()) {

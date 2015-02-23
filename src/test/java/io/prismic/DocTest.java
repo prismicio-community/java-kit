@@ -16,7 +16,7 @@ import java.util.List;
 public class DocTest
 {
 
-  SimpleLinkResolver linkResolver = new SimpleLinkResolver() {
+  LinkResolver linkResolver = new SimpleLinkResolver() {
     public String resolve(Fragment.DocumentLink link) {
       return "/"+link.getId()+"/"+link.getSlug();
     }
@@ -132,7 +132,7 @@ public class DocTest
       .submit();
     // startgist:5bb74558f53045367d2c:prismic-asHtml.java
     Document doc = response.getResults().get(0);
-    SimpleLinkResolver resolver = new SimpleLinkResolver() {
+    LinkResolver resolver = new SimpleLinkResolver() {
       @Override public String resolve(Fragment.DocumentLink link) {
         return "/"+link.getId()+"/"+link.getSlug();
       }
@@ -151,7 +151,7 @@ public class DocTest
       .submit();
     // startgist:a7f6afacb673871eaa4d:prismic-htmlSerializer.java
     Document doc = response.getResults().get(0);
-    final SimpleLinkResolver resolver = new SimpleLinkResolver() {
+    final LinkResolver resolver = new SimpleLinkResolver() {
       @Override public String resolve(Fragment.DocumentLink link) {
         return "/"+link.getId()+"/"+link.getSlug();
       }

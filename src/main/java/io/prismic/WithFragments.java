@@ -136,11 +136,11 @@ public abstract class WithFragments {
     return null;
   }
 
-  public String getHtml(String field, SimpleLinkResolver linkResolver) {
+  public String getHtml(String field, LinkResolver linkResolver) {
     return getHtml(field, linkResolver, null);
   }
 
-  public String getHtml(String field, SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+  public String getHtml(String field, LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.StructuredText) {
       return ((Fragment.StructuredText)fragment).asHtml(linkResolver, htmlSerializer);
@@ -269,11 +269,11 @@ public abstract class WithFragments {
     return false;
   }
 
-  public String asHtml(SimpleLinkResolver linkResolver) {
+  public String asHtml(LinkResolver linkResolver) {
     return asHtml(linkResolver, null);
   }
 
-  public String asHtml(SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+  public String asHtml(LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     StringBuilder html = new StringBuilder();
     for(Map.Entry<String,Fragment> fragment: getFragments().entrySet()) {
       html.append("<section data-field=\"" + fragment.getKey() + "\">");
