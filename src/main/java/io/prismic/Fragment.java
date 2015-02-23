@@ -306,7 +306,7 @@ public interface Fragment {
      * @param resolver DocumentLinkResolver, only used for DocumentLink.
      * @return target URL of the link
      */
-    public String getUrl(DocumentLinkResolver resolver);
+    public String getUrl(SimpleLinkResolver resolver);
   }
 
   public static class WebLink implements Link {
@@ -323,7 +323,7 @@ public interface Fragment {
      *                 If you know you're working on a WebLink, just use getUrl().
      * @return the target URL of the link
      */
-    public String getUrl(DocumentLinkResolver resolver) {
+    public String getUrl(SimpleLinkResolver resolver) {
       return url;
     }
 
@@ -371,7 +371,7 @@ public interface Fragment {
      *                 If you know you're working on a WebLink, just use getUrl().
      * @return the target URL of the link
      */
-    public String getUrl(DocumentLinkResolver resolver) {
+    public String getUrl(SimpleLinkResolver resolver) {
       return url;
     }
 
@@ -417,7 +417,7 @@ public interface Fragment {
       this.url = url;
     }
 
-    public String getUrl(DocumentLinkResolver resolver) {
+    public String getUrl(SimpleLinkResolver resolver) {
       return url;
     }
 
@@ -465,7 +465,7 @@ public interface Fragment {
       this.broken = broken;
     }
 
-    public String getUrl(DocumentLinkResolver resolver) {
+    public String getUrl(SimpleLinkResolver resolver) {
       return resolver.resolve(this);
     }
 
@@ -498,8 +498,8 @@ public interface Fragment {
       return this.fragments;
     }
 
-    public String asHtml(DocumentLinkResolver linkResolver) {
-      return ("<a " + (linkResolver.getTitle(this) == null ? "" : "title=\"" + linkResolver.getTitle(this) + "\" ") + "href=\"" + linkResolver.resolve(this) + "\">" + slug + "</a>");
+    public String asHtml(SimpleLinkResolver linkResolver) {
+      return ("<a href=\"" + linkResolver.resolve(this) + "\">" + slug + "</a>");
     }
 
     // --
@@ -573,7 +573,7 @@ public interface Fragment {
         return (double)width / height;
       }
 
-      public String asHtml(DocumentLinkResolver linkResolver) {
+      public String asHtml(SimpleLinkResolver linkResolver) {
         String imgTag = "<img alt=\"" + alt + "\" src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" />";
         if (this.linkTo != null) {
           String url = "about:blank";
@@ -630,7 +630,7 @@ public interface Fragment {
       return views.get(view);
     }
 
-    public String asHtml(DocumentLinkResolver linkResolver) {
+    public String asHtml(SimpleLinkResolver linkResolver) {
       return getView("main").asHtml(linkResolver);
     }
 
@@ -973,7 +973,7 @@ public interface Fragment {
       }
     }
 
-    public String asHtml(List<Block> blocks, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+    public String asHtml(List<Block> blocks, SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       List<BlockGroup> blockGroups = new ArrayList<BlockGroup>();
       for(Block block: blocks) {
         BlockGroup lastOne = blockGroups.isEmpty() ? null : blockGroups.get(blockGroups.size() - 1);
@@ -1016,7 +1016,7 @@ public interface Fragment {
       return html.toString();
     }
 
-    public String asHtml(Block block, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+    public String asHtml(Block block, SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       String content = "";
       if(block instanceof StructuredText.Block.Heading) {
         StructuredText.Block.Heading heading = (StructuredText.Block.Heading)block;
@@ -1076,7 +1076,7 @@ public interface Fragment {
       }
     }
 
-    private static String serialize(Span span, String content, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+    private static String serialize(Span span, String content, SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       if (htmlSerializer != null) {
         String customHtml = htmlSerializer.serialize(span, content);
         if (customHtml != null) {
@@ -1108,14 +1108,14 @@ public interface Fragment {
         }
         else if(hyperlink.link instanceof Link.DocumentLink) {
           DocumentLink documentLink = (Link.DocumentLink)hyperlink.getLink();
-          String url = linkResolver.resolveLink(documentLink);
-          return "<a " + (linkResolver.getTitle(documentLink) == null ? "" : "title=\"" + linkResolver.getTitle(documentLink) + "\" ") + "href=\""+ url+ "\">" + content + "</a>";
+          String url = linkResolver.resolve(documentLink);
+          return "<a href=\""+ url+ "\">" + content + "</a>";
         }
       }
       return "<span>" + content + "</span>";
     }
 
-    private String insertSpans(String text, List<Span> spans, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+    private String insertSpans(String text, List<Span> spans, SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       if (spans.isEmpty()) {
         return escape(text);
       }
@@ -1186,11 +1186,11 @@ public interface Fragment {
       return html;
    }
 
-    public String asHtml(DocumentLinkResolver linkResolver) {
+    public String asHtml(SimpleLinkResolver linkResolver) {
       return asHtml(linkResolver, null);
     }
 
-    public String asHtml(DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+    public String asHtml(SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
       return asHtml(getBlocks(), linkResolver, htmlSerializer);
     }
 
@@ -1362,7 +1362,7 @@ public interface Fragment {
       return result;
     }
 
-    public String asHtml(DocumentLinkResolver linkResolver) {
+    public String asHtml(SimpleLinkResolver linkResolver) {
       StringBuilder sb = new StringBuilder();
       for (GroupDoc groupDoc: this.groupDocs) {
         sb.append(groupDoc.asHtml(linkResolver));

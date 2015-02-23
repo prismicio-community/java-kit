@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -17,7 +16,7 @@ import java.util.List;
 public class DocTest
 {
 
-  DocumentLinkResolver linkResolver = new DocumentLinkResolver() {
+  SimpleLinkResolver linkResolver = new SimpleLinkResolver() {
     public String resolve(Fragment.DocumentLink link) {
       return "/"+link.getId()+"/"+link.getSlug();
     }
@@ -133,7 +132,7 @@ public class DocTest
       .submit();
     // startgist:5bb74558f53045367d2c:prismic-asHtml.java
     Document doc = response.getResults().get(0);
-    DocumentLinkResolver resolver = new DocumentLinkResolver() {
+    SimpleLinkResolver resolver = new SimpleLinkResolver() {
       @Override public String resolve(Fragment.DocumentLink link) {
         return "/"+link.getId()+"/"+link.getSlug();
       }
@@ -152,7 +151,7 @@ public class DocTest
       .submit();
     // startgist:a7f6afacb673871eaa4d:prismic-htmlSerializer.java
     Document doc = response.getResults().get(0);
-    final DocumentLinkResolver resolver = new DocumentLinkResolver() {
+    final SimpleLinkResolver resolver = new SimpleLinkResolver() {
       @Override public String resolve(Fragment.DocumentLink link) {
         return "/"+link.getId()+"/"+link.getSlug();
       }

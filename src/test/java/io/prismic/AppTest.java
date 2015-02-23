@@ -70,7 +70,7 @@ public class AppTest {
     .submit()
     .getResults()
     .get(0)
-    .asHtml(new DocumentLinkResolver() {
+    .asHtml(new SimpleLinkResolver() {
       public String resolve(Fragment.DocumentLink link) {
         return "/"+link.getId()+"/"+link.getSlug();
       }
@@ -90,7 +90,7 @@ public class AppTest {
     .submit()
     .getResults()
     .get(0)
-    .asHtml(new DocumentLinkResolver() {
+    .asHtml(new SimpleLinkResolver() {
       public String resolve(Fragment.DocumentLink link) {
         return "/"+link.getId()+"/"+link.getSlug();
       }
@@ -115,7 +115,7 @@ public class AppTest {
     .submit()
     .getResults()
     .get(0)
-    .asHtml(new DocumentLinkResolver() {
+    .asHtml(new SimpleLinkResolver() {
       public String resolve(Fragment.DocumentLink link) {
         return "/" + link.getId() + "/" + link.getSlug();
       }
@@ -124,7 +124,7 @@ public class AppTest {
       public String serialize(Fragment.StructuredText.Element element, String content) {
         if (element instanceof Fragment.StructuredText.Block.Image) {
           Fragment.StructuredText.Block.Image image = (Fragment.StructuredText.Block.Image)element;
-          return (image.getView().asHtml(new DocumentLinkResolver() {
+          return (image.getView().asHtml(new SimpleLinkResolver() {
             public String resolve(Fragment.DocumentLink link) {
               return "/"+link.getId()+"/"+link.getSlug();
             }
@@ -149,7 +149,7 @@ public class AppTest {
       .set("orderings", "[my.docchapter.priority]")
       .ref(micro_api.getMaster())
       .submit().getResults().get(0);
-    String docchapter_retrieved = docchapter.asHtml(new DocumentLinkResolver() {
+    String docchapter_retrieved = docchapter.asHtml(new SimpleLinkResolver() {
         public String resolve(Fragment.DocumentLink link) {
           return "/"+link.getId()+"/"+link.getSlug();
         }
@@ -183,7 +183,7 @@ public class AppTest {
       .query("[[:d = at(document.id, \"UrDejAEAAFwMyrW9\")]]")
       .ref(micro_api.getMaster())
       .submit().getResults().get(0);
-    String retrieved = installingMetaMicro.getStructuredText("doc.content").asHtml(new DocumentLinkResolver() {
+    String retrieved = installingMetaMicro.getStructuredText("doc.content").asHtml(new SimpleLinkResolver() {
         public String resolve(Fragment.DocumentLink link) {
           return "/"+link.getId()+"/"+link.getSlug();
         }

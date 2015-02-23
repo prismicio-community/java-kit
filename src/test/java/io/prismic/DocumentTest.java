@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DocumentTest {
 
-  DocumentLinkResolver linkResolver = new DocumentLinkResolver() {
+  SimpleLinkResolver linkResolver = new SimpleLinkResolver() {
     public String resolve(Fragment.DocumentLink link) {
       return "/"+link.getId()+"/"+link.getSlug();
     }

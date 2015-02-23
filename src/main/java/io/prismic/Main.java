@@ -18,7 +18,7 @@ public class Main {
 
     for(Document doc: documents) {
       System.out.println(doc + " -> ");
-      System.out.println(doc.asHtml(new DocumentLinkResolver() {
+      System.out.println(doc.asHtml(new SimpleLinkResolver() {
         public String resolve(Fragment.DocumentLink link) {
           return "kiki";
         }

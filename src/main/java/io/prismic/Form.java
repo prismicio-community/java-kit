@@ -371,8 +371,10 @@ public class Form {
      */
      public SearchForm query(Predicate... predicates) {
       StringBuilder result = new StringBuilder();
-      for (Predicate p: predicates) {
-        result.append(p.q());
+      if (predicates != null) {
+        for (Predicate p : predicates) {
+          result.append(p.q());
+        }
       }
       return this.query("[" + result.toString() + "]");
     }

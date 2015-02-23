@@ -1,7 +1,6 @@
 package io.prismic;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -137,11 +136,11 @@ public abstract class WithFragments {
     return null;
   }
 
-  public String getHtml(String field, DocumentLinkResolver linkResolver) {
+  public String getHtml(String field, SimpleLinkResolver linkResolver) {
     return getHtml(field, linkResolver, null);
   }
 
-  public String getHtml(String field, DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+  public String getHtml(String field, SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.StructuredText) {
       return ((Fragment.StructuredText)fragment).asHtml(linkResolver, htmlSerializer);
@@ -270,11 +269,11 @@ public abstract class WithFragments {
     return false;
   }
 
-  public String asHtml(DocumentLinkResolver linkResolver) {
+  public String asHtml(SimpleLinkResolver linkResolver) {
     return asHtml(linkResolver, null);
   }
 
-  public String asHtml(DocumentLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+  public String asHtml(SimpleLinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     StringBuilder html = new StringBuilder();
     for(Map.Entry<String,Fragment> fragment: getFragments().entrySet()) {
       html.append("<section data-field=\"" + fragment.getKey() + "\">");
