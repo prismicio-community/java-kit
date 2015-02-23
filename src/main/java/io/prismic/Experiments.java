@@ -77,7 +77,7 @@ public class Experiments {
     return null;
   }
 
-  static Experiments parse(JsonNode json) {
+  public static Experiments parse(JsonNode json) {
     List<Experiment> draft = new ArrayList<Experiment>();
     List<Experiment> running = new ArrayList<Experiment>();
     Iterator<JsonNode> it;

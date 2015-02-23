@@ -1376,7 +1376,6 @@ public interface Fragment {
      * Static method to parse JSON into a proper Fragment.Group object.
      *
      * @param json the Jackson json node
-     * @param fragmentParser the fragment parser passed from the Api object, needed to parse the sub-fragment
      * @return the properly initialized Fragment.Group object
      */
     public static Group parse(JsonNode json) {
