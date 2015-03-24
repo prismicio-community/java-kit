@@ -29,7 +29,7 @@ public interface Fragment {
     }
 
     public String asHtml() {
-      return ("<span class=\"text\">" + value + "</span>");
+      return ("<span class=\"text\">" + StructuredText.escape(value) + "</span>");
     }
 
     // --
@@ -1194,7 +1194,7 @@ public interface Fragment {
       return asHtml(getBlocks(), linkResolver, htmlSerializer);
     }
 
-    private static String escape(String input) {
+    static String escape(String input) {
       return input.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
     }
 

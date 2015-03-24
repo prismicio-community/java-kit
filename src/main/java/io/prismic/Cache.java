@@ -8,30 +8,24 @@ public interface Cache {
   public void set(String key, Long ttl, JsonNode response);
   public JsonNode get(String key);
   public JsonNode getOrSet(String key, Long ttl, Callback f);
-  public Boolean isExpired(String key);
-  public Boolean isPending(String key);
 
-  // -- 
+  // --
   public static class NoCache implements Cache {
 
+    @Override
     public void set(String key, Long ttl, JsonNode response) {
     }
 
+    @Override
     public JsonNode get(String key) {
       return null;
     }
 
+    @Override
     public JsonNode getOrSet(String key, Long ttl, Callback f) {
       return f.execute();
     }
 
-    public Boolean isExpired(String key) {
-      return true;
-    }
-
-    public Boolean isPending(String key) {
-      return false;
-    }
   }
 
   // --
@@ -56,11 +50,6 @@ public interface Cache {
   public static class BuiltInCache implements Cache {
 
     private final java.util.Map<String, Entry> cache;
-    private final java.util.Map<String, State> states;
-
-    static enum State {
-      PENDING
-    }
 
     static class Entry {
       public final Long expiration;
@@ -73,48 +62,40 @@ public interface Cache {
 
     public BuiltInCache(int maxDocuments) {
       this.cache = java.util.Collections.synchronizedMap(new LRUMap<String, Entry>(maxDocuments));
-      this.states = java.util.Collections.synchronizedMap(new java.util.HashMap<String, State>());
     }
 
+    @Override
     public JsonNode get(String key) {
       Entry entry = this.cache.get(key);
       Boolean isExpired = this.isExpired(key);
-      Boolean isPending = this.isPending(key);
-      if(entry != null && (!isExpired || (isExpired && isPending))) {
+      if (entry != null && !isExpired) {
         return entry.value;
       }
       return null;
     }
 
+    @Override
     public void set(String key, Long ttl, JsonNode response) {
       Long expiration = ttl + System.currentTimeMillis();
       this.cache.put(key, new Entry(expiration, response));
     }
 
+    @Override
     public JsonNode getOrSet(String key, Long ttl, Callback f) {
       JsonNode found = this.get(key);
       if(found == null) {
-        this.states.put(key, State.PENDING);
         JsonNode json = f.execute();
         this.set(key, ttl, json);
-        this.states.remove(key);
         return json;
       } else {
         return found;
       }
     }
 
-    public Boolean isExpired(String key) {
+    private Boolean isExpired(String key) {
       Entry entry = (Entry)this.cache.get(key);
-      if(entry != null) {
-        return entry.expiration !=0 && entry.expiration < System.currentTimeMillis();
-      } else {
-        return false;
-      }
+      return entry != null && entry.expiration !=0 && entry.expiration < System.currentTimeMillis();
     }
 
-    public Boolean isPending(String key) {
-      return this.states.get(key) == State.PENDING;
-    }
   }
 }
