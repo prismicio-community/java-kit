@@ -345,11 +345,6 @@ public class DocTest
       @Override
       public JsonNode getOrSet(String key, Long ttl, Callback f) { return f.execute(); }
 
-      @Override
-      public Boolean isExpired(String key) { return false; }
-
-      @Override
-      public Boolean isPending(String key) { return false; }
     };
     // Thi Api will use the custom cache object
     Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", cache, null /* logger */);
