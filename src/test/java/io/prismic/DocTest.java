@@ -24,7 +24,7 @@ public class DocTest
 
   @Test
   public void testApi() {
-    // startgist:9b08c18ad53ba62736b7:prismic-api.java
+    // startgist:ed5e3217dad1663b27a5:prismic-api.java
     Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     for (Ref ref: api.getRefs()) {
       System.out.println("Reference: " + ref);
@@ -36,7 +36,7 @@ public class DocTest
   @Test
   public void testApiPrivate() {
     try {
-      // startgist:3ed369c967dbb931a9ab:prismic-apiPrivate.java
+      // startgist:2de893c69c29b1878f8a:prismic-apiPrivate.java
       // This will fail because the token is invalid, but this is how to access a private API
       Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", "MC5-XXXXXXX-vRfvv70");
       // endgist
@@ -47,7 +47,7 @@ public class DocTest
 
   @Test
   public void testReferences() {
-    // startgist:b5c1ca7cc474c6456214:prismic-references.java
+    // startgist:8957c240ffa030876645:prismic-references.java
     String previewToken = "MC5VbDdXQmtuTTB6Z0hNWHF3.c--_vVbvv73vv73vv73vv71EA--_vS_vv73vv70T77-9Ke-_ve-_vWfvv70ebO-_ve-_ve-_vQN377-9ce-_vRfvv70";
     Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", previewToken);
     Ref stPatrickRef = api.getRef("St-Patrick specials");
@@ -63,7 +63,7 @@ public class DocTest
 
   @Test
   public void testSimpleQuery() {
-    // startgist:e3f35b01edbd553ca60a:prismic-simplequery.java
+    // startgist:2824a5bff44f000c0183:prismic-simplequery.java
     Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     // The response object contains all documents of type "product", paginated
     Response response = api.getForm("everything")
@@ -76,7 +76,7 @@ public class DocTest
 
   @Test
   public void testOrderings() {
-    // startgist:f5077e40997afd0008df:prismic-orderings.java
+    // startgist:b647227dd416457b01e3:prismic-orderings.java
     Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Response response = api.getForm("everything")
       .ref(api.getMaster())
@@ -92,7 +92,7 @@ public class DocTest
 
   @Test
   public void testPredicates() {
-    // startgist:ad8134f5848d828fae50:prismic-predicates.java
+    // startgist:d823d0455322e2b31946:prismic-predicates.java
     Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     // The response object contains all documents of type "product", paginated
     Response response = api.getForm("everything")
@@ -107,7 +107,7 @@ public class DocTest
 
   @Test
   public void testAllPredicates() {
-    // startgist:b16bf60f1f6f8cec55f5:prismic-allPredicates.java
+    // startgist:032fc0e060d85b74ead1:prismic-allPredicates.java
     // "at" predicate: equality of a fragment to a value.
     Predicate at = Predicates.at("document.type", "article");
     // "any" predicate: equality of a fragment to a value.
@@ -130,7 +130,7 @@ public class DocTest
       .ref(api.getMaster())
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbX"))
       .submit();
-    // startgist:5bb74558f53045367d2c:prismic-asHtml.java
+    // startgist:fec4ca358aab00fd7fa0:prismic-asHtml.java
     Document doc = response.getResults().get(0);
     LinkResolver resolver = new SimpleLinkResolver() {
       @Override public String resolve(Fragment.DocumentLink link) {
@@ -149,7 +149,7 @@ public class DocTest
       .ref(api.getMaster())
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbX"))
       .submit();
-    // startgist:a7f6afacb673871eaa4d:prismic-htmlSerializer.java
+    // startgist:9bd4bcd4f84eb584bbbf:prismic-htmlSerializer.java
     Document doc = response.getResults().get(0);
     final LinkResolver resolver = new SimpleLinkResolver() {
       @Override public String resolve(Fragment.DocumentLink link) {
@@ -182,7 +182,7 @@ public class DocTest
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbl"))
       .ref(api.getMaster()).submit()
       .getResults().get(0);
-    // startgist:a16e6a29ad84110a46b8:prismic-getText.java
+    // startgist:97395c4aad72a10cdd11:prismic-getText.java
     String author = doc.getText("blog-post.author");
     // endgist
     Assert.assertEquals(author, "John M. Martelle, Fine Pastry Magazine");
@@ -194,7 +194,7 @@ public class DocTest
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
       .getResults().get(0);
-    // startgist:a74e5e7850f2f202eb02:prismic-getNumber.java
+    // startgist:da814f5a41f14c7c96f7:prismic-getNumber.java
     // Number predicates
     Predicate gt = Predicates.gt("my.product.price", 10);
     Predicate lt = Predicates.lt("my.product.price", 20);
@@ -211,7 +211,7 @@ public class DocTest
     Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     Document doc = api.getForm("everything").query(Predicates.at("document.id", "UlfoxUnM0wkXYXbl"))
       .ref(api.getMaster()).submit().getResults().get(0);
-    // startgist:3297308d8a2395ff68b5:prismic-dateTimestamp.java
+    // startgist:80aba795d6e5f105fc16:prismic-dateTimestamp.java
     // Date and Timestamp predicates
     Predicate dateBefore = Predicates.dateBefore("my.product.releaseDate", new DateTime(2014, 6, 1, 0, 0));
     Predicate dateAfter = Predicates.dateAfter("my.product.releaseDate", new DateTime(2014, 1, 1, 0, 0));
@@ -247,7 +247,7 @@ public class DocTest
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"documents\":{\"type\":\"Group\",\"value\":[{\"linktodoc\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UrDejAEAAFwMyrW9\",\"type\":\"doc\",\"tags\":[],\"slug\":\"installing-meta-micro\"},\"isBroken\":false}},\"desc\":{\"type\":\"StructuredText\",\"value\":[{\"type\":\"paragraph\",\"text\":\"A detailed step by step point of view on how installing happens.\",\"spans\":[]}]}},{\"linktodoc\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UrDmKgEAALwMyrXA\",\"type\":\"doc\",\"tags\":[],\"slug\":\"using-meta-micro\"},\"isBroken\":false}}}]}}}}";
     JsonNode json = mapper.readTree(jsonString);
     Document doc = Document.parse(json);
-    // startgist:feb9f79a9f19f49586e0:prismic-group.java
+    // startgist:d761699589bc26c04942:prismic-group.java
     Fragment.Group group = doc.getGroup("article.documents");
     for (GroupDoc groupdoc: group.getDocs()) {
       // GroupDoc can be manipulated like a Document
@@ -265,7 +265,7 @@ public class DocTest
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"source\":{\"type\":\"Link.document\",\"value\":{\"document\":{\"id\":\"UlfoxUnM0wkXYXbE\",\"type\":\"product\",\"tags\":[\"Macaron\"],\"slug\":\"dark-chocolate-macaron\"},\"isBroken\":false}}}}}";
     JsonNode json = mapper.readTree(jsonString);
     Document doc = Document.parse(json);
-    // startgist:6beab058b1f25fdc86d5:prismic-link.java
+    // startgist:349a00e422f7bc963920:prismic-link.java
     Fragment.Link source = doc.getLink("article.source");
     String url = source.getUrl(linkResolver);
     // endgist
@@ -278,7 +278,7 @@ public class DocTest
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"video\":{\"type\":\"Embed\",\"value\":{\"oembed\":{\"provider_url\":\"http://www.youtube.com/\",\"type\":\"video\",\"thumbnail_height\":360,\"height\":270,\"thumbnail_url\":\"http://i1.ytimg.com/vi/baGfM6dBzs8/hqdefault.jpg\",\"width\":480,\"provider_name\":\"YouTube\",\"html\":\"<iframe width=\\\"480\\\" height=\\\"270\\\" src=\\\"http://www.youtube.com/embed/baGfM6dBzs8?feature=oembed\\\" frameborder=\\\"0\\\" allowfullscreen></iframe>\",\"author_name\":\"Siobhan Wilson\",\"version\":\"1.0\",\"author_url\":\"http://www.youtube.com/user/siobhanwilsonsongs\",\"thumbnail_width\":480,\"title\":\"Siobhan Wilson - All Dressed Up\",\"embed_url\":\"https://www.youtube.com/watch?v=baGfM6dBzs8\"}}}}}}";
     JsonNode json = mapper.readTree(jsonString);
     Document doc = Document.parse(json);
-    // startgist:11e0a18e3f6b82a04a51:prismic-embed.java
+    // startgist:e5344636baaf3a3ccc7d:prismic-embed.java
     Fragment.Embed video = doc.getEmbed("article.video");
     // Html is the code to include to embed the object, and depends on the embedded service
     String html = video.asHtml();
@@ -292,7 +292,7 @@ public class DocTest
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"background\":{\"type\":\"Color\",\"value\":\"#000000\"}}}}";
     JsonNode json = mapper.readTree(jsonString);
     Document doc = Document.parse(json);
-    // startgist:24f9be9a0f46a282716e:prismic-color.java
+    // startgist:751275634c9f2bca95f5:prismic-color.java
     Fragment.Color bgcolor = doc.getColor("article.background");
     String hexa = bgcolor.getHexValue();
     // endgist
@@ -305,7 +305,7 @@ public class DocTest
     String jsonString = "{\"id\":\"abcd\",\"type\":\"article\",\"href\":\"\",\"slugs\":[],\"tags\":[],\"data\":{\"article\":{\"location\":{\"type\":\"GeoPoint\",\"value\":{\"latitude\":48.877108,\"longitude\":2.333879}}}}}";
     JsonNode json = mapper.readTree(jsonString);
     Document doc = Document.parse(json);
-    // startgist:ba12f6d368bb0b5fba86:prismic-geopoint.java
+    // startgist:4a8aba97ae4388305921:prismic-geopoint.java
     // "near" predicate for GeoPoint fragments
     Predicate near = Predicates.near("my.store.location", 48.8768767, 2.3338802, 10);
 
@@ -322,7 +322,7 @@ public class DocTest
     Document doc = api.getForm("everything")
       .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbO")).ref(api.getMaster()).submit()
       .getResults().get(0);
-    // startgist:d7cc82fbfb3574cd5868:prismic-images.java
+    // startgist:64cf7da96ac83b187251:prismic-images.java
     // Accessing image fields
     Fragment.Image image = doc.getImage("product.image");
     // Most of the time you will be using the "main" view
@@ -333,7 +333,7 @@ public class DocTest
 
   @Test
   public void testCache() {
-    // startgist:1169febd1ccb6afd1273:prismic-cache.java
+    // startgist:e45a34f6d895e2fd9d85:prismic-cache.java
     Cache cache = new Cache() {
 
       @Override
