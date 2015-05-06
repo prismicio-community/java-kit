@@ -14,6 +14,12 @@ public class PredicateTest {
   }
 
   @Test
+  public void testAtTagsPredicate() throws Exception {
+    Predicate p = Predicates.atTags(Arrays.asList("Macaron", "Cupcakes"));
+    Assert.assertEquals("[:d = at(document.tags, [\"Macaron\",\"Cupcakes\"])]", p.q());
+  }
+
+  @Test
   public void testAnyPredicate() throws Exception {
     Predicate p = Predicates.any("document.tags", Arrays.asList("Macaron", "Cupcakes"));
     Assert.assertEquals("[:d = any(document.tags, [\"Macaron\",\"Cupcakes\"])]", p.q());
