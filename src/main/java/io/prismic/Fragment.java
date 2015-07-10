@@ -649,6 +649,56 @@ public interface Fragment {
 
   }
 
+  public static class Slice {
+    private final String sliceType;
+    private final String label;
+    private final Fragment value;
+
+    public Slice(String sliceType, String label, Fragment value) {
+      this.sliceType = sliceType;
+      this.label = label;
+      this.value = value;
+    }
+
+    public String asHtml(LinkResolver linkResolver) {
+      String className = "slice";
+      if (this.label != null) className += (" " + this.label);
+      return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
+             WithFragments.fragmentHtml(this.value, linkResolver, null) +
+             "</div>";
+    }
+
+  }
+
+  public static class SliceZone implements Fragment {
+    private final List<Slice> slices;
+
+    public SliceZone(List<Slice> slices) {
+      this.slices = Collections.unmodifiableList(slices);
+    }
+
+    public String asHtml(LinkResolver linkResolver) {
+      StringBuilder output = new StringBuilder();
+      for (Slice slice: this.slices) {
+        output.append(slice.asHtml(linkResolver));
+      }
+      return output.toString();
+    }
+
+    public static SliceZone parse(JsonNode json) {
+      List<Slice> slices = new ArrayList<Slice>();
+      for(JsonNode sliceJson: json) {
+        String sliceType = sliceJson.path("slice_type").asText();
+        String label = sliceJson.has("label") ? sliceJson.path("label").asText() : null;
+        String fragmentType = sliceJson.path("value").path("type").asText();
+        Fragment fragment = Document.parseFragment(fragmentType, sliceJson.path("value").path("value"));
+        slices.add(new Slice(sliceType, label, fragment));
+      }
+      return new SliceZone(slices);
+    }
+
+  }
+
   // -- StructuredText
 
   /**

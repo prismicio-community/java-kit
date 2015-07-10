@@ -18,9 +18,7 @@ public class DocumentTest {
 
   @Test
   public void testParseGeoPoint() throws Exception {
-
     JsonNode node = getJson("/fixtures/document_store.json");
-
     Document doc = Document.parse(node);
 
     Assert.assertNotNull(
@@ -36,6 +34,24 @@ public class DocumentTest {
       "The geopoint longitude retrieval work well",
       doc.getGeoPoint("store.coordinates").getLongitude(),
       2.3338790d
+    );
+  }
+
+  @Test
+  public void testParseSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/slices.json");
+    Document doc = Document.parse(node);
+
+    Assert.assertNotNull(
+      "The slices retrieval work well",
+      doc.getSliceZone("article.blocks")
+    );
+    Assert.assertEquals(
+      "The slices HTML serialization works well",
+      doc.getSliceZone("article.blocks").asHtml(linkResolver),
+      "<div data-slicetype=\"features\" class=\"slice\"><section data-field=\"illustration\"><img alt=\"\" src=\"https://wroomdev.s3.amazonaws.com/toto/db3775edb44f9818c54baa72bbfc8d3d6394b6ef_hsf_evilsquall.jpg\" width=\"4285\" height=\"709\" /></section>\n"
+        + "<section data-field=\"title\"><span class=\"text\">c'est un bloc features</span></section></div>"
+        + "<div data-slicetype=\"text\" class=\"slice\"><p>C'est un bloc content</p></div>"
     );
   }
 

@@ -136,40 +136,54 @@ public abstract class WithFragments {
     return null;
   }
 
+  public Fragment.SliceZone getSliceZone(String field) {
+    Fragment fragment = get(field);
+    if(fragment != null && fragment instanceof Fragment.SliceZone) {
+      return (Fragment.SliceZone)fragment;
+    }
+    return null;
+  }
+
   public String getHtml(String field, LinkResolver linkResolver) {
     return getHtml(field, linkResolver, null);
   }
 
   public String getHtml(String field, LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     Fragment fragment = get(field);
-    if(fragment != null && fragment instanceof Fragment.StructuredText) {
+    return WithFragments.fragmentHtml(fragment, linkResolver, htmlSerializer);
+  }
+
+  public static String fragmentHtml(Fragment fragment, LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
+    if (fragment == null) return "";
+
+    if(fragment instanceof Fragment.StructuredText) {
       return ((Fragment.StructuredText)fragment).asHtml(linkResolver, htmlSerializer);
     }
-    else if(fragment != null && fragment instanceof Fragment.Number) {
+    else if(fragment instanceof Fragment.Number) {
       return ((Fragment.Number)fragment).asHtml();
     }
-    else if(fragment != null && fragment instanceof Fragment.Color) {
+    else if(fragment instanceof Fragment.Color) {
       return ((Fragment.Color)fragment).asHtml();
     }
-    else if(fragment != null && fragment instanceof Fragment.Text) {
+    else if(fragment instanceof Fragment.Text) {
       return ((Fragment.Text)fragment).asHtml();
     }
-    else if(fragment != null && fragment instanceof Fragment.Date) {
+    else if(fragment instanceof Fragment.Date) {
       return ((Fragment.Date)fragment).asHtml();
     }
-    else if(fragment != null && fragment instanceof Fragment.Embed) {
+    else if(fragment instanceof Fragment.Embed) {
       return ((Fragment.Embed)fragment).asHtml();
     }
-    else if(fragment != null && fragment instanceof Fragment.Image) {
+    else if(fragment instanceof Fragment.Image) {
       return ((Fragment.Image)fragment).asHtml(linkResolver);
     }
-    else if(fragment != null && fragment instanceof Fragment.WebLink) {
+    else if(fragment instanceof Fragment.WebLink) {
       return ((Fragment.WebLink)fragment).asHtml();
     }
-    else if(fragment != null && fragment instanceof Fragment.DocumentLink) {
+    else if(fragment instanceof Fragment.DocumentLink) {
       return ((Fragment.DocumentLink)fragment).asHtml(linkResolver);
     }
-    else if(fragment != null && fragment instanceof Fragment.Group) {
+    else if(fragment instanceof Fragment.Group) {
       return ((Fragment.Group)fragment).asHtml(linkResolver);
     }
     return "";

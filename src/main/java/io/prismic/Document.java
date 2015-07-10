@@ -125,6 +125,9 @@ public class Document extends WithFragments {
     else if("Group".equals(type)) {
       return Fragment.Group.parse(json);
     }
+    else if("SliceZone".equals(type)) {
+      return Fragment.SliceZone.parse(json);
+    }
     return null;
   }
 
