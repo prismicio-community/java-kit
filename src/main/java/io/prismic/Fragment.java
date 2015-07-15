@@ -1433,7 +1433,7 @@ public interface Fragment {
       for(JsonNode groupJson : json) {
         // each groupJson looks like this: { "somelink" : { "type" : "Link.document", { ... } }, "someimage" : { ... } }
         Iterator<String> dataJson = groupJson.fieldNames();
-        Map<String, Fragment> fragmentMap = new HashMap<String, Fragment>();
+        Map<String, Fragment> fragmentMap = new LinkedHashMap<String, Fragment>();
         while (dataJson.hasNext()) {
           String field = dataJson.next();
           JsonNode fieldJson = groupJson.path(field);
