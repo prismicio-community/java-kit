@@ -668,6 +668,17 @@ public interface Fragment {
              "</div>";
     }
 
+    public String getSliceType() {
+      return sliceType;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    public Fragment getValue() {
+      return value;
+    }
   }
 
   public static class SliceZone implements Fragment {
@@ -697,6 +708,9 @@ public interface Fragment {
       return new SliceZone(slices);
     }
 
+    public List<Slice> getSlices() {
+      return slices;
+    }
   }
 
   // -- StructuredText
