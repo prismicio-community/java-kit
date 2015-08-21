@@ -1,11 +1,21 @@
 package io.prismic;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.littleshoot.proxy.HttpFilters;
+import org.littleshoot.proxy.HttpFiltersAdapter;
+import org.littleshoot.proxy.HttpFiltersSourceAdapter;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Unit test for simple App.
@@ -352,5 +362,54 @@ public class AppTest {
         api.getForm("products").ref(api.getMaster()).submit().getResults().size(),
         16
       );
+  }
+
+  /**
+   * Tests proxy support implementation.
+   */
+  @Test
+  public void proxySupportWorks() {
+    ProxySpyHttpFiltersSource proxySpy = new ProxySpyHttpFiltersSource();
+    HttpProxyServer server =
+      DefaultHttpProxyServer.bootstrap()
+        .withPort(12345)
+        .withFiltersSource(proxySpy)
+        .start();
+
+    try {
+      Api api = Api.get("https://lesbonneschoses.cdn.prismic.io/api", null, Cache.DefaultCache.getInstance(), new Logger.NoLogger(), new Proxy("localhost", 12345));
+      Assert.assertEquals(
+        "Proxy implementation should be transparent.",
+        api.getForm("products").ref(api.getMaster()).submit().getResults().size(),
+        16
+      );
+      Assert.assertEquals(
+        "Proxy should have been called",
+        proxySpy.getCallsCount(),
+        1
+      );
+    } finally {
+      server.stop();
+    }
+  }
+
+  private static class ProxySpyHttpFiltersSource extends HttpFiltersSourceAdapter {
+    private AtomicInteger callsCounts = new AtomicInteger();
+
+    public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
+      return new HttpFiltersAdapter(originalRequest, ctx) {
+        @Override
+        public HttpResponse requestPre(HttpObject httpObject) {
+          if (originalRequest.getUri().equals("lesbonneschoses.cdn.prismic.io:443")) {
+            callsCounts.incrementAndGet();
+          }
+          return super.requestPre(httpObject);
+        }
+      };
+    }
+
+    public int getCallsCount() {
+      return callsCounts.intValue();
+    }
   }
 }
