@@ -1,6 +1,8 @@
 package io.prismic;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.joda.time.*;
 import org.joda.time.format.*;
@@ -1340,21 +1342,11 @@ public interface Fragment {
     public static Block parseBlock(JsonNode json) {
       String type = json.path("type").asText();
       String label = json.path("label").textValue();
-      if("heading1".equals(type)) {
+      Matcher matcher = Pattern.compile("^heading(\\d)$").matcher(type);
+      if (matcher.find()) {
+        int level = Integer.parseInt(matcher.group(1));
         ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 1, label);
-      }
-      else if("heading2".equals(type)) {
-        ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 2, label);
-      }
-      else if("heading3".equals(type)) {
-        ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 3, label);
-      }
-      else if("heading4".equals(type)) {
-        ParsedText p = parseText(json);
-        return new Block.Heading(p.text, p.spans, 4, label);
+        return new Block.Heading(p.text, p.spans, level, label);
       }
       else if("paragraph".equals(type)) {
         ParsedText p = parseText(json);
