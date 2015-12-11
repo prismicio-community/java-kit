@@ -328,7 +328,7 @@ public class DocTest
     // Most of the time you will be using the "main" view
     String url = image.getView("main").getUrl();
     // endgist
-    Assert.assertEquals(url, "https://lesbonneschoses.cdn.prismic.io/lesbonneschoses/f606ad513fcc2a73b909817119b84d6fd0d61a6d.png");
+    Assert.assertEquals(url, "https://d2aw36oac6sa9o.cloudfront.net/lesbonneschoses/f606ad513fcc2a73b909817119b84d6fd0d61a6d.png");
   }
 
   @Test
