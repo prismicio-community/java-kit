@@ -73,22 +73,27 @@ public class Api {
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
+   * @param proxy an optional {@link Proxy} instance that defines the http proxy to be used
    * @return the usable API object
    */
-  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger) {
+  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger, final Proxy proxy) {
     final String url = (accessToken == null ? endpoint : (endpoint + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = cache.getOrSet(
         url,
         5000L,
         new Cache.Callback() {
-            public JsonNode execute() {
-                return HttpClient.fetch(url, logger, null);
-            }
+          public JsonNode execute() {
+            return HttpClient.fetch(url, logger, null, proxy);
+          }
         }
     );
 
     ApiData apiData = ApiData.parse(json);
-    return new Api(apiData, accessToken, cache, logger);
+    return new Api(apiData, accessToken, cache, logger, proxy);
+  }
+
+  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger) {
+    return get(endpoint, accessToken, cache, logger, null);
   }
 
   public static Api get(String url, Cache cache, Logger logger) {
@@ -124,6 +129,7 @@ public class Api {
   final private String accessToken;
   final private Cache cache;
   final private Logger logger;
+  final private Proxy proxy;
 
   /**
    * Constructor to build a proper {@link Api} object. This is not to build an {@link Api} object
@@ -133,12 +139,14 @@ public class Api {
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
+   * @param proxy an optional {@link Proxy} instance that defines the http proxy to be used
    */
-  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger) {
+  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger, Proxy proxy) {
     this.apiData = apiData;
     this.accessToken = accessToken;
     this.cache = cache;
     this.logger = logger;
+    this.proxy = proxy;
   }
 
   public Logger getLogger() {
@@ -151,6 +159,10 @@ public class Api {
 
   public Cache getCache() {
     return cache;
+  }
+
+  public Proxy getProxy() {
+    return proxy;
   }
 
   /**
@@ -268,7 +280,7 @@ public class Api {
    * @return the URL you should redirect the user to preview the requested change
    */
   public String previewSession(String token, LinkResolver linkResolver, String defaultUrl) {
-    JsonNode tokenJson = HttpClient.fetch(token, logger, cache);
+    JsonNode tokenJson = HttpClient.fetch(token, logger, cache, proxy);
     JsonNode mainDocumentId = tokenJson.path("mainDocument");
     if (!mainDocumentId.isTextual()) {
       return defaultUrl;

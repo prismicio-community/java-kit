@@ -399,7 +399,7 @@ public class Form {
             sep = "&";
           }
         }
-        JsonNode json = HttpClient.fetch(url.toString(), api.getLogger(), api.getCache());
+        JsonNode json = HttpClient.fetch(url.toString(), api.getLogger(), api.getCache(), api.getProxy());
         return Response.parse(json);
       } else {
         throw new Api.Error(Api.Error.Code.UNEXPECTED, "Form type not supported");
