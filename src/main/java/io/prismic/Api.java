@@ -197,8 +197,8 @@ public class Api {
   public Map<String,String> getTypes() {
     return apiData.getTypes();
   }
-  
-  
+
+
   /**
    * From a properly built {@link Api} object, returns the list of available tags.
    *
@@ -209,7 +209,7 @@ public class Api {
   public List<String> getTags() {
     return apiData.getTags();
   }
-  
+
   /**
    * From a properly built {@link Api} object, returns the Map of available form names.
    *
@@ -218,8 +218,8 @@ public class Api {
   public Map<String, String> getFormNames() {
       Map<String, String> formNames = new HashMap<String, String>();
       if (apiData.getForms() != null)
-          for(Entry<String, Form> formEntry : apiData.getForms().entrySet()) 
-              formNames.put(formEntry.getKey(), formEntry.getValue().getName()); 
+          for(Entry<String, Form> formEntry : apiData.getForms().entrySet())
+              formNames.put(formEntry.getKey(), formEntry.getValue().getName());
       return formNames;
   }
 
@@ -260,6 +260,27 @@ public class Api {
   }
 
   /**
+   * Start a query defaulting on the master reference (you can still override it)
+   */
+  public Form.SearchForm query() {
+    return this.getForm("everything").ref(this.getMaster());
+  }
+
+  /**
+   * Start a query defaulting on the master reference (you can still override it)
+   */
+  public Form.SearchForm query(String q) {
+    return this.getForm("everything").ref(this.getMaster()).query(q);
+  }
+
+  /**
+   * Start a query defaulting on the master reference (you can still override it)
+   */
+  public Form.SearchForm query(Predicate... predicates) {
+    return this.getForm("everything").ref(this.getMaster()).query(predicates);
+  }
+
+  /**
    * Return the URL to display a given preview
    * @param token as received from Prismic server to identify the content to preview
    * @param linkResolver the link resolver to build URL for your site
@@ -273,7 +294,7 @@ public class Api {
     if (!mainDocumentId.isTextual()) {
       return defaultUrl;
     }
-    Response resp = getForm("everything").query(Predicates.at("document.id", mainDocumentId.asText())).ref(token).submit();
+    Response resp = query(Predicates.at("document.id", mainDocumentId.asText())).ref(token).submit();
     if (resp.getResults().size() == 0) {
       return defaultUrl;
     }

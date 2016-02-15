@@ -144,10 +144,8 @@ public class AppTest {
 
   @Test
   public void groupFragments() {
-    Document docchapter = micro_api.getForm("everything")
-      .query("[[:d = at(document.type, \"docchapter\")]]")
+    Document docchapter = micro_api.query("[[:d = at(document.type, \"docchapter\")]]")
       .set("orderings", "[my.docchapter.priority]")
-      .ref(micro_api.getMaster())
       .submit().getResults().get(0);
     String docchapter_retrieved = docchapter.asHtml(new SimpleLinkResolver() {
         public String resolve(Fragment.DocumentLink link) {
@@ -179,9 +177,7 @@ public class AppTest {
 
   @Test
   public void preformattedSerialization() {
-    Document installingMetaMicro = micro_api.getForm("everything")
-      .query("[[:d = at(document.id, \"UrDejAEAAFwMyrW9\")]]")
-      .ref(micro_api.getMaster())
+    Document installingMetaMicro = micro_api.query("[[:d = at(document.id, \"UrDejAEAAFwMyrW9\")]]")
       .submit().getResults().get(0);
     String retrieved = installingMetaMicro.getStructuredText("doc.content").asHtml(new SimpleLinkResolver() {
         public String resolve(Fragment.DocumentLink link) {
@@ -203,7 +199,7 @@ public class AppTest {
 
   @Test
   public void linkedDocuments() {
-    java.util.List<Document> documents = micro_api.getForm("everything").ref(micro_api.getMaster()).query("[[:d = any(document.type, [\"doc\",\"docchapter\"])]]").submit().getResults();
+    java.util.List<Document> documents = micro_api.query("[[:d = any(document.type, [\"doc\",\"docchapter\"])]]").submit().getResults();
     Assert.assertEquals(
       "Have one linked document",
       documents.get(0).getLinkedDocuments().size(),
@@ -215,12 +211,12 @@ public class AppTest {
   public void pagination() {
     Assert.assertEquals(
       "Page number is right if page 1 requested",
-      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getPage(),
+      lbc_api.query().submit().getPage(),
       1
     );
     Assert.assertEquals(
       "Results per page is right if page 1 requested",
-      lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getResultsPerPage(),
+      lbc_api.query().submit().getResultsPerPage(),
       20
     );
     Assert.assertEquals(
@@ -323,7 +319,7 @@ public class AppTest {
         10,
         formNames.size()
       );
-      
+
       Assert.assertEquals(
         "Form names are populated with accurate data",
         formNames.get("cupcakes"),
