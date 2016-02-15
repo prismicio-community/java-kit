@@ -155,7 +155,7 @@ public class Form {
     public SearchForm set(String field, String value) {
       Field fieldDesc = form.getFields().get(field);
       if (fieldDesc == null) {
-        throw new RuntimeException("Unknown field " + field); 
+        throw new RuntimeException("Unknown field " + field);
       }
       if (value == null) {
         return this;
@@ -184,10 +184,10 @@ public class Form {
     public SearchForm set(String field, Integer value) {
       Field fieldDesc = form.getFields().get(field);
       if(fieldDesc == null) {
-        throw new RuntimeException("Unknown field " + field); 
+        throw new RuntimeException("Unknown field " + field);
       }
       if(!"Integer".equals(fieldDesc.getType())) {
-        throw new RuntimeException("Cannot set an Integer value to field " + field + " of type " + fieldDesc.getType()); 
+        throw new RuntimeException("Cannot set an Integer value to field " + field + " of type " + fieldDesc.getType());
       }
       return set(field, value.toString());
     }

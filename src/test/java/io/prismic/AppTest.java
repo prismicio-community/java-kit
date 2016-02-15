@@ -298,17 +298,20 @@ public class AppTest {
 
   @Test
   public void testFetchLinks() {
-    List<Document> documents = lbc_api
-      .getForm("everything")
-      .fetchLinks("blog-post.author")
-      .query(Predicates.at("document.id", "UlfoxUnM0wkXYXbt"))
-      .ref(lbc_api.getMaster()).submit().getResults();
+    List<Document> documents = lbc_api.query(Predicates.at("document.id", "UlfoxUnM0wkXYXbt"))
+      .fetchLinks("blog-post.author").submit().getResults();
     Fragment.DocumentLink link = (Fragment.DocumentLink)documents.get(0).getLink("blog-post.relatedpost[0]");
     Assert.assertEquals(
       "Additional data retrieved from DocumentLink with fetchLinks",
       "John M. Martelle, Fine Pastry Magazine",
       link.getText("blog-post.author")
     );
+  }
+
+  @Test
+  public void testQueryHelpers() {
+    Document document = lbc_api.getByID("UlfoxUnM0wkXYXbt");
+    Assert.assertNotNull(document);
   }
 
   @Test

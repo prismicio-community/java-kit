@@ -281,6 +281,76 @@ public class Api {
   }
 
   /**
+   * Retrieve multiple documents from their IDS
+   */
+  public Form.SearchForm getByIDs(Iterable<String> ids) {
+    return this.query(Predicates.in("document.id", ids));
+  }
+
+  /**
+   * Return the first document matching the predicate
+   */
+  public Document queryFirst(Predicate p, String ref) {
+    if (ref == null) {
+      ref = this.getMaster().getRef();
+    }
+    List<Document> results = query(p).ref(ref).submit().getResults();
+    if (results.size() > 0) {
+      return results.get(0);
+    } else {
+      return null;
+    }
+  }
+
+  public Document queryFirst(Predicate p) {
+    return queryFirst(p, this.getMaster().getRef());
+  }
+
+  /**
+   * Retrieve a document by its ID on the given reference
+   *
+   * @return the document, or null if it doesn't exist
+   */
+  public Document getByID(String documentId, String ref) {
+    return queryFirst(Predicates.at("document.id", documentId), ref);
+  }
+
+  /**
+   * Retrieve a document by its ID on the master reference
+   *
+   * @return the document, or null if it doesn't exist
+   */
+  public Document getByID(String documentId) {
+    return this.getByID(documentId, null);
+  }
+
+  /**
+   * Retrieve a document by its UID on the given reference
+   *
+   * @return the document, or null if it doesn't exist
+   */
+  public Document getByUID(String documentType, String documentUid, String ref) {
+    return queryFirst(Predicates.at("my." + documentType + ".uid", documentUid), ref);
+  }
+
+  /**
+   * Retrieve a document by its UID on the master reference
+   *
+   * @return the document, or null if it doesn't exist
+   */
+  public Document getByUID(String documentType, String documentUid) {
+    return this.getByUID(documentType, documentUid, null);
+  }
+
+  public Document getBookmark(String bookmark, String ref) {
+    return this.getByID(this.apiData.bookmarks.get(bookmark));
+  }
+
+  public Document getBookmark(String bookmark) {
+    return getBookmark(bookmark, this.getMaster().getRef());
+  }
+
+  /**
    * Return the URL to display a given preview
    * @param token as received from Prismic server to identify the content to preview
    * @param linkResolver the link resolver to build URL for your site
