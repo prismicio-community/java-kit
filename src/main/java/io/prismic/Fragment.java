@@ -636,6 +636,25 @@ public interface Fragment {
       return getView("main").asHtml(linkResolver);
     }
 
+    public String getUrl() {
+      return getView("main").getUrl();
+    }
+
+    public int getWidth() {
+      return getView("main").getWidth();
+    }
+
+    public int getHeight() {
+      return getView("main").getHeight();
+    }
+
+    public String getAlt() {
+      return getView("main").getAlt();
+    }
+
+    public String getCopyright() {
+      return getView("main").getCopyright();
+    }
     // --
 
     public static Image parse(JsonNode json) {
