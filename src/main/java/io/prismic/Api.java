@@ -71,11 +71,12 @@ public class Api {
    *
    * @param endpoint the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
+   * @param defaultReference The default reference to use with queries. Will default to master if null
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
    * @return the usable API object
    */
-  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger) {
+  public static Api get(String endpoint, String accessToken, String defaultReference, final Cache cache, final Logger logger) {
     final String url = (accessToken == null ? endpoint : (endpoint + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = cache.getOrSet(
         url,
@@ -88,11 +89,27 @@ public class Api {
     );
 
     ApiData apiData = ApiData.parse(json);
-    return new Api(apiData, accessToken, cache, logger);
+    return new Api(apiData, accessToken, defaultReference, cache, logger);
+  }
+
+  public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger) {
+    return get(endpoint, accessToken, null, cache, logger);
   }
 
   public static Api get(String url, Cache cache, Logger logger) {
     return get(url, null, cache, logger);
+  }
+
+  /**
+   * Entry point to get an {@link Api} object.
+   * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null);</code>
+   *
+   * @param url the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
+   * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
+   * @return the usable API object
+   */
+  public static Api get(String url, String accessToken, String defaultReference) {
+    return get(url, accessToken, defaultReference, Cache.DefaultCache.getInstance(), new Logger.NoLogger());
   }
 
   /**
@@ -122,6 +139,7 @@ public class Api {
 
   final private ApiData apiData;
   final private String accessToken;
+  final private String defaultReference;
   final private Cache cache;
   final private Logger logger;
 
@@ -131,12 +149,23 @@ public class Api {
    *
    * @param apiData the data retrieved from the API document, ready to be stored in memory
    * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
+   * @param defaultReference The default reference to use with queries. Will default to master if null
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
    */
+  public Api(ApiData apiData, String accessToken, String defaultReference, Cache cache, Logger logger) {
+    this.apiData = apiData;
+    this.accessToken = accessToken;
+    this.defaultReference = defaultReference;
+    this.cache = cache;
+    this.logger = logger;
+  }
+
+  @Deprecated
   public Api(ApiData apiData, String accessToken, Cache cache, Logger logger) {
     this.apiData = apiData;
     this.accessToken = accessToken;
+    this.defaultReference = null;
     this.cache = cache;
     this.logger = logger;
   }
@@ -263,21 +292,24 @@ public class Api {
    * Start a query defaulting on the master reference (you can still override it)
    */
   public Form.SearchForm query() {
-    return this.getForm("everything").ref(this.getMaster());
+    String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
+    return this.getForm("everything").ref(reference);
   }
 
   /**
    * Start a query defaulting on the master reference (you can still override it)
    */
   public Form.SearchForm query(String q) {
-    return this.getForm("everything").ref(this.getMaster()).query(q);
+    String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
+    return this.getForm("everything").ref(reference).query(q);
   }
 
   /**
    * Start a query defaulting on the master reference (you can still override it)
    */
   public Form.SearchForm query(Predicate... predicates) {
-    return this.getForm("everything").ref(this.getMaster()).query(predicates);
+    String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
+    return this.getForm("everything").ref(reference).query(predicates);
   }
 
   /**
@@ -292,7 +324,7 @@ public class Api {
    */
   public Document queryFirst(Predicate p, String ref) {
     if (ref == null) {
-      ref = this.getMaster().getRef();
+      ref = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
     }
     List<Document> results = query(p).ref(ref).submit().getResults();
     if (results.size() > 0) {
@@ -303,7 +335,7 @@ public class Api {
   }
 
   public Document queryFirst(Predicate p) {
-    return queryFirst(p, this.getMaster().getRef());
+    return queryFirst(p, null);
   }
 
   /**
@@ -343,11 +375,14 @@ public class Api {
   }
 
   public Document getBookmark(String bookmark, String ref) {
+    if (ref == null) {
+      ref = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
+    }
     return this.getByID(this.apiData.bookmarks.get(bookmark));
   }
 
   public Document getBookmark(String bookmark) {
-    return getBookmark(bookmark, this.getMaster().getRef());
+    return getBookmark(bookmark, null);
   }
 
   /**
