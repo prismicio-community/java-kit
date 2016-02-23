@@ -24,12 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 public class PrismicFilter implements Filter {
 
 	private String endpoint;
-  private String accessToken;
+	private String accessToken;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		endpoint = filterConfig.getInitParameter("endpoint");
-		accessToken = filterConfig.getInitParameter("accessToken");
+    endpoint = filterConfig.getInitParameter("endpoint");
+    accessToken = filterConfig.getInitParameter("accessToken");
 	}
 
 	@Override
@@ -37,12 +37,14 @@ public class PrismicFilter implements Filter {
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
-		Api api = Api.get(endpoint);
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    HttpServletRequest req = (HttpServletRequest) request;
+    if (endpoint == null) {
+      throw new ServletException("Missing parameter in PrismicFilter: endpoint");
+    }
 		String referenceFromCookies = getRefFromCookies(req.getCookies());
-		request.getServletContext().setAttribute("prismicapi", api);
+    Api api = Api.get(endpoint, accessToken, referenceFromCookies);
+		request.setAttribute("prismicapi", api);
 		chain.doFilter(request, response);
 	}
 
