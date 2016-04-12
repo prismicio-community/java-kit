@@ -21,23 +21,10 @@ This library is on Maven Central. The kit coordinates are:
 
 The kit requires **Java 7** or superior.
 
-#### Get started with prismic.io
+#### Documentation
 
-You can find out [how to get started with prismic.io](https://developers.prismic.io/documentation/UjBaQsuvzdIHvE4D/getting-started) on our [prismic.io developer's portal](https://developers.prismic.io/).
-
-#### Get started using the kit
-
-Also on our [prismic.io developer's portal](https://developers.prismic.io/), on top of our full documentation, you will:
- * get a thorough introduction of [how to use prismic.io kits](https://developers.prismic.io/documentation/UjBe8bGIJ3EKtgBZ/api-documentation#kits-and-helpers), including this one.
- * see [what else is available for Java](https://developers.prismic.io/technologies/UjBh0MuvzeMJvE4g/java): starter projects, examples, ...
-
-#### Kit's detailed documentation
-
-You can find the documentation on [this Javadoc](http://prismicio.github.io/java-kit/).
-
-Through Java's syntax, this kit contains some mild differences and syntastic sugar over the section of our documentation that tells you [how to use prismic.io kits](https://developers.prismic.io/documentation/UjBe8bGIJ3EKtgBZ/api-documentation#kits-and-helpers) in general (which you should read first). The differences are listed here:
- * Traditional POJO getter-and-setter syntaxes are applied; therefore, one calls a SearchForm like this: ```api.getForm("everything")```
- * The class usually called `SearchForm` is a nested class here, which is called `Form.Search`.
+* [Prismic.io documentation](https://prismic.io/doc)
+* [Javadoc](http://prismicio.github.io/java-kit/)
 
 ### Changelog
 
@@ -61,7 +48,7 @@ Please write tests using [JUnit3](http://junit.sourceforge.net/junit3.8.1/) for 
 
 If you find existing code that is not optimally tested and wish to make it better, we really appreciate it; but you should document it on its own branch and its own pull request.
 
-#### Documentation
+#### Documenting
 
 Please document any bugfix or new feature using the [Javadoc syntax](http://docs.oracle.com/javase/1.5.0/docs/tooldocs/windows/javadoc.html)
 
