@@ -12,12 +12,10 @@ import java.util.Map;
  */
 public class AppTest {
 
-  //static Api lbc_api;
   static Api micro_api;
 
   @BeforeClass
   public static void init() {
-    //lbc_api = Api.get("https://lesbonneschoses.cdn.prismic.io/api");
     micro_api = Api.get("https://micro.prismic.io/api");
   }
 
@@ -47,16 +45,16 @@ public class AppTest {
   }
 
   /**
-   * Tests whether a simple query (all the products) works.
+   * Tests whether a simple query (all the docs) works.
    */
-  // @Test
-  // public void apiQueryWorks(){
-  //   Assert.assertEquals(
-  //     "SearchForm query does not return the right amount of documents.",
-  //     lbc_api.getForm("products").ref(lbc_api.getMaster()).submit().getResults().size(),
-  //     16
-  //   );
-  // }
+  @Test
+  public void apiQueryWorks(){
+    Assert.assertEquals(
+      "SearchForm query does not return the right amount of documents.",
+      6,
+      micro_api.getForm("doc").ref(micro_api.getMaster()).submit().getResults().size()
+    );
+  }
 
   /**
    * Tests whether complex blog posts serialize well into HTML.
@@ -202,99 +200,54 @@ public class AppTest {
     java.util.List<Document> documents = micro_api.query("[[:d = any(document.type, [\"doc\",\"docchapter\"])]]").submit().getResults();
     Assert.assertEquals(
       "Have one linked document",
-      documents.get(0).getLinkedDocuments().size(),
-      1
+      1,
+      documents.get(0).getLinkedDocuments().size()
     );
   }
 
-  // @Test
-  // public void pagination() {
-  //   Assert.assertEquals(
-  //     "Page number is right if page 1 requested",
-  //     lbc_api.query().submit().getPage(),
-  //     1
-  //   );
-  //   Assert.assertEquals(
-  //     "Results per page is right if page 1 requested",
-  //     lbc_api.query().submit().getResultsPerPage(),
-  //     20
-  //   );
-  //   Assert.assertEquals(
-  //     "Total results size is right if page 1 requested",
-  //     lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getTotalResultsSize(),
-  //     40
-  //   );
-  //   Assert.assertEquals(
-  //     "Total pages is right if page 1 requested",
-  //     lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getTotalPages(),
-  //     2
-  //   );
-  //   Assert.assertEquals(
-  //     "Next page is right if page 1 requested",
-  //     lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getNextPage(),
-  //     "https://d2aw36oac6sa9o.cloudfront.net/api/documents/search?ref=UlfoxUnM08QWYXdl&page=2&pageSize=20"
-  //   );
-  //   Assert.assertEquals(
-  //     "Previous page is right if page 1 requested",
-  //     lbc_api.getForm("everything").ref(lbc_api.getMaster()).submit().getPrevPage(),
-  //     null
-  //   );
+  @Test
+  public void pagination() {
+    Assert.assertEquals(
+      "Page number is right if page 1 requested",
+      1,
+      micro_api.query().submit().getPage()
+    );
+    Assert.assertEquals(
+      "Results per page is right if page 1 requested",
+      20,
+      micro_api.query().submit().getResultsPerPage()
+    );
+    Assert.assertEquals(
+      "Total results size is right if page 1 requested",
+      20,
+      micro_api.getForm("everything").ref(micro_api.getMaster()).submit().getTotalResultsSize()
+    );
+    Assert.assertEquals(
+      "Total pages is right if page 1 requested",
+      1,
+      micro_api.getForm("everything").ref(micro_api.getMaster()).submit().getTotalPages()
+    );
+    Assert.assertNull(
+      "Previous page is right if page 1 requested",
+      micro_api.getForm("everything").ref(micro_api.getMaster()).submit().getPrevPage()
+    );
+    Assert.assertNull(
+      "Next page is right if page 1 requested",
+      micro_api.getForm("everything").set("page", 1).ref(micro_api.getMaster()).submit().getNextPage()
+    );
+  }
 
-  //   Assert.assertEquals(
-  //     "Page number is right if page 2 requested",
-  //     lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getPage(),
-  //     2
-  //   );
-  //   Assert.assertEquals(
-  //     "Results per page is right if page 2 requested",
-  //     lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getResultsPerPage(),
-  //     20
-  //   );
-  //   Assert.assertEquals(
-  //     "Total results size is right if page 2 requested",
-  //     lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getTotalResultsSize(),
-  //     40
-  //   );
-  //   Assert.assertEquals(
-  //     "Total pages is right if page 2 requested",
-  //     lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getTotalPages(),
-  //     2
-  //   );
-  //   Assert.assertEquals(
-  //     "Next page is right if page 2 requested",
-  //     lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getNextPage(),
-  //     null
-  //   );
-  //   Assert.assertEquals(
-  //     "Previous page is right if page 2 requested",
-  //     lbc_api.getForm("everything").set("page", 2).ref(lbc_api.getMaster()).submit().getPrevPage(),
-  //     "https://d2aw36oac6sa9o.cloudfront.net/api/documents/search?ref=UlfoxUnM08QWYXdl&page=1&pageSize=20"
-  //   );
-  // }
-
-  // @Test
-  // public void searchFormFunctions() {
-  //   Response docsInt = lbc_api.getForm("everything").pageSize(15).page(2).ref(lbc_api.getMaster()).submit();
-  //   Assert.assertTrue(
-  //     "The page and pageSize functions work well with an integer",
-  //     docsInt.getPage() == 2
-  //       && docsInt.getResultsPerPage() == 15
-  //       && docsInt.getResults().size() == 15
-  //   );
-  //   Response docsStr = lbc_api.getForm("everything").pageSize("15").page("2").ref(lbc_api.getMaster()).submit();
-  //   Assert.assertTrue(
-  //     "The page and pageSize functions work well with a String",
-  //     docsStr.getPage() == 2
-  //       && docsStr.getResultsPerPage() == 15
-  //       && docsStr.getResults().size() == 15
-  //   );
-  //   Response orderedProducts = lbc_api.getForm("products").orderings("[my.product.price]").ref(lbc_api.getMaster()).submit();
-  //   Assert.assertEquals(
-  //     "The orderings work well",
-  //     orderedProducts.getResults().get(0).getId(),
-  //     "UlfoxUnM0wkXYXbK"
-  //   );
-  // }
+  @Test
+  public void searchFormFunctions() {
+    Response docsInt = micro_api.getForm("everything").pageSize(5).page(2).ref(micro_api.getMaster()).submit();
+    Assert.assertEquals("getPage function works well with an integer", 2, docsInt.getPage());
+    Assert.assertEquals("getResultsPerPage works well with an integer", 5, docsInt.getResultsPerPage());
+    Assert.assertEquals("getResults() size is correct with an integer", 5, docsInt.getResults().size());
+    Response docsStr = micro_api.getForm("everything").pageSize("5").page("2").ref(micro_api.getMaster()).submit();
+    Assert.assertEquals("getPage function works well with an integer", 2, docsStr.getPage());
+    Assert.assertEquals("getResultsPerPage works well with an integer", 5, docsStr.getResultsPerPage());
+    Assert.assertEquals("getResults() size is correct with an integer", 5, docsStr.getResults().size());
+  }
 
   // @Test
   // public void testFetchLinks() {
