@@ -23,7 +23,7 @@ The kit requires **Java 7** or superior.
 
 #### Documentation
 
-* [Prismic.io documentation](https://prismic.io/doc)
+* [Prismic.io documentation](https://prismic.io/docs#?lang=java)
 * [Javadoc](http://prismicio.github.io/java-kit/)
 
 ### Changelog
