@@ -55,10 +55,10 @@ public class PrismicFilter implements Filter {
 		String experimentCookie = null;
 		String previewCookie = null;
         for(Cookie cookie : cookies) {
-        	if (cookie.getName() == Prismic.EXPERIMENTS_COOKIE) {
+        	if (Prismic.EXPERIMENTS_COOKIE.equals(cookie.getName())) {
         		experimentCookie = cookie.getValue();
         	}
-        	if (cookie.getName() == Prismic.PREVIEW_COOKIE) {
+        	if (Prismic.PREVIEW_COOKIE.equals(cookie.getName())) {
         		previewCookie = cookie.getValue();
         	}
         }
