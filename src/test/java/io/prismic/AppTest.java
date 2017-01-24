@@ -32,7 +32,7 @@ public class AppTest {
     Assert.assertEquals(
       "Api object does not return the right master ref.",
       micro_api.getMaster().getRef(),
-      "V_OpmSUAACcAE0lS"
+      "WH8MzyoAAGoSGJwT"
     );
   }
 
@@ -219,12 +219,12 @@ public class AppTest {
     );
     Assert.assertEquals(
       "Total results size is right if page 1 requested",
-      20,
+      24,
       micro_api.getForm("everything").ref(micro_api.getMaster()).submit().getTotalResultsSize()
     );
     Assert.assertEquals(
       "Total pages is right if page 1 requested",
-      1,
+      2,
       micro_api.getForm("everything").ref(micro_api.getMaster()).submit().getTotalPages()
     );
     Assert.assertNull(
@@ -232,8 +232,8 @@ public class AppTest {
       micro_api.getForm("everything").ref(micro_api.getMaster()).submit().getPrevPage()
     );
     Assert.assertNull(
-      "Next page is right if page 1 requested",
-      micro_api.getForm("everything").set("page", 1).ref(micro_api.getMaster()).submit().getNextPage()
+      "Next page is right if page 2 requested",
+      micro_api.getForm("everything").set("page", 2).ref(micro_api.getMaster()).submit().getNextPage()
     );
   }
 
