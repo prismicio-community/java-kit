@@ -448,6 +448,7 @@ public interface Fragment {
     private final String type;
     private final Set<String> tags;
     private final String slug;
+    private final String lang;
     private final boolean broken;
     private final Map<String, Fragment> fragments;
 
@@ -456,6 +457,7 @@ public interface Fragment {
                         String type,
                         Set<String> tags,
                         String slug,
+                        String lang,
                         Map<String, Fragment> fragments,
                         boolean broken) {
       this.id = id;
@@ -463,6 +465,7 @@ public interface Fragment {
       this.type = type;
       this.tags = tags;
       this.slug = slug;
+      this.lang = lang;
       this.fragments = fragments;
       this.broken = broken;
     }
@@ -513,12 +516,13 @@ public interface Fragment {
       String uid = document.path("uid").asText();
       String type = document.path("type").asText();
       String slug = document.path("slug").asText();
+      String lang = document.path("lang").asText();
       Set<String> tags = new HashSet<String>();
       for(JsonNode tagJson: document.withArray("tags")) {
         tags.add(tagJson.asText());
       }
       Map<String, Fragment> fragments = Document.parseFragments(document.with("data").with(type), type);
-      return new DocumentLink(id, uid, type, tags, slug, fragments, broken);
+      return new DocumentLink(id, uid, type, tags, slug, lang, fragments, broken);
     }
 
   }

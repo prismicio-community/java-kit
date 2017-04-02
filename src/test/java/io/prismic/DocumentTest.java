@@ -56,6 +56,22 @@ public class DocumentTest {
   }
 
   @Test
+  public void testParseLanguage() throws Exception {
+    JsonNode node = getJson("/fixtures/language.json");
+    Document doc = Document.parse(node);
+
+    Assert.assertEquals(
+      "de-ch",
+      doc.getLang()
+    );
+
+    Assert.assertEquals(
+      2,
+      doc.getAlternateLanguages().size()
+    );
+  }
+
+  @Test
   public void image() {
     Api api = Api.get("https://test-public.prismic.io/api");
     Document doc =
