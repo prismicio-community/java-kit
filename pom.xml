@@ -155,6 +155,24 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <!-- to simulate a proxy -->
+		<dependency>
+			<groupId>org.littleshoot</groupId>
+			<artifactId>littleproxy</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
+		<!--looger -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.24</version>
+		</dependency>
     </dependencies>
 
     <profiles>

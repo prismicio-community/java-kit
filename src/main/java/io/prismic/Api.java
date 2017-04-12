@@ -2,6 +2,7 @@ package io.prismic;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Proxy;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -74,26 +75,42 @@ public class Api {
    * @param defaultReference The default reference to use with queries. Will default to master if null
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
+   * @param proxy an optional java.net.Proxy instance that defines the http proxy to be used
    * @return the usable API object
    */
-  public static Api get(String endpoint, String accessToken, String defaultReference, final Cache cache, final Logger logger) {
+  public static Api get(String endpoint, String accessToken, String defaultReference, final Cache cache, final Logger logger, final Proxy proxy) {
     final String url = (accessToken == null ? endpoint : (endpoint + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = cache.getOrSet(
         url,
         5000L,
         new Cache.Callback() {
             public JsonNode execute() {
-                return HttpClient.fetch(url, logger, null);
+                return HttpClient.fetch(url, logger, null, proxy);
             }
         }
     );
 
     ApiData apiData = ApiData.parse(json);
-    return new Api(apiData, accessToken, defaultReference, cache, logger);
+    return new Api(apiData, accessToken, defaultReference, cache, logger, proxy);
   }
+  
+  /**
+   * Entry point to get an {@link Api} object.
+   * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null, new Cache.BuiltInCache(999), new Logger.PrintlnLogger());</code>
+   *
+   * @param endpoint the endpoint of your prismic.io content repository, typically https://yourrepoid.prismic.io/api
+   * @param accessToken Your Oauth access token if you wish to use one (to access future content releases, for instance)
+   * @param defaultReference The default reference to use with queries. Will default to master if null
+   * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
+   * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
+   * @return the usable API object
+   */
+  public static Api get(String endpoint, String accessToken, String defaultReference, final Cache cache, final Logger logger) {
+		return get(endpoint, accessToken, defaultReference, cache, logger, null);
+	}
 
   public static Api get(String endpoint, String accessToken, final Cache cache, final Logger logger) {
-    return get(endpoint, accessToken, null, cache, logger);
+    return get(endpoint, accessToken, null, cache, logger, null);
   }
 
   public static Api get(String url, Cache cache, Logger logger) {
@@ -109,7 +126,7 @@ public class Api {
    * @return the usable API object
    */
   public static Api get(String url, String accessToken, String defaultReference) {
-    return get(url, accessToken, defaultReference, Cache.DefaultCache.getInstance(), new Logger.NoLogger());
+    return get(url, accessToken, defaultReference, Cache.DefaultCache.getInstance(), new Logger.NoLogger(), null);
   }
 
   /**
@@ -142,6 +159,7 @@ public class Api {
   final private String defaultReference;
   final private Cache cache;
   final private Logger logger;
+  final private Proxy proxy;
 
   /**
    * Constructor to build a proper {@link Api} object. This is not to build an {@link Api} object
@@ -153,21 +171,23 @@ public class Api {
    * @param cache instance of a class that implements the {@link Cache} interface, and will handle the cache
    * @param logger instance of a class that implements the {@link Logger} interface, and will handle the logging
    */
-  public Api(ApiData apiData, String accessToken, String defaultReference, Cache cache, Logger logger) {
+  public Api(ApiData apiData, String accessToken, String defaultReference, Cache cache, Logger logger, Proxy proxy) {
     this.apiData = apiData;
     this.accessToken = accessToken;
     this.defaultReference = defaultReference;
     this.cache = cache;
     this.logger = logger;
+    this.proxy = proxy;
   }
 
   @Deprecated
-  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger) {
+  public Api(ApiData apiData, String accessToken, Cache cache, Logger logger, Proxy proxy) {
     this.apiData = apiData;
     this.accessToken = accessToken;
     this.defaultReference = null;
     this.cache = cache;
     this.logger = logger;
+    this.proxy = proxy;
   }
 
   public Logger getLogger() {
@@ -181,6 +201,10 @@ public class Api {
   public Cache getCache() {
     return cache;
   }
+  
+  public Proxy getProxy() {
+		return proxy;
+	}
 
   /**
    * From a properly built {@link Api} object, returns the ref IDs (points in a prismic.io repository's timeline,
@@ -393,8 +417,8 @@ public class Api {
    *                (usually the home page of your site)
    * @return the URL you should redirect the user to preview the requested change
    */
-  public String previewSession(String token, LinkResolver linkResolver, String defaultUrl) {
-    JsonNode tokenJson = HttpClient.fetch(token, logger, cache);
+  public String previewSession(String token, LinkResolver linkResolver, String defaultUrl, Proxy proxy) {
+    JsonNode tokenJson = HttpClient.fetch(token, logger, cache, proxy);
     JsonNode mainDocumentId = tokenJson.path("mainDocument");
     if (!mainDocumentId.isTextual()) {
       return defaultUrl;
