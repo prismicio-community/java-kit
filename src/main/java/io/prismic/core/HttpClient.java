@@ -21,11 +21,11 @@ public class HttpClient {
       }
 
       URLConnection connection;
-		if (proxy != null) {
-			connection = new URL(url).openConnection(proxy);
-		} else {
-			connection = new URL(url).openConnection();
-		}
+      if (proxy != null) {
+        connection = new URL(url).openConnection(proxy);
+      } else {
+        connection = new URL(url).openConnection();
+      }
       HttpURLConnection httpConnection = (HttpURLConnection) connection;
       InputStream response = null;
 
