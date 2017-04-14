@@ -14,15 +14,19 @@ public class Document extends WithFragments {
   private final Set<String> tags;
   private final List<String> slugs;
   private final String type;
+  private final String lang;
+  private final List<String> alternateLanguages;
   private final Map<String, Fragment> fragments;
 
-  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, Map<String,Fragment> fragments) {
+  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, String lang, List<String> alternateLanguages, Map<String,Fragment> fragments) {
     this.id = id;
     this.uid = uid;
     this.type = type;
     this.href = href;
     this.tags = Collections.unmodifiableSet(tags);
     this.slugs = Collections.unmodifiableList(slugs);
+    this.lang = lang;
+    this.alternateLanguages = Collections.unmodifiableList(alternateLanguages);
     this.fragments = Collections.unmodifiableMap(fragments);
   }
 
@@ -57,6 +61,14 @@ public class Document extends WithFragments {
     return null;
   }
 
+  public String getLang() {
+    return lang;
+  }
+
+  public List<String> getAlternateLanguages() {
+    return alternateLanguages;
+  }
+
   @Override
   public Map<String, Fragment> getFragments() {
     return fragments;
@@ -75,7 +87,7 @@ public class Document extends WithFragments {
   }
 
   public Fragment.DocumentLink asDocumentLink() {
-    return new Fragment.DocumentLink(id, uid, type, tags, getSlug(), fragments, false);
+    return new Fragment.DocumentLink(id, uid, type, tags, getSlug(), lang, fragments, false);
   }
 
   // --
@@ -166,7 +178,13 @@ public class Document extends WithFragments {
     String uid = json.has("uid") ? json.path("uid").asText() : null;
     String href = json.path("href").asText();
     String type = json.path("type").asText();
+    String lang = json.path("lang").asText();
 
+    Iterator<JsonNode> alternateLanguagesJson = json.withArray("alternate_languages").elements();
+    List<String> alternateLanguages = new ArrayList<String>();
+    while(alternateLanguagesJson.hasNext()) {
+      alternateLanguages.add(alternateLanguagesJson.next().asText());
+    }
 
     Iterator<JsonNode> tagsJson = json.withArray("tags").elements();
     Set<String> tags = new HashSet<String>();
@@ -187,7 +205,7 @@ public class Document extends WithFragments {
 
     Map<String, Fragment> fragments = parseFragments(json.with("data").with(type), type);
 
-    return new Document(id, uid, type, href, tags, slugs, fragments);
+    return new Document(id, uid, type, href, tags, slugs, lang, alternateLanguages, fragments);
   }
 
 }

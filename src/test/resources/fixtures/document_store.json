@@ -1,5 +1,5 @@
 {
-    "id": "UlfoxUnM0wkXYXbb", "type": "store", "href": "https://lesbonneschoses.prismic.io/api/documents/search?ref=UlfoxUnM08QWYXdl&q=%5B%5B%3Ad+%3D+at%28document.id%2C+%22UlfoxUnM0wkXYXbb%22%29+%5D%5D", "tags": [], "slugs": ["paris-saint-lazare"], "linked_documents": [], "data": {
+    "id": "UlfoxUnM0wkXYXbb", "type": "store", "href": "https://lesbonneschoses.prismic.io/api/documents/search?ref=UlfoxUnM08QWYXdl&q=%5B%5B%3Ad+%3D+at%28document.id%2C+%22UlfoxUnM0wkXYXbb%22%29+%5D%5D", "tags": [], "slugs": ["paris-saint-lazare"], "lang": "fr-fr", "alternate_languages":[], "linked_documents": [], "data": {
     "store": {
         "name": {
             "type": "StructuredText",

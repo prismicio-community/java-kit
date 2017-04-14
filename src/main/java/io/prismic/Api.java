@@ -321,19 +321,33 @@ public class Api {
   }
 
   /**
+   * Start a query defaulting on the master reference (you can still override it) with the given language
+   */
+  public Form.SearchForm query(String lang, String q) {
+    String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
+    return this.getForm("everything").ref(reference).lang(lang).query(q);
+  }
+
+  /**
    * Start a query defaulting on the master reference (you can still override it)
    */
   public Form.SearchForm query(String q) {
+    return this.query(null, q);
+  }
+
+  /**
+   * Start a query defaulting on the master reference (you can still override it) with the given language
+   */
+  public Form.SearchForm query(String lang, Predicate... predicates) {
     String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
-    return this.getForm("everything").ref(reference).query(q);
+    return this.getForm("everything").ref(reference).lang(lang).query(predicates);
   }
 
   /**
    * Start a query defaulting on the master reference (you can still override it)
    */
   public Form.SearchForm query(Predicate... predicates) {
-    String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
-    return this.getForm("everything").ref(reference).query(predicates);
+    return this.query(null, predicates);
   }
 
   /**
@@ -344,13 +358,13 @@ public class Api {
   }
 
   /**
-   * Return the first document matching the predicate
+   * Return the first document matching the predicate, language on the given reference
    */
-  public Document queryFirst(Predicate p, String ref) {
+  public Document queryFirst(Predicate p, String lang, String ref) {
     if (ref == null) {
       ref = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
     }
-    List<Document> results = query(p).ref(ref).submit().getResults();
+    List<Document> results = query(p).ref(ref).lang(lang).submit().getResults();
     if (results.size() > 0) {
       return results.get(0);
     } else {
@@ -358,8 +372,27 @@ public class Api {
     }
   }
 
+  /**
+   * Return the first document matching the predicate on the given reference
+   */
+  public Document queryFirst(Predicate p, String ref) {
+    return queryFirst(p, ref);
+  }
+
+  /**
+   * Return the first document matching the predicate on the master reference
+   */
   public Document queryFirst(Predicate p) {
-    return queryFirst(p, null);
+    return queryFirst(p, null, null);
+  }
+
+  /**
+   * Retrieve a document by its ID in the given language on the given reference
+   *
+   * @return the document, or null if it doesn't exist
+   */
+  public Document getByID(String documentId, String lang, String ref) {
+    return queryFirst(Predicates.at("document.id", documentId), lang, ref);
   }
 
   /**
@@ -368,7 +401,7 @@ public class Api {
    * @return the document, or null if it doesn't exist
    */
   public Document getByID(String documentId, String ref) {
-    return queryFirst(Predicates.at("document.id", documentId), ref);
+    return this.getByID(documentId, null, ref);
   }
 
   /**
@@ -386,7 +419,7 @@ public class Api {
    * @return the document, or null if it doesn't exist
    */
   public Document getByUID(String documentType, String documentUid, String ref) {
-    return queryFirst(Predicates.at("my." + documentType + ".uid", documentUid), ref);
+    return queryFirst(Predicates.at("my." + documentType + ".uid", documentUid), null, ref);
   }
 
   /**
