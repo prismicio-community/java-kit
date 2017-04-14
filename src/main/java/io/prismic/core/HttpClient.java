@@ -6,11 +6,12 @@ import java.net.*;
 import io.prismic.*;
 
 import com.fasterxml.jackson.databind.*;
+
 import org.apache.commons.io.IOUtils;
 
 public class HttpClient {
 
-  public static JsonNode fetch(String url, Logger logger, Cache cache) {
+  public static JsonNode fetch(String url, Logger logger, Cache cache, Proxy proxy) {
     logger = (logger!=null) ? logger : new Logger.NoLogger();
     cache = (cache!=null) ? cache : new Cache.NoCache();
     try {
@@ -19,7 +20,12 @@ public class HttpClient {
         return cachedResult;
       }
 
-      URLConnection connection = new URL(url).openConnection();
+      URLConnection connection;
+		if (proxy != null) {
+			connection = new URL(url).openConnection(proxy);
+		} else {
+			connection = new URL(url).openConnection();
+		}
       HttpURLConnection httpConnection = (HttpURLConnection) connection;
       InputStream response = null;
 

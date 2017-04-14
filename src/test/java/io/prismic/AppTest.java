@@ -1,11 +1,26 @@
 package io.prismic;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpObject;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpResponse;
 import junit.framework.Assert;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.littleshoot.proxy.HttpFilters;
+import org.littleshoot.proxy.HttpFiltersAdapter;
+import org.littleshoot.proxy.HttpFiltersSourceAdapter;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Unit test for simple App.
@@ -305,4 +320,46 @@ public class AppTest {
   //       16
   //     );
   // }
+  
+  @Test
+	public void proxySupportOk() throws UnknownHostException {
+		ProxySpyHttpFiltersSource proxySpy = new ProxySpyHttpFiltersSource();
+		HttpProxyServer server = DefaultHttpProxyServer.bootstrap().withAddress(new InetSocketAddress("127.0.0.1", 8080)).withFiltersSource(proxySpy)
+				.start();
+
+		try {
+
+			InetAddress proxyServer = InetAddress.getByName("127.0.0.1");
+			int proxyPort = 8080;
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyServer, proxyPort));
+			Api.get("https://carrousel.prismic.io/api", null, null, Cache.DefaultCache.getInstance(), new Logger.NoLogger(), proxy);
+
+			Assert.assertEquals("Proxy should have been called", proxySpy.getCallsCount(), 1);
+		} finally {
+			server.stop();
+		}
+	}
+
+	private static class ProxySpyHttpFiltersSource extends HttpFiltersSourceAdapter {
+		private final AtomicInteger callsCounts = new AtomicInteger();
+
+		@Override
+		public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
+			return new HttpFiltersAdapter(originalRequest, ctx) {
+				@Override
+				public HttpResponse clientToProxyRequest(HttpObject httpObject) {
+					if (originalRequest.getUri().equals("carrousel.prismic.io:443")) {
+						callsCounts.incrementAndGet();
+					}
+					return super.clientToProxyRequest(httpObject);
+				}
+			};
+		}
+
+		public int getCallsCount() {
+			return callsCounts.intValue();
+		}
+	}
+
+  
 }
