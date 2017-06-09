@@ -199,7 +199,7 @@ public class Form {
      * @return the current form, in order to chain those calls
      */
     public SearchForm lang(String lang) {
-      return set("lang", lang != null ? lang : "*");
+      return set("lang", lang);
     }
 
     /**

@@ -297,46 +297,47 @@ public class Api {
   }
 
   /**
-   * Start a query defaulting on the master reference (you can still override it) with the given language
-   */
-  public Form.SearchForm query(String lang, String q) {
-    String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
-    return this.getForm("everything").ref(reference).lang(lang).query(q);
-  }
-
-  /**
    * Start a query defaulting on the master reference (you can still override it)
    */
   public Form.SearchForm query(String q) {
-    return this.query(null, q);
-  }
-
-  /**
-   * Start a query defaulting on the master reference (you can still override it) with the given language
-   */
-  public Form.SearchForm query(String lang, Predicate... predicates) {
     String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
-    return this.getForm("everything").ref(reference).lang(lang).query(predicates);
+    return this.getForm("everything").ref(reference).query(q);
   }
 
   /**
    * Start a query defaulting on the master reference (you can still override it)
    */
   public Form.SearchForm query(Predicate... predicates) {
-    return this.query(null, predicates);
+    String reference = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
+    return this.getForm("everything").ref(reference).query(predicates);
   }
 
   /**
-   * Retrieve multiple documents from their IDS
+   * Retrieve multiple documents from their ids on the given ref in the given language
+   */
+  public Form.SearchForm getByIDs(Iterable<String> ids, String ref, String lang) {
+    lang = lang != null ? lang : "*";
+    return this.query(Predicates.in("document.id", ids)).ref(ref).lang(lang);
+  }
+
+  /**
+   * Retrieve multiple documents from their ids on the given ref
+   */
+  public Form.SearchForm getByIDs(Iterable<String> ids, String ref) {
+    return this.getByIDs(ids, ref, null);
+  }
+
+  /**
+   * Retrieve multiple documents from their ids
    */
   public Form.SearchForm getByIDs(Iterable<String> ids) {
-    return this.query(Predicates.in("document.id", ids));
+    return this.getByIDs(ids, null, null);
   }
 
   /**
-   * Return the first document matching the predicate, language on the given reference
+   * Return the first document matching the predicate on the given ref in the given language
    */
-  public Document queryFirst(Predicate p, String lang, String ref) {
+  public Document queryFirst(Predicate p, String ref, String lang) {
     if (ref == null) {
       ref = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
     }
@@ -352,23 +353,24 @@ public class Api {
    * Return the first document matching the predicate on the given reference
    */
   public Document queryFirst(Predicate p, String ref) {
-    return queryFirst(p, ref);
+    return queryFirst(p, ref, null);
   }
 
   /**
    * Return the first document matching the predicate on the master reference
    */
   public Document queryFirst(Predicate p) {
-    return queryFirst(p, null, null);
+    return queryFirst(p, null);
   }
 
   /**
-   * Retrieve a document by its ID in the given language on the given reference
+   * Retrieve a document by its ID on the given reference in the given language
    *
    * @return the document, or null if it doesn't exist
    */
-  public Document getByID(String documentId, String lang, String ref) {
-    return queryFirst(Predicates.at("document.id", documentId), lang, ref);
+  public Document getByID(String documentId, String ref, String lang) {
+    lang = lang != null ? lang : "*";
+    return queryFirst(Predicates.at("document.id", documentId), ref, lang);
   }
 
   /**
@@ -377,7 +379,7 @@ public class Api {
    * @return the document, or null if it doesn't exist
    */
   public Document getByID(String documentId, String ref) {
-    return this.getByID(documentId, null, ref);
+    return this.getByID(documentId, ref, null);
   }
 
   /**
@@ -390,12 +392,22 @@ public class Api {
   }
 
   /**
+   * Retrieve a document by its UID on the given reference in the given language
+   *
+   * @return the document, or null if it doesn't exist
+   */
+  public Document getByUID(String documentType, String documentUID, String ref, String lang) {
+    lang = lang != null ? lang : "*";
+    return queryFirst(Predicates.at("my." + documentType + ".uid", documentUID), ref, lang);
+  }
+
+  /**
    * Retrieve a document by its UID on the given reference
    *
    * @return the document, or null if it doesn't exist
    */
-  public Document getByUID(String documentType, String documentUid, String ref) {
-    return queryFirst(Predicates.at("my." + documentType + ".uid", documentUid), null, ref);
+  public Document getByUID(String documentType, String documentUID, String ref) {
+    return this.getByUID(documentType, documentUID, ref, null);
   }
 
   /**
@@ -403,8 +415,8 @@ public class Api {
    *
    * @return the document, or null if it doesn't exist
    */
-  public Document getByUID(String documentType, String documentUid) {
-    return this.getByUID(documentType, documentUid, null);
+  public Document getByUID(String documentType, String documentUID) {
+    return this.getByUID(documentType, documentUID, null);
   }
 
   public Document getBookmark(String bookmark, String ref) {
@@ -432,7 +444,7 @@ public class Api {
     if (!mainDocumentId.isTextual()) {
       return defaultUrl;
     }
-    Response resp = query(Predicates.at("document.id", mainDocumentId.asText())).ref(token).submit();
+    Response resp = query(Predicates.at("document.id", mainDocumentId.asText())).ref(token).lang("*").submit();
     if (resp.getResults().size() == 0) {
       return defaultUrl;
     }
