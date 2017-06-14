@@ -13,7 +13,7 @@ This library is on Maven Central. The kit coordinates are:
 <dependency>
   <groupId>io.prismic</groupId>
   <artifactId>java-kit</artifactId>
-  <version>1.3.3</version>
+  <version>X.X.X</version>
 </dependency>
 ```
 
@@ -64,7 +64,7 @@ If you find existing code that is not optimally documented and wish to make it b
 
 This software is licensed under the Apache 2 license, quoted below.
 
-Copyright 2013 Zengularity (http://www.zengularity.com).
+Copyright 2017 Prismic.io (https://prismic.io).
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
 

@@ -193,6 +193,16 @@ public class Form {
     }
 
     /**
+     * Allows to set the language you want to get for your query.
+     *
+     * @param lang the language code you wish
+     * @return the current form, in order to chain those calls
+     */
+    public SearchForm lang(String lang) {
+      return set("lang", lang);
+    }
+
+    /**
      * Allows to set the ref on which you wish to be performing the query.
      *
      * This is mandatory to submit a query; if you call <code>api.getForm("everything").submit();</code>, the kit will complain!
