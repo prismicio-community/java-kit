@@ -3,6 +3,9 @@ package io.prismic;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -68,6 +71,44 @@ public class DocumentTest {
     Assert.assertEquals(
       2,
       doc.getAlternateLanguages().size()
+    );
+  }
+
+  @Test
+  public void testParseFirstPublicationDate() throws Exception {
+    JsonNode node = getJson("/fixtures/language.json");
+    Document doc = Document.parse(node);
+
+    Assert.assertEquals(
+      DateTime.now()
+        .withZone( DateTimeZone.UTC )
+        .withYear( 2017 )
+        .withMonthOfYear( 1 )
+        .withDayOfMonth( 13 )
+        .withHourOfDay( 11 )
+        .withMinuteOfHour( 45 )
+        .withSecondOfMinute( 21 )
+        .withMillisOfSecond( 0 ),
+      doc.getFirstPublicationDate()
+    );
+  }
+
+  @Test
+  public void testParseLastPublicationDate() throws Exception {
+    JsonNode node = getJson("/fixtures/language.json");
+    Document doc = Document.parse(node);
+
+    Assert.assertEquals(
+      DateTime.now()
+        .withZone( DateTimeZone.UTC )
+        .withYear( 2017 )
+        .withMonthOfYear( 2 )
+        .withDayOfMonth( 21 )
+        .withHourOfDay( 16 )
+        .withMinuteOfHour( 5 )
+        .withSecondOfMinute( 19 )
+        .withMillisOfSecond( 0 ),
+      doc.getLastPublicationDate()
     );
   }
 
