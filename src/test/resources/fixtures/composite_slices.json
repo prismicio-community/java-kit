@@ -1,0 +1,97 @@
+{
+  "id": "WV-gECQAACgAYZhq",
+  "uid": null,
+  "type": "page",
+  "href": "https://levi-templeting.prismic.io/api/v1/documents/search?ref=WYhXLigAACUA3hcM&q=%5B%5B%3Ad+%3D+at%28document.id%2C+%22WV-gECQAACgAYZhq%22%29+%5D%5D",
+  "tags": [],
+  "first_publication_date": "2017-07-07T14:52:04+0000",
+  "last_publication_date": "2017-08-07T12:01:21+0000",
+  "slugs": ["new-slices"],
+  "lang": "en-us",
+  "alternate_languages": [],
+  "linked_documents": [],
+  "data": {
+    "page": {
+      "title": {
+        "type": "StructuredText",
+        "value": [{
+          "type": "heading1",
+          "text": "Page Title",
+          "spans": []
+        }]
+      },
+      "page_content": {
+        "type": "SliceZone",
+        "value": [{
+          "type": "Slice",
+          "slice_type": "text",
+          "slice_label": "levi-label",
+          "repeat": [
+            {}
+          ],
+          "non-repeat": {
+            "rich_text": {
+              "type": "StructuredText",
+              "value": [{
+                "type": "paragraph",
+                "text": "Here is paragraph 1.",
+                "spans": []
+              },{
+                "type": "paragraph",
+                "text": "Here is paragraph 2.",
+                "spans": []
+              }]
+            }
+          }
+        },{
+          "type": "Slice",
+          "slice_type": "image_gallery",
+          "slice_label": null,
+          "repeat": [{
+            "image": {
+              "type": "Image",
+              "value": {
+                "main": {
+                  "dimensions": {
+                    "width": 267,
+                    "height": 200
+                  },
+                  "alt": null,
+                  "copyright": null,
+                  "url": "https://prismic-io.s3.amazonaws.com/levi-templeting%2Fdc0bfab3-d222-44a6-82b8-c74f8cdc6a6b_200_s.gif"
+                },
+                "views": {}
+              }
+            }
+          },{
+            "image": {
+              "type": "Image",
+              "value": {
+                "main": {
+                  "dimensions": {
+                    "width": 400,
+                    "height": 369
+                  },
+                  "alt": null,
+                  "copyright": null,
+                  "url": "https://prismic-io.s3.amazonaws.com/levi-templeting/83c03dac4a604ac2e97e285e60034c641abd73b6_image2.jpg"
+                },
+                "views": {}
+              }
+            }
+          }],
+          "non-repeat": {
+            "gallery_title": {
+              "type": "StructuredText",
+              "value": [{
+                "type": "heading2",
+                "text": "Image Gallery",
+                "spans": []
+              }]
+            }
+          }
+        }]
+      }
+    }
+  }
+}
