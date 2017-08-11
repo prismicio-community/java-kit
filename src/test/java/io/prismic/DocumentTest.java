@@ -113,6 +113,26 @@ public class DocumentTest {
   }
 
   @Test
+  public void testParseNullFirstPublicationDate() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"id\":\"\", \"uid\":null, \"type\":\"\", \"href\":\"\", \"tags\":[], \"slugs\":[\"\"], \"lang\":\"\", \"alternate_languages\":[\"\",\"\"], \"linked_documents\":[], \"first_publication_date\": null, \"last_publication_date\": null, \"data\":{ \"article\":{} } }";
+    JsonNode json = mapper.readTree(jsonString);
+    Document doc = Document.parse(json);
+
+    Assert.assertNull( doc.getFirstPublicationDate() );
+  }
+
+  @Test
+  public void testParseNullLastPublicationDate() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"id\":\"\", \"uid\":null, \"type\":\"\", \"href\":\"\", \"tags\":[], \"slugs\":[\"\"], \"lang\":\"\", \"alternate_languages\":[\"\",\"\"], \"linked_documents\":[], \"first_publication_date\": null, \"last_publication_date\": null, \"data\":{ \"article\":{} } }";
+    JsonNode json = mapper.readTree(jsonString);
+    Document doc = Document.parse(json);
+
+    Assert.assertNull( doc.getLastPublicationDate() );
+  }
+
+  @Test
   public void image() {
     Api api = Api.get("https://test-public.prismic.io/api");
     Document doc =
