@@ -78,7 +78,7 @@ public interface Fragment {
 
   }
 
-   // -- Timestamp
+  // -- Timestamp
 
   /**
    * Timestamp fragment: date with time. For just date, see Date.
@@ -589,8 +589,8 @@ public interface Fragment {
             url = ((ImageLink) this.linkTo).getUrl();
           } else if (this.linkTo instanceof DocumentLink) {
             url = ((DocumentLink)this.linkTo).isBroken()
-                ? "#broken"
-                : linkResolver.resolve((DocumentLink) this.linkTo);
+              ? "#broken"
+              : linkResolver.resolve((DocumentLink) this.linkTo);
           }
           return "<a href=\"" + url + "\">" + imgTag + "</a>";
         } else {
@@ -674,12 +674,68 @@ public interface Fragment {
 
   }
 
-  public static class Slice {
+  /**
+   * A generic Slice fragment
+   */
+  public interface Slice {
+
+    public String getSliceType();
+    public String getLabel();
+  }
+
+  /**
+   * The Composite Slice
+   */
+  public static class CompositeSlice implements Slice {
+    private final String sliceType;
+    private final String label;
+    private final Group repeat;
+    private final GroupDoc nonRepeat;
+
+    public CompositeSlice(String sliceType, String label, Group repeat, GroupDoc nonRepeat) {
+      this.sliceType = sliceType;
+      this.label = label;
+      this.repeat = repeat;
+      this.nonRepeat = nonRepeat;
+    }
+
+    public String asHtml(LinkResolver linkResolver) {
+      String className = "slice";
+      if (this.label != null && this.label != "null") className += (" " + this.label);
+      List<GroupDoc> groupDocs = new ArrayList<GroupDoc>(Arrays.asList(this.nonRepeat));
+      Group nonRepeat = this.nonRepeat != null ? new Group(groupDocs) : null;
+      return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
+        WithFragments.fragmentHtml(nonRepeat, linkResolver, null) +
+        WithFragments.fragmentHtml(this.repeat, linkResolver, null) +
+        "</div>";
+    }
+
+    public String getSliceType() {
+      return sliceType;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    public Group getRepeat() {
+      return repeat;
+    }
+
+    public GroupDoc getNonRepeat() {
+      return nonRepeat;
+    }
+  }
+
+  /**
+   * The depricated Simple Slice
+   */
+  public static class SimpleSlice implements Slice {
     private final String sliceType;
     private final String label;
     private final Fragment value;
 
-    public Slice(String sliceType, String label, Fragment value) {
+    public SimpleSlice(String sliceType, String label, Fragment value) {
       this.sliceType = sliceType;
       this.label = label;
       this.value = value;
@@ -687,10 +743,10 @@ public interface Fragment {
 
     public String asHtml(LinkResolver linkResolver) {
       String className = "slice";
-      if (this.label != null) className += (" " + this.label);
+      if (this.label != null && this.label != "null") className += (" " + this.label);
       return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
-             WithFragments.fragmentHtml(this.value, linkResolver, null) +
-             "</div>";
+        WithFragments.fragmentHtml(this.value, linkResolver, null) +
+        "</div>";
     }
 
     public String getSliceType() {
@@ -716,7 +772,13 @@ public interface Fragment {
     public String asHtml(LinkResolver linkResolver) {
       StringBuilder output = new StringBuilder();
       for (Slice slice: this.slices) {
-        output.append(slice.asHtml(linkResolver));
+        if (slice instanceof SimpleSlice){
+          SimpleSlice simpleSlice = (SimpleSlice)slice;
+          output.append(simpleSlice.asHtml(linkResolver));
+        } else if (slice instanceof CompositeSlice){
+          CompositeSlice compositeSlice = (CompositeSlice)slice;
+          output.append(compositeSlice.asHtml(linkResolver));
+        }
       }
       return output.toString();
     }
@@ -725,10 +787,16 @@ public interface Fragment {
       List<Slice> slices = new ArrayList<Slice>();
       for(JsonNode sliceJson: json) {
         String sliceType = sliceJson.path("slice_type").asText();
-        String label = sliceJson.has("label") ? sliceJson.path("label").asText() : null;
+        String label = sliceJson.has("slice_label") ? sliceJson.path("slice_label").asText() : null;
         String fragmentType = sliceJson.path("value").path("type").asText();
-        Fragment fragment = Document.parseFragment(fragmentType, sliceJson.path("value").path("value"));
-        slices.add(new Slice(sliceType, label, fragment));
+        if (sliceJson.has("non-repeat")) {
+          Group repeat = Group.parse(sliceJson.path("repeat"));
+          GroupDoc nonRepeat = Group.parseGroupDoc(sliceJson.path("non-repeat"));
+          slices.add(new CompositeSlice(sliceType, label, repeat, nonRepeat));
+        } else {
+          Fragment fragment = Document.parseFragment(fragmentType, sliceJson.path("value").path("value"));
+          slices.add(new SimpleSlice(sliceType, label, fragment));
+        }
       }
       return new SliceZone(slices);
     }
@@ -832,7 +900,7 @@ public interface Fragment {
         public String getLabel() {
           return label;
         }
-       }
+      }
 
       /**
        * A listitem, typically a "li" tag within a "ul" or "ol" (whether the ordered property is true or not)
@@ -1273,7 +1341,7 @@ public interface Fragment {
         }
       }
       return html;
-   }
+    }
 
     public String asHtml(LinkResolver linkResolver) {
       return asHtml(linkResolver, null);
@@ -1460,20 +1528,30 @@ public interface Fragment {
     public static Group parse(JsonNode json) {
       List<GroupDoc> groupDocs = new ArrayList<GroupDoc>();
       for(JsonNode groupJson : json) {
-        // each groupJson looks like this: { "somelink" : { "type" : "Link.document", { ... } }, "someimage" : { ... } }
-        Iterator<String> dataJson = groupJson.fieldNames();
-        Map<String, Fragment> fragmentMap = new LinkedHashMap<String, Fragment>();
-        while (dataJson.hasNext()) {
-          String field = dataJson.next();
-          JsonNode fieldJson = groupJson.path(field);
-          String fragmentType = fieldJson.path("type").asText();
-          JsonNode fragmentValue = fieldJson.path("value");
-          Fragment fragment = Document.parseFragment(fragmentType, fragmentValue);
-          if (fragment != null) fragmentMap.put(field, fragment);
-        }
-        groupDocs.add(new GroupDoc(fragmentMap));
+        groupDocs.add(parseGroupDoc(groupJson));
       }
       return new Group(groupDocs);
+    }
+
+    /**
+     * Static method to parse JSON into a GroupDoc.
+     *
+     * @param groupJson the Jackson json node
+     * @return the properly initialized GroupDoc
+     */
+    public static GroupDoc parseGroupDoc(JsonNode groupJson) {
+      // each groupJson looks like this: { "somelink" : { "type" : "Link.document", { ... } }, "someimage" : { ... } }
+      Iterator<String> dataJson = groupJson.fieldNames();
+      Map<String, Fragment> fragmentMap = new LinkedHashMap<String, Fragment>();
+      while (dataJson.hasNext()) {
+        String field = dataJson.next();
+        JsonNode fieldJson = groupJson.path(field);
+        String fragmentType = fieldJson.path("type").asText();
+        JsonNode fragmentValue = fieldJson.path("value");
+        Fragment fragment = Document.parseFragment(fragmentType, fragmentValue);
+        if (fragment != null) fragmentMap.put(field, fragment);
+      }
+      return new GroupDoc(fragmentMap);
     }
 
   }

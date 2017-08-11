@@ -41,8 +41,19 @@ public class DocumentTest {
   }
 
   @Test
-  public void testParseSlices() throws Exception {
-    JsonNode node = getJson("/fixtures/slices.json");
+  public void getFirstItemOfSimpleSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/simple_slices.json");
+    Document doc = Document.parse(node);
+    Fragment.SliceZone sliceZone = doc.getSliceZone("article.blocks");
+    Fragment.SimpleSlice firstSlice = (Fragment.SimpleSlice)sliceZone.getSlices().get(0);
+    Fragment.Group group = (Fragment.Group)firstSlice.getValue();
+    String expectedUrl = "https://wroomdev.s3.amazonaws.com/toto/db3775edb44f9818c54baa72bbfc8d3d6394b6ef_hsf_evilsquall.jpg";
+    Assert.assertEquals(expectedUrl, group.getDocs().get(0).getImage("illustration").getUrl());
+  }
+
+  @Test
+  public void testParseSimpleSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/simple_slices.json");
     Document doc = Document.parse(node);
 
     Assert.assertNotNull(
@@ -55,6 +66,40 @@ public class DocumentTest {
       "<div data-slicetype=\"features\" class=\"slice\"><section data-field=\"illustration\"><img alt=\"\" src=\"https://wroomdev.s3.amazonaws.com/toto/db3775edb44f9818c54baa72bbfc8d3d6394b6ef_hsf_evilsquall.jpg\" width=\"4285\" height=\"709\" /></section>\n"
         + "<section data-field=\"title\"><span class=\"text\">c'est un bloc features</span></section></div>"
         + "<div data-slicetype=\"text\" class=\"slice\"><p>C'est un bloc content</p></div>"
+    );
+  }
+
+  @Test
+  public void getFirstItemOfCompositeSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/composite_slices.json");
+    Document doc = Document.parse(node);
+    Fragment.SliceZone sliceZone = doc.getSliceZone("page.page_content");
+    Fragment.CompositeSlice firstSlice = (Fragment.CompositeSlice)sliceZone.getSlices().get(0);
+    Fragment.StructuredText richText = firstSlice.getNonRepeat().getStructuredText("rich_text");
+    Assert.assertEquals("<p>Here is paragraph 1.</p><p>Here is paragraph 2.</p>", richText.asHtml(linkResolver));
+
+    Fragment.CompositeSlice secondSlice = (Fragment.CompositeSlice)sliceZone.getSlices().get(1);
+    String expectedUrl = "https://prismic-io.s3.amazonaws.com/levi-templeting%2Fdc0bfab3-d222-44a6-82b8-c74f8cdc6a6b_200_s.gif";
+    Assert.assertEquals(expectedUrl, secondSlice.getRepeat().getDocs().get(0).getImage("image").getUrl());
+  }
+
+  @Test
+  public void testParseCompositeSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/composite_slices.json");
+    Document doc = Document.parse(node);
+
+    Assert.assertNotNull(
+      "The composite slices retrieval works well",
+      doc.getSliceZone("page.page_content")
+    );
+    
+    Assert.assertEquals(
+      "The composite slices HTML serialization works well",
+      doc.getSliceZone("page.page_content").asHtml(linkResolver),
+      "<div data-slicetype=\"text\" class=\"slice levi-label\"><section data-field=\"rich_text\"><p>Here is paragraph 1.</p><p>Here is paragraph 2.</p></section></div>"
+      + "<div data-slicetype=\"image_gallery\" class=\"slice\"><section data-field=\"gallery_title\"><h2>Image Gallery</h2></section>"
+      + "<section data-field=\"image\"><img alt=\"null\" src=\"https://prismic-io.s3.amazonaws.com/levi-templeting%2Fdc0bfab3-d222-44a6-82b8-c74f8cdc6a6b_200_s.gif\" width=\"267\" height=\"200\" /></section>"
+      + "<section data-field=\"image\"><img alt=\"null\" src=\"https://prismic-io.s3.amazonaws.com/levi-templeting/83c03dac4a604ac2e97e285e60034c641abd73b6_image2.jpg\" width=\"400\" height=\"369\" /></section></div>"
     );
   }
 

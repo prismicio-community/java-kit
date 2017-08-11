@@ -23,16 +23,12 @@ The kit requires **Java 7** or superior.
 
 #### Documentation
 
-* [Prismic.io documentation](https://prismic.io/docs#?lang=java)
+* [Prismic.io documentation](https://prismic.io/docs/java/getting-started-in-jav/getting-started-with-java)
 * [Javadoc](http://prismicio.github.io/java-kit/)
 
 ### Changelog
 
 Need to see what changed, or to upgrade your kit? We keep our changelog on [this repository's "Releases" tab](https://github.com/prismicio/java-kit/releases).
-
-### Contribute to the kit
-
-Contribution is open to all developer levels, read our "[Contribute to the official kits](https://developers.prismic.io/documentation/UszOeAEAANUlwFpp/contribute-to-the-official-kits)" documentation to learn more.
 
 #### Install the kit locally
 
