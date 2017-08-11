@@ -38,8 +38,19 @@ public class DocumentTest {
   }
 
   @Test
-  public void testParseSlices() throws Exception {
-    JsonNode node = getJson("/fixtures/slices.json");
+  public void getFirstItemOfSimpleSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/simple_slices.json");
+    Document doc = Document.parse(node);
+    Fragment.SliceZone sliceZone = doc.getSliceZone("article.blocks");
+    Fragment.SimpleSlice firstSlice = (Fragment.SimpleSlice)sliceZone.getSlices().get(0);
+    Fragment.Group group = (Fragment.Group)firstSlice.getValue();
+    String expectedUrl = "https://wroomdev.s3.amazonaws.com/toto/db3775edb44f9818c54baa72bbfc8d3d6394b6ef_hsf_evilsquall.jpg";
+    Assert.assertEquals(expectedUrl, group.getDocs().get(0).getImage("illustration").getUrl());
+  }
+
+  @Test
+  public void testParseSimpleSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/simple_slices.json");
     Document doc = Document.parse(node);
 
     Assert.assertNotNull(
@@ -53,6 +64,20 @@ public class DocumentTest {
         + "<section data-field=\"title\"><span class=\"text\">c'est un bloc features</span></section></div>"
         + "<div data-slicetype=\"text\" class=\"slice\"><p>C'est un bloc content</p></div>"
     );
+  }
+
+  @Test
+  public void getFirstItemOfCompositeSlices() throws Exception {
+    JsonNode node = getJson("/fixtures/composite_slices.json");
+    Document doc = Document.parse(node);
+    Fragment.SliceZone sliceZone = doc.getSliceZone("page.page_content");
+    Fragment.CompositeSlice firstSlice = (Fragment.CompositeSlice)sliceZone.getSlices().get(0);
+    Fragment.StructuredText richText = firstSlice.getNonRepeat().getStructuredText("rich_text");
+    Assert.assertEquals("<p>Here is paragraph 1.</p><p>Here is paragraph 2.</p>", richText.asHtml(linkResolver));
+
+    Fragment.CompositeSlice secondSlice = (Fragment.CompositeSlice)sliceZone.getSlices().get(1);
+    String expectedUrl = "https://prismic-io.s3.amazonaws.com/levi-templeting%2Fdc0bfab3-d222-44a6-82b8-c74f8cdc6a6b_200_s.gif";
+    Assert.assertEquals(expectedUrl, secondSlice.getRepeat().getDocs().get(0).getImage("image").getUrl());
   }
 
   @Test
