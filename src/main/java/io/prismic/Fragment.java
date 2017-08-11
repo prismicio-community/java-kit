@@ -78,7 +78,7 @@ public interface Fragment {
 
   }
 
-   // -- Timestamp
+  // -- Timestamp
 
   /**
    * Timestamp fragment: date with time. For just date, see Date.
@@ -589,8 +589,8 @@ public interface Fragment {
             url = ((ImageLink) this.linkTo).getUrl();
           } else if (this.linkTo instanceof DocumentLink) {
             url = ((DocumentLink)this.linkTo).isBroken()
-                ? "#broken"
-                : linkResolver.resolve((DocumentLink) this.linkTo);
+              ? "#broken"
+              : linkResolver.resolve((DocumentLink) this.linkTo);
           }
           return "<a href=\"" + url + "\">" + imgTag + "</a>";
         } else {
@@ -679,83 +679,86 @@ public interface Fragment {
    */
   public interface Slice {
 
-    /**
-     * The Composite Slice
-     */
-    public static class CompositeSlice implements Slice {
-      private final String sliceType;
-      private final String label;
-      private final Group repeat;
-      private final GroupDoc nonRepeat;
+    public String getSliceType();
+    public String getLabel();
+  }
 
-      public CompositeSlice(String sliceType, String label, Group repeat, GroupDoc nonRepeat) {
-        this.sliceType = sliceType;
-        this.label = label;
-        this.repeat = repeat;
-        this.nonRepeat = nonRepeat;
-      }
+  /**
+   * The Composite Slice
+   */
+  public static class CompositeSlice implements Slice {
+    private final String sliceType;
+    private final String label;
+    private final Group repeat;
+    private final GroupDoc nonRepeat;
 
-      public String asHtml(LinkResolver linkResolver) {
-        String className = "slice";
-        if (this.label != null && this.label != "null") className += (" " + this.label);
-        List<GroupDoc> groupDocs = new ArrayList<GroupDoc>(Arrays.asList(this.nonRepeat));
-        Group nonRepeat = this.nonRepeat != null ? new Group(groupDocs) : null;
-        return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
-               WithFragments.fragmentHtml(nonRepeat, linkResolver, null) +
-               WithFragments.fragmentHtml(this.repeat, linkResolver, null) +
-               "</div>";
-      }
-
-      public String getSliceType() {
-        return sliceType;
-      }
-
-      public String getLabel() {
-        return label;
-      }
-
-      public Group getRepeat() {
-        return repeat;
-      }
-
-      public GroupDoc getNonRepeat() {
-        return nonRepeat;
-      }
+    public CompositeSlice(String sliceType, String label, Group repeat, GroupDoc nonRepeat) {
+      this.sliceType = sliceType;
+      this.label = label;
+      this.repeat = repeat;
+      this.nonRepeat = nonRepeat;
     }
 
-    /**
-     * The depricated Simple Slice
-     */
-    public static class SimpleSlice implements Slice {
-      private final String sliceType;
-      private final String label;
-      private final Fragment value;
+    public String asHtml(LinkResolver linkResolver) {
+      String className = "slice";
+      if (this.label != null && this.label != "null") className += (" " + this.label);
+      List<GroupDoc> groupDocs = new ArrayList<GroupDoc>(Arrays.asList(this.nonRepeat));
+      Group nonRepeat = this.nonRepeat != null ? new Group(groupDocs) : null;
+      return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
+        WithFragments.fragmentHtml(nonRepeat, linkResolver, null) +
+        WithFragments.fragmentHtml(this.repeat, linkResolver, null) +
+        "</div>";
+    }
 
-      public SimpleSlice(String sliceType, String label, Fragment value) {
-        this.sliceType = sliceType;
-        this.label = label;
-        this.value = value;
-      }
+    public String getSliceType() {
+      return sliceType;
+    }
 
-      public String asHtml(LinkResolver linkResolver) {
-        String className = "slice";
-        if (this.label != null && this.label != "null") className += (" " + this.label);
-        return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
-               WithFragments.fragmentHtml(this.value, linkResolver, null) +
-               "</div>";
-      }
+    public String getLabel() {
+      return label;
+    }
 
-      public String getSliceType() {
-        return sliceType;
-      }
+    public Group getRepeat() {
+      return repeat;
+    }
 
-      public String getLabel() {
-        return label;
-      }
+    public GroupDoc getNonRepeat() {
+      return nonRepeat;
+    }
+  }
 
-      public Fragment getValue() {
-        return value;
-      }
+  /**
+   * The depricated Simple Slice
+   */
+  public static class SimpleSlice implements Slice {
+    private final String sliceType;
+    private final String label;
+    private final Fragment value;
+
+    public SimpleSlice(String sliceType, String label, Fragment value) {
+      this.sliceType = sliceType;
+      this.label = label;
+      this.value = value;
+    }
+
+    public String asHtml(LinkResolver linkResolver) {
+      String className = "slice";
+      if (this.label != null && this.label != "null") className += (" " + this.label);
+      return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
+        WithFragments.fragmentHtml(this.value, linkResolver, null) +
+        "</div>";
+    }
+
+    public String getSliceType() {
+      return sliceType;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    public Fragment getValue() {
+      return value;
     }
   }
 
@@ -769,11 +772,11 @@ public interface Fragment {
     public String asHtml(LinkResolver linkResolver) {
       StringBuilder output = new StringBuilder();
       for (Slice slice: this.slices) {
-        if (slice instanceof Slice.SimpleSlice){
-          Slice.SimpleSlice simpleSlice = (Slice.SimpleSlice)slice;
+        if (slice instanceof SimpleSlice){
+          SimpleSlice simpleSlice = (SimpleSlice)slice;
           output.append(simpleSlice.asHtml(linkResolver));
-        } else if (slice instanceof Slice.CompositeSlice){
-          Slice.CompositeSlice compositeSlice = (Slice.CompositeSlice)slice;
+        } else if (slice instanceof CompositeSlice){
+          CompositeSlice compositeSlice = (CompositeSlice)slice;
           output.append(compositeSlice.asHtml(linkResolver));
         }
       }
@@ -789,10 +792,10 @@ public interface Fragment {
         if (sliceJson.has("non-repeat")) {
           Group repeat = Group.parse(sliceJson.path("repeat"));
           GroupDoc nonRepeat = Group.parseGroupDoc(sliceJson.path("non-repeat"));
-          slices.add(new Slice.CompositeSlice(sliceType, label, repeat, nonRepeat));
+          slices.add(new CompositeSlice(sliceType, label, repeat, nonRepeat));
         } else {
           Fragment fragment = Document.parseFragment(fragmentType, sliceJson.path("value").path("value"));
-          slices.add(new Slice.SimpleSlice(sliceType, label, fragment));
+          slices.add(new SimpleSlice(sliceType, label, fragment));
         }
       }
       return new SliceZone(slices);
@@ -897,7 +900,7 @@ public interface Fragment {
         public String getLabel() {
           return label;
         }
-       }
+      }
 
       /**
        * A listitem, typically a "li" tag within a "ul" or "ol" (whether the ordered property is true or not)
@@ -1338,7 +1341,7 @@ public interface Fragment {
         }
       }
       return html;
-   }
+    }
 
     public String asHtml(LinkResolver linkResolver) {
       return asHtml(linkResolver, null);
