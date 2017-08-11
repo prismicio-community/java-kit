@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.databind.*;
 
 public class Document extends WithFragments {
@@ -16,9 +18,11 @@ public class Document extends WithFragments {
   private final String type;
   private final String lang;
   private final List<String> alternateLanguages;
+  private final DateTime firstPublicationDate;
+  private final DateTime lastPublicationDate;
   private final Map<String, Fragment> fragments;
 
-  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, String lang, List<String> alternateLanguages, Map<String,Fragment> fragments) {
+  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, String lang, List<String> alternateLanguages, DateTime firstPublicationDate, DateTime lastPublicationDate, Map<String,Fragment> fragments) {
     this.id = id;
     this.uid = uid;
     this.type = type;
@@ -27,6 +31,8 @@ public class Document extends WithFragments {
     this.slugs = Collections.unmodifiableList(slugs);
     this.lang = lang;
     this.alternateLanguages = Collections.unmodifiableList(alternateLanguages);
+    this.firstPublicationDate = firstPublicationDate;
+    this.lastPublicationDate = lastPublicationDate;
     this.fragments = Collections.unmodifiableMap(fragments);
   }
 
@@ -67,6 +73,14 @@ public class Document extends WithFragments {
 
   public List<String> getAlternateLanguages() {
     return alternateLanguages;
+  }
+
+  public DateTime getFirstPublicationDate() {
+    return firstPublicationDate;
+  }
+
+  public DateTime getLastPublicationDate() {
+    return lastPublicationDate;
   }
 
   @Override
@@ -179,6 +193,8 @@ public class Document extends WithFragments {
     String href = json.path("href").asText();
     String type = json.path("type").asText();
     String lang = json.path("lang").asText();
+    DateTime firstPublicationDate = parseDateTime(json.path("first_publication_date"));
+    DateTime lastPublicationDate = parseDateTime(json.path("last_publication_date"));
 
     Iterator<JsonNode> alternateLanguagesJson = json.withArray("alternate_languages").elements();
     List<String> alternateLanguages = new ArrayList<String>();
@@ -205,7 +221,12 @@ public class Document extends WithFragments {
 
     Map<String, Fragment> fragments = parseFragments(json.with("data").with(type), type);
 
-    return new Document(id, uid, type, href, tags, slugs, lang, alternateLanguages, fragments);
+    return new Document(id, uid, type, href, tags, slugs, lang, alternateLanguages, firstPublicationDate, lastPublicationDate, fragments);
   }
 
+  private static DateTime parseDateTime(JsonNode json) {
+    return json.asText().equals("null")
+      ? null
+      : DateTime.parse( json.asText() );
+  }
 }

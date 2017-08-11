@@ -3,6 +3,9 @@ package io.prismic;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -69,6 +72,64 @@ public class DocumentTest {
       2,
       doc.getAlternateLanguages().size()
     );
+  }
+
+  @Test
+  public void testParseFirstPublicationDate() throws Exception {
+    JsonNode node = getJson("/fixtures/language.json");
+    Document doc = Document.parse(node);
+
+    Assert.assertEquals(
+      DateTime.now()
+        .withZone( DateTimeZone.UTC )
+        .withYear( 2017 )
+        .withMonthOfYear( 1 )
+        .withDayOfMonth( 13 )
+        .withHourOfDay( 11 )
+        .withMinuteOfHour( 45 )
+        .withSecondOfMinute( 21 )
+        .withMillisOfSecond( 0 ),
+      doc.getFirstPublicationDate()
+    );
+  }
+
+  @Test
+  public void testParseLastPublicationDate() throws Exception {
+    JsonNode node = getJson("/fixtures/language.json");
+    Document doc = Document.parse(node);
+
+    Assert.assertEquals(
+      DateTime.now()
+        .withZone( DateTimeZone.UTC )
+        .withYear( 2017 )
+        .withMonthOfYear( 2 )
+        .withDayOfMonth( 21 )
+        .withHourOfDay( 16 )
+        .withMinuteOfHour( 5 )
+        .withSecondOfMinute( 19 )
+        .withMillisOfSecond( 0 ),
+      doc.getLastPublicationDate()
+    );
+  }
+
+  @Test
+  public void testParseNullFirstPublicationDate() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"id\":\"\", \"uid\":null, \"type\":\"\", \"href\":\"\", \"tags\":[], \"slugs\":[\"\"], \"lang\":\"\", \"alternate_languages\":[\"\",\"\"], \"linked_documents\":[], \"first_publication_date\": null, \"last_publication_date\": null, \"data\":{ \"article\":{} } }";
+    JsonNode json = mapper.readTree(jsonString);
+    Document doc = Document.parse(json);
+
+    Assert.assertNull( doc.getFirstPublicationDate() );
+  }
+
+  @Test
+  public void testParseNullLastPublicationDate() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"id\":\"\", \"uid\":null, \"type\":\"\", \"href\":\"\", \"tags\":[], \"slugs\":[\"\"], \"lang\":\"\", \"alternate_languages\":[\"\",\"\"], \"linked_documents\":[], \"first_publication_date\": null, \"last_publication_date\": null, \"data\":{ \"article\":{} } }";
+    JsonNode json = mapper.readTree(jsonString);
+    Document doc = Document.parse(json);
+
+    Assert.assertNull( doc.getLastPublicationDate() );
   }
 
   @Test
