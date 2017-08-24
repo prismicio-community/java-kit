@@ -17,12 +17,12 @@ public class Document extends WithFragments {
   private final List<String> slugs;
   private final String type;
   private final String lang;
-  private final List<String> alternateLanguages;
+  private final List<AlternateLanguage> alternateLanguages;
   private final DateTime firstPublicationDate;
   private final DateTime lastPublicationDate;
   private final Map<String, Fragment> fragments;
 
-  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, String lang, List<String> alternateLanguages, DateTime firstPublicationDate, DateTime lastPublicationDate, Map<String,Fragment> fragments) {
+  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, String lang, List<AlternateLanguage> alternateLanguages, DateTime firstPublicationDate, DateTime lastPublicationDate, Map<String,Fragment> fragments) {
     this.id = id;
     this.uid = uid;
     this.type = type;
@@ -71,7 +71,7 @@ public class Document extends WithFragments {
     return lang;
   }
 
-  public List<String> getAlternateLanguages() {
+  public List<AlternateLanguage> getAlternateLanguages() {
     return alternateLanguages;
   }
 
@@ -197,9 +197,14 @@ public class Document extends WithFragments {
     DateTime lastPublicationDate = parseDateTime(json.path("last_publication_date"));
 
     Iterator<JsonNode> alternateLanguagesJson = json.withArray("alternate_languages").elements();
-    List<String> alternateLanguages = new ArrayList<String>();
+    List<AlternateLanguage> alternateLanguages = new ArrayList<AlternateLanguage>();
     while(alternateLanguagesJson.hasNext()) {
-      alternateLanguages.add(alternateLanguagesJson.next().asText());
+      JsonNode altLangJson = alternateLanguagesJson.next();
+      String altLangId = altLangJson.path("id").asText();
+      String altLangUid = altLangJson.has("uid") ? altLangJson.path("uid").asText() : null;
+      String altLangType = altLangJson.path("type").asText();
+      String altLangCode = altLangJson.path("lang").asText();
+      alternateLanguages.add(new AlternateLanguage(altLangId, altLangUid, altLangType, altLangCode));
     }
 
     Iterator<JsonNode> tagsJson = json.withArray("tags").elements();

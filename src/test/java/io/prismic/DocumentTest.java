@@ -114,8 +114,8 @@ public class DocumentTest {
     );
 
     Assert.assertEquals(
-      2,
-      doc.getAlternateLanguages().size()
+      "french",
+      doc.getAlternateLanguages().get(0).getUid()
     );
   }
 
