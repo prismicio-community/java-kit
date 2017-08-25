@@ -6,7 +6,19 @@
     "tags":[],
     "slugs":["schweizer-deutsch"],
     "lang":"de-ch",
-    "alternate_languages":["fr-fr","en-gb"],
+    "alternate_languages":[
+      {
+        "id": "WZ1iGioAACkA7Kqn",
+        "uid": "french",
+        "type": "article",
+        "lang": "fr-fr"
+      },{
+        "id": "WZ1iPyoAACkA7KtJ",
+        "uid": "spanish",
+        "type": "article",
+        "lang": "es-es"
+      }
+    ],
     "linked_documents":[],
     "first_publication_date": "2017-01-13T11:45:21.000Z",
     "last_publication_date": "2017-02-21T16:05:19.000Z",
