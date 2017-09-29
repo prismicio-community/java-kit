@@ -701,7 +701,7 @@ public interface Fragment {
 
     public String asHtml(LinkResolver linkResolver) {
       String className = "slice";
-      if (this.label != null && this.label != "null") className += (" " + this.label);
+      if (this.label != null && !this.label.equals("null")) className += (" " + this.label);
       List<GroupDoc> groupDocs = new ArrayList<GroupDoc>(Arrays.asList(this.nonRepeat));
       Group nonRepeat = this.nonRepeat != null ? new Group(groupDocs) : null;
       return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
@@ -743,7 +743,7 @@ public interface Fragment {
 
     public String asHtml(LinkResolver linkResolver) {
       String className = "slice";
-      if (this.label != null && this.label != "null") className += (" " + this.label);
+      if (this.label != null && !this.label.equals("null")) className += (" " + this.label);
       return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
         WithFragments.fragmentHtml(this.value, linkResolver, null) +
         "</div>";
