@@ -92,14 +92,14 @@ public class DocumentTest {
       "The composite slices retrieval works well",
       doc.getSliceZone("page.page_content")
     );
-    
+
     Assert.assertEquals(
       "The composite slices HTML serialization works well",
       doc.getSliceZone("page.page_content").asHtml(linkResolver),
       "<div data-slicetype=\"text\" class=\"slice levi-label\"><section data-field=\"rich_text\"><p>Here is paragraph 1.</p><p>Here is paragraph 2.</p></section></div>"
       + "<div data-slicetype=\"image_gallery\" class=\"slice\"><section data-field=\"gallery_title\"><h2>Image Gallery</h2></section>"
-      + "<section data-field=\"image\"><img alt=\"null\" src=\"https://prismic-io.s3.amazonaws.com/levi-templeting%2Fdc0bfab3-d222-44a6-82b8-c74f8cdc6a6b_200_s.gif\" width=\"267\" height=\"200\" /></section>"
-      + "<section data-field=\"image\"><img alt=\"null\" src=\"https://prismic-io.s3.amazonaws.com/levi-templeting/83c03dac4a604ac2e97e285e60034c641abd73b6_image2.jpg\" width=\"400\" height=\"369\" /></section></div>"
+      + "<section data-field=\"image\"><img alt=\"\" src=\"https://prismic-io.s3.amazonaws.com/levi-templeting%2Fdc0bfab3-d222-44a6-82b8-c74f8cdc6a6b_200_s.gif\" width=\"267\" height=\"200\" /></section>"
+      + "<section data-field=\"image\"><img alt=\"\" src=\"https://prismic-io.s3.amazonaws.com/levi-templeting/83c03dac4a604ac2e97e285e60034c641abd73b6_image2.jpg\" width=\"400\" height=\"369\" /></section></div>"
     );
   }
 

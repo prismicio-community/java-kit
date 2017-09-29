@@ -580,7 +580,10 @@ public interface Fragment {
       }
 
       public String asHtml(LinkResolver linkResolver) {
-        String imgTag = "<img alt=\"" + alt + "\" src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" />";
+        String imgTag = "<img alt=\"";
+        if (alt != null && !alt.equals("null")) imgTag += alt;
+        imgTag += "\" src=\"" + url + "\" width=\"" + width + "\" height=\"" + height + "\" />";
+
         if (this.linkTo != null) {
           String url = "about:blank";
           if (this.linkTo instanceof WebLink) {
