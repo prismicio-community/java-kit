@@ -32,15 +32,13 @@ Need to see what changed, or to upgrade your kit? We keep our changelog on [this
 
 #### Install the kit locally
 
-You will need [Maven](http://maven.apache.org/) to contribute to the kit; first [install it](http://maven.apache.org/download.cgi) if you haven't.
+Run ```./mvnw install```.
 
-Then run ```mvn compile```.
-
-Always run ```mvn test``` before committing, to make sure everything runs as expected.
+Always run ```./mvnw test``` before committing, to make sure everything runs as expected.
 
 #### Test
 
-Please write tests using [JUnit3](http://junit.sourceforge.net/junit3.8.1/) for any bugfix or new feature; please add the tests to the [AppTest.java file](https://github.com/prismicio/java-kit/blob/master/src/test/java/io/prismic/AppTest.java). Run ```mvn test``` to test.
+Please write tests using [JUnit3](http://junit.sourceforge.net/junit3.8.1/) for any bugfix or new feature; please add the tests to the [AppTest.java file](https://github.com/prismicio/java-kit/blob/master/src/test/java/io/prismic/AppTest.java). Run ```./mvnw test``` to test.
 
 If you find existing code that is not optimally tested and wish to make it better, we really appreciate it; but you should document it on its own branch and its own pull request.
 
@@ -54,7 +52,7 @@ If you find existing code that is not optimally documented and wish to make it b
 
 (Only for Prismic.io developers)
 
-    mvn clean javadoc:javadoc scm-publish:publish-scm
+    ./mvnw clean javadoc:javadoc scm-publish:publish-scm
 
 ### Licence
 
