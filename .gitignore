@@ -4,6 +4,7 @@
 
 # Java / maven
 target
+!.mvn/wrapper/maven-wrapper.jar
 
 # Node (used to publish Gists)
 node_modules/
