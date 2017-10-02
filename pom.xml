@@ -145,9 +145,9 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-	          <groupId>javax.servlet</groupId>
-	          <artifactId>javax.servlet-api</artifactId>
-	          <version>3.0.1</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -156,18 +156,17 @@
             <scope>test</scope>
         </dependency>
         <!-- to simulate a proxy -->
-		<dependency>
-			<groupId>org.littleshoot</groupId>
-			<artifactId>littleproxy</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-
-		<!--looger -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.25</version>
-		</dependency>
+        <dependency>
+          <groupId>org.littleshoot</groupId>
+          <artifactId>littleproxy</artifactId>
+          <version>1.1.0</version>
+        </dependency>
+        <!--logger -->
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.25</version>
+        </dependency>
     </dependencies>
 
     <profiles>
