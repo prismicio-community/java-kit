@@ -494,6 +494,10 @@ public interface Fragment {
       return slug;
     }
 
+    public String getLang() {
+      return lang;
+    }
+
     public boolean isBroken() {
       return broken;
     }
