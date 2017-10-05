@@ -1,10 +1,28 @@
-# IntelliJ files
-*.iml
+### Maven ###
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
 .idea
+*.iws
+*.iml
+*.ipr
 
-# Java / maven
-target
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
 
-# Node (used to publish Gists)
+### Node (used to publish Gists) ###
 node_modules/
-
