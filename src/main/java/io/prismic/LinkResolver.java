@@ -4,6 +4,8 @@ public interface LinkResolver {
 
   public String resolve(Fragment.DocumentLink link);
 
-  public String resolve(Document document);
+  public default String resolve(Document document) {
+    return resolve(document.asDocumentLink());
+  }
 
 }
