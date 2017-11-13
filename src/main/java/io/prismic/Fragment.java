@@ -309,15 +309,23 @@ public interface Fragment {
      * @return target URL of the link
      */
     public String getUrl(LinkResolver resolver);
+    
+    /**
+     * Return the target of the link.
+     * @return target of the link
+     */
+    public String getTarget();
   }
 
   public static class WebLink implements Link {
     private final String url;
     private final String contentType;
+    private final String target;
 
-    public WebLink(String url, String contentType) {
+    public WebLink(String url, String contentType, String target) {
       this.url = url;
       this.contentType = contentType;
+      this.target = target;
     }
 
     /**
@@ -340,6 +348,10 @@ public interface Fragment {
       return contentType;
     }
 
+    public String getTarget() {
+      return target;
+    }
+
     public String asHtml() {
       return ("<a href=\"" + url + "\">" + url + "</a>");
     }
@@ -348,7 +360,8 @@ public interface Fragment {
 
     public static WebLink parse(JsonNode json) {
       String url = json.path("url").asText();
-      return new WebLink(url, null);
+      String target = json.has("target") ? json.path("target").asText() : null;
+      return new WebLink(url, null, target);
     }
   }
 
@@ -396,6 +409,10 @@ public interface Fragment {
       return filename;
     }
 
+    public String getTarget() {
+      return null;
+    }
+
     public String asHtml() {
       return ("<a href=\"" + url + "\">" + filename + "</a>");
     }
@@ -425,6 +442,10 @@ public interface Fragment {
 
     public String getUrl() {
       return url;
+    }
+
+    public String getTarget() {
+      return null;
     }
 
     public String asHtml() {
@@ -496,6 +517,10 @@ public interface Fragment {
 
     public String getLang() {
       return lang;
+    }
+
+    public String getTarget() {
+      return null;
     }
 
     public boolean isBroken() {
@@ -590,8 +615,11 @@ public interface Fragment {
 
         if (this.linkTo != null) {
           String url = "about:blank";
+          String target = "";
           if (this.linkTo instanceof WebLink) {
             url = ((WebLink) this.linkTo).getUrl();
+            String webTarget = ((WebLink) this.linkTo).getTarget();
+            target = webTarget != null ? " target=\"" + webTarget + "\" rel=\"noopener\"" : "";
           } else if (this.linkTo instanceof ImageLink) {
             url = ((ImageLink) this.linkTo).getUrl();
           } else if (this.linkTo instanceof DocumentLink) {
@@ -599,7 +627,7 @@ public interface Fragment {
               ? "#broken"
               : linkResolver.resolve((DocumentLink) this.linkTo);
           }
-          return "<a href=\"" + url + "\">" + imgTag + "</a>";
+          return "<a href=\"" + url + "\"" + target + ">" + imgTag + "</a>";
         } else {
           return imgTag;
         }
@@ -1260,7 +1288,8 @@ public interface Fragment {
         Span.Hyperlink hyperlink = (Span.Hyperlink)span;
         if(hyperlink.link instanceof WebLink) {
           WebLink webLink = (WebLink)hyperlink.getLink();
-          return "<a href=\""+ webLink.getUrl() + "\">" + content + "</a>";
+          String target = webLink.getTarget() != null ? " target=\"" + webLink.getTarget() + "\" rel=\"noopener\"" : "";
+          return "<a href=\""+ webLink.getUrl() + "\"" + target + ">" + content + "</a>";
         }
         else if(hyperlink.link instanceof FileLink) {
           FileLink fileLink = (FileLink)hyperlink.getLink();
