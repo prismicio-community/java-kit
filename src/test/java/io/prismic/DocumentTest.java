@@ -3,7 +3,6 @@ package io.prismic;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -246,7 +245,6 @@ public class DocumentTest {
     String jsonString = "{\"type\":\"StructuredText\",\"value\":[{\"type\":\"paragraph\",\"text\":\"To query your API, you will need to specify a form and a reference in addition to your query.\",\"spans\":[{\"start\":46,\"end\":50,\"type\":\"strong\"},{\"start\":57,\"end\":67,\"type\":\"strong\"},{\"start\":78,\"end\":92,\"type\":\"strong\"}]},{\"type\":\"list-item\",\"text\":\"The operator: this is the function you call to build the predicate, for example Predicate.at.\",\"spans\":[{\"start\":4,\"end\":12,\"type\":\"em\"},{\"start\":80,\"end\":92,\"type\":\"label\",\"data\":{\"label\":\"codespan\"}}]},{\"type\":\"list-item\",\"text\":\"The fragment: the first argument you pass, for example document.id.\",\"spans\":[{\"start\":4,\"end\":12,\"type\":\"em\"},{\"start\":55,\"end\":67,\"type\":\"label\",\"data\":{\"label\":\"codespan\"}}]},{\"type\":\"list-item\",\"text\":\"The values: the other arguments you pass, usually one but it can be more for some predicates. For example product.\",\"spans\":[{\"start\":4,\"end\":10,\"type\":\"em\"},{\"start\":106,\"end\":113,\"type\":\"label\",\"data\":{\"label\":\"codespan\"}}]}]}";
     JsonNode json = mapper.readTree(jsonString);
     Fragment.StructuredText text = Fragment.StructuredText.parse(json.path("value"));
-    System.out.println(text.asHtml(linkResolver));
     Assert.assertEquals(
       "<p>To query your API, you will need to specify a <strong>form</strong> and a <strong>reference </strong>in addition<strong> to your query</strong>.</p><ul><li>The <em>operator</em>: this is the function you call to build the predicate, for example <span class=\"codespan\">Predicate.at</span>.</li><li>The <em>fragment</em>: the first argument you pass, for example <span class=\"codespan\">document.id.</span></li><li>The <em>values</em>: the other arguments you pass, usually one but it can be more for some predicates. For example <span class=\"codespan\">product</span>.</li></ul>",
       text.asHtml(linkResolver)
@@ -262,6 +260,18 @@ public class DocumentTest {
     Assert.assertEquals(
       "_blank",
       target.getTarget()
+    );
+  }
+
+  @Test
+  public void lineBreaks() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"type\": \"StructuredText\", \"value\": [ { \"type\": \"paragraph\", \"text\": \"Line\\nwith\\n\\nline breaks\", \"spans\": [] } ]}";
+    JsonNode json = mapper.readTree(jsonString);
+    Fragment.StructuredText text = Fragment.StructuredText.parse(json.path("value"));
+    Assert.assertEquals(
+      "<p>Line<br/>with<br/><br/>line breaks</p>",
+      text.asHtml(linkResolver)
     );
   }
 

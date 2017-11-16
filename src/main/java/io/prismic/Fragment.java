@@ -1205,7 +1205,7 @@ public interface Fragment {
           }
         }
       }
-      return html.toString();
+      return convertLineSeparatorsToHtmlLineBreaks(html.toString());
     }
 
     public String asHtml(Block block, LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
@@ -1266,6 +1266,10 @@ public interface Fragment {
         this.x = x;
         this.y = y;
       }
+    }
+
+    private String convertLineSeparatorsToHtmlLineBreaks(String html) {
+      return html.replaceAll("\n", "<br/>");
     }
 
     private static String serialize(Span span, String content, LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
