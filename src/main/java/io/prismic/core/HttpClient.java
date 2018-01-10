@@ -80,8 +80,6 @@ public class HttpClient {
             throw new RuntimeException("HTTP error " + httpConnection.getResponseCode() + " (" + body + ")");
         }
       }
-    } catch(Api.Error e) {
-      throw e;
     } catch(IOException e) {
       e.printStackTrace();
       throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
