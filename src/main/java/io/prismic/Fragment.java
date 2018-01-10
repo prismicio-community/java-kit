@@ -738,7 +738,7 @@ public interface Fragment {
     public String asHtml(LinkResolver linkResolver) {
       String className = "slice";
       if (this.label != null && !this.label.equals("null")) className += (" " + this.label);
-      List<GroupDoc> groupDocs = new ArrayList<>(Arrays.asList(this.nonRepeat));
+      List<GroupDoc> groupDocs = new ArrayList<>(Collections.singletonList(this.nonRepeat));
       Group nonRepeat = this.nonRepeat != null ? new Group(groupDocs) : null;
       return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
         WithFragments.fragmentHtml(nonRepeat, linkResolver, null) +
@@ -1196,11 +1196,11 @@ public interface Fragment {
       StringBuilder html = new StringBuilder();
       for(BlockGroup blockGroup: blockGroups) {
         if(blockGroup.tag != null) {
-          html.append("<" + blockGroup.tag + ">");
+          html.append("<").append(blockGroup.tag).append(">");
           for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver, htmlSerializer));
           }
-          html.append("</" + blockGroup.tag + ">");
+          html.append("</").append(blockGroup.tag).append(">");
         } else {
           for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver, htmlSerializer));
@@ -1334,7 +1334,7 @@ public interface Fragment {
       }
 
       char c;
-      String html = "";
+      StringBuilder html = new StringBuilder();
       Stack<Tuple<Span, String>> stack = new Stack<>();
       for (int pos = 0, len = text.length(); pos < len; pos++) {
         if (tagsEnd.containsKey(pos)) {
@@ -1344,7 +1344,7 @@ public interface Fragment {
             String innerHtml = serialize(tag.x, tag.y, linkResolver, htmlSerializer);
             if (stack.isEmpty()) {
               // The tag was top level
-              html += innerHtml;
+              html.append(innerHtml);
             } else {
               // Add the content to the parent tag
               Tuple<Span, String> head = stack.pop();
@@ -1362,7 +1362,7 @@ public interface Fragment {
         String escaped = escape(Character.toString(c));
         if (stack.isEmpty()) {
           // Top-level text
-          html += escaped;
+          html.append(escaped);
         } else {
           // Inner text of a span
           Tuple<Span, String> head = stack.pop();
@@ -1375,14 +1375,14 @@ public interface Fragment {
         String innerHtml = serialize(tag.x, tag.y, linkResolver, htmlSerializer);
         if (stack.isEmpty()) {
           // The tag was top level
-          html += innerHtml;
+          html.append(innerHtml);
         } else {
           // Add the content to the parent tag
           Tuple<Span, String> head = stack.pop();
           stack.push(new Tuple<>(head.x, head.y + innerHtml));
         }
       }
-      return html;
+      return html.toString();
     }
 
     public String asHtml(LinkResolver linkResolver) {

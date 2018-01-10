@@ -288,7 +288,7 @@ public abstract class WithFragments {
   public String asHtml(LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     StringBuilder html = new StringBuilder();
     for(Map.Entry<String,Fragment> fragment: getFragments().entrySet()) {
-      html.append("<section data-field=\"" + fragment.getKey() + "\">");
+      html.append("<section data-field=\"").append(fragment.getKey()).append("\">");
       html.append(getHtml(fragment.getKey(), linkResolver, htmlSerializer));
       html.append("</section>\n");
     }
