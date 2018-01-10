@@ -309,7 +309,7 @@ public interface Fragment {
      * @return target URL of the link
      */
     public String getUrl(LinkResolver resolver);
-    
+
     /**
      * Return the target of the link.
      * @return target of the link
@@ -763,8 +763,9 @@ public interface Fragment {
   }
 
   /**
-   * The depricated Simple Slice
+   * @deprecated use CompositeSlice instead
    */
+  @Deprecated
   public static class SimpleSlice implements Slice {
     private final String sliceType;
     private final String label;
