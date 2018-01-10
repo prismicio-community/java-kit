@@ -442,7 +442,7 @@ public class Api {
     if (ref == null) {
       ref = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
     }
-    return this.getByID(this.apiData.bookmarks.get(bookmark));
+    return this.getByID(this.apiData.bookmarks.get(bookmark), ref);
   }
 
   public Document getBookmark(String bookmark) {
