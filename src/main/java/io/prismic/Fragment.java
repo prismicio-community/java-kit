@@ -1405,17 +1405,15 @@ public interface Fragment {
       }
       String linkType = json.path("type").asText();
       JsonNode value = json.with("value");
-      if("Link.web".equals(linkType)) {
-        return Link.WebLink.parse(value);
-      }
-      else if("Link.document".equals(linkType)) {
-        return Link.DocumentLink.parse(value);
-      }
-      else if("Link.file".equals(linkType)) {
-        return Link.FileLink.parse(value);
-      }
-      else if("Link.image".equals(linkType)) {
-        return Link.ImageLink.parse(value);
+      switch (linkType) {
+        case "Link.web":
+          return WebLink.parse(value);
+        case "Link.document":
+          return DocumentLink.parse(value);
+        case "Link.file":
+          return FileLink.parse(value);
+        case "Link.image":
+          return ImageLink.parse(value);
       }
       return null;
     }
