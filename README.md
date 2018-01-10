@@ -19,7 +19,7 @@ This library is on Maven Central. The kit coordinates are:
 
 *(you may need to adapt the version number)*
 
-The kit requires **Java 7** or superior.
+The kit requires **Java 8** or superior.
 
 #### Documentation
 
@@ -38,13 +38,13 @@ Always run ```./mvnw test``` before committing, to make sure everything runs as 
 
 #### Test
 
-Please write tests using [JUnit3](http://junit.sourceforge.net/junit3.8.1/) for any bugfix or new feature; please add the tests to the [AppTest.java file](https://github.com/prismicio/java-kit/blob/master/src/test/java/io/prismic/AppTest.java). Run ```./mvnw test``` to test.
+Please write tests using [JUnit4](http://junit.org/junit4/) for any bugfix or new feature; please add the tests to the [AppTest.java file](https://github.com/prismicio/java-kit/blob/master/src/test/java/io/prismic/AppTest.java). Run ```./mvnw test``` to test.
 
 If you find existing code that is not optimally tested and wish to make it better, we really appreciate it; but you should document it on its own branch and its own pull request.
 
 #### Documenting
 
-Please document any bugfix or new feature using the [Javadoc syntax](http://docs.oracle.com/javase/1.5.0/docs/tooldocs/windows/javadoc.html)
+Please document any bugfix or new feature using the [Javadoc syntax](https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javadoc.html)
 
 If you find existing code that is not optimally documented and wish to make it better, we really appreciate it; but you should document it on its own branch and its own pull request.
 
@@ -58,7 +58,7 @@ If you find existing code that is not optimally documented and wish to make it b
 
 This software is licensed under the Apache 2 license, quoted below.
 
-Copyright 2017 Prismic.io (https://prismic.io).
+Copyright 2018 Prismic.io (https://prismic.io).
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
 
