@@ -80,13 +80,9 @@ public class Api {
   public static Api get(String endpoint, String accessToken, String defaultReference, final Cache cache, final Logger logger, final Proxy proxy) {
     final String url = (accessToken == null ? endpoint : (endpoint + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = cache.getOrSet(
-        url,
-        5000L,
-        new Cache.Callback() {
-            public JsonNode execute() {
-                return HttpClient.fetch(url, logger, null, proxy);
-            }
-        }
+      url,
+      5000L,
+      () -> HttpClient.fetch(url, logger, null, proxy)
     );
 
     ApiData apiData = ApiData.parse(json);
