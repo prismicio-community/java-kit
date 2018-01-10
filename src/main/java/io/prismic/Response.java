@@ -1,8 +1,10 @@
 package io.prismic;
 
-import java.util.*;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import com.fasterxml.jackson.databind.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Response {
 

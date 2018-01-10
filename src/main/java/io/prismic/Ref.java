@@ -1,8 +1,7 @@
 package io.prismic;
 
-import org.joda.time.*;
-
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.joda.time.DateTime;
 
 public class Ref {
 

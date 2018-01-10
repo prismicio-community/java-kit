@@ -1,10 +1,9 @@
 package io.prismic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.prismic.core.HttpClient;
+
 import java.util.*;
-
-import com.fasterxml.jackson.databind.*;
-
-import io.prismic.core.*;
 
 /**
  * A general usage RESTful form, manipulated by higher-level forms like {@link Form.SearchForm}.

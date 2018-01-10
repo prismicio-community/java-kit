@@ -1,12 +1,11 @@
 package io.prismic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.joda.time.DateTime;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
-
-import org.joda.time.DateTime;
-
-import com.fasterxml.jackson.databind.*;
 
 public class Document extends WithFragments {
 

@@ -1,14 +1,13 @@
 package io.prismic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.prismic.core.HttpClient;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Proxy;
 import java.util.*;
 import java.util.Map.Entry;
-
-import io.prismic.core.*;
-
-import com.fasterxml.jackson.databind.*;
 
 /**
  * Embodies an API endpoint, from which it is possible to make queries.

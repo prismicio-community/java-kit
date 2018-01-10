@@ -2,9 +2,6 @@ package io.prismic;
 
 import org.joda.time.DateTime;
 
-import java.util.Iterator;
-import java.util.List;
-
 class SimplePredicate implements Predicate {
 
   private final String name;

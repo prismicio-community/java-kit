@@ -1,9 +1,6 @@
 package io.prismic;
 
 
-import org.junit.Assert;
-import org.junit.Test;
-
 /**
  * Unit test for simple App.
  */

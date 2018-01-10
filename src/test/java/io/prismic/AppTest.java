@@ -5,7 +5,6 @@ import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import org.junit.Assert;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.littleshoot.proxy.HttpFilters;
@@ -18,8 +17,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**

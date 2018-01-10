@@ -1,13 +1,15 @@
 package io.prismic.core;
 
-import java.io.*;
-import java.net.*;
-
-import io.prismic.*;
-
-import com.fasterxml.jackson.databind.*;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.prismic.Api;
+import io.prismic.Cache;
+import io.prismic.Logger;
 import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
 
 public class HttpClient {
 

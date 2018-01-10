@@ -1,6 +1,6 @@
 package io.prismic;
 
-import java.util.*;
+import java.util.List;
 
 public class Main {
 
@@ -31,5 +31,5 @@ public class Main {
 
     System.out.println("DONE.");
   }
-  
+
 }

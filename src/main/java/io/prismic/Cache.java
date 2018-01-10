@@ -1,6 +1,6 @@
 package io.prismic;
 
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections4.map.LRUMap;
 
 public interface Cache {

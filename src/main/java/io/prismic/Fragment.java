@@ -1,13 +1,14 @@
 package io.prismic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
-import org.joda.time.*;
-import org.joda.time.format.*;
-
-import com.fasterxml.jackson.databind.*;
+import java.util.regex.Pattern;
 
 /**
  * A generic fragment of document
