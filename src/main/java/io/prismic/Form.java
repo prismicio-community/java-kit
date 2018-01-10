@@ -103,7 +103,7 @@ public class Form {
     String enctype = json.path("enctype").asText();
     String action = json.path("action").asText();
 
-    Map<String,Field> fields = new HashMap<String,Field>();
+    Map<String,Field> fields = new HashMap<>();
     Iterator<String> fieldsJson = json.with("fields").fieldNames();
     while(fieldsJson.hasNext()) {
       String field = fieldsJson.next();
@@ -133,10 +133,10 @@ public class Form {
     public SearchForm(Api api, Form form) {
       this.api = api;
       this.form = form;
-      this.data = new HashMap<String,List<String>>();
+      this.data = new HashMap<>();
       for(Map.Entry<String,Field> field: form.getFields().entrySet())
         if (field.getValue().getDefaultValue() != null) {
-          List<String> value = new ArrayList<String>(1);
+          List<String> value = new ArrayList<>(1);
           value.add(field.getValue().getDefaultValue());
           this.data.put(field.getKey(), value);
         }
@@ -163,12 +163,12 @@ public class Form {
       if (fieldDesc.isMultiple()) {
         List<String> existingValue = data.get(field);
         if(existingValue == null) {
-          existingValue = new ArrayList<String>();
+          existingValue = new ArrayList<>();
         }
         existingValue.add(value);
         data.put(field, existingValue);
       } else {
-        List<String> newValue = new ArrayList<String>();
+        List<String> newValue = new ArrayList<>();
         newValue.add(value);
         data.put(field, newValue);
       }
@@ -364,7 +364,7 @@ public class Form {
       if(fieldDesc != null && fieldDesc.isMultiple()) {
         return set("q", q);
       } else {
-        List<String> value = new ArrayList<String>();
+        List<String> value = new ArrayList<>();
         value.add(("[ " + (form.getFields().containsKey("q") ? strip(form.getFields().get("q").getDefaultValue()) : "") + " " + strip(q) + " ]"));
         this.data.put("q", value);
         return this;

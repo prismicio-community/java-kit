@@ -49,7 +49,7 @@ public class Response {
   static Response parse(JsonNode json) {
     Iterator<JsonNode> resultsJson = null;
     resultsJson = json.path("results").elements();
-    List<Document> results = new ArrayList<Document>();
+    List<Document> results = new ArrayList<>();
     while (resultsJson.hasNext()) {
       results.add(Document.parse(resultsJson.next()));
     }

@@ -159,7 +159,7 @@ public class Document extends WithFragments {
 
   static Map<String, Fragment> parseFragments(JsonNode json, String type) {
     Iterator<String> dataJson = json.fieldNames();
-    Map<String, Fragment> fragments = new LinkedHashMap<String, Fragment>();
+    Map<String, Fragment> fragments = new LinkedHashMap<>();
     while(dataJson.hasNext()) {
       String field = dataJson.next();
       JsonNode fieldJson = json.path(field);
@@ -197,7 +197,7 @@ public class Document extends WithFragments {
     DateTime lastPublicationDate = parseDateTime(json.path("last_publication_date"));
 
     Iterator<JsonNode> alternateLanguagesJson = json.withArray("alternate_languages").elements();
-    List<AlternateLanguage> alternateLanguages = new ArrayList<AlternateLanguage>();
+    List<AlternateLanguage> alternateLanguages = new ArrayList<>();
     while(alternateLanguagesJson.hasNext()) {
       JsonNode altLangJson = alternateLanguagesJson.next();
       String altLangId = altLangJson.path("id").asText();
@@ -208,13 +208,13 @@ public class Document extends WithFragments {
     }
 
     Iterator<JsonNode> tagsJson = json.withArray("tags").elements();
-    Set<String> tags = new HashSet<String>();
+    Set<String> tags = new HashSet<>();
     while(tagsJson.hasNext()) {
       tags.add(tagsJson.next().asText());
     }
 
     Iterator<JsonNode> slugsJson = json.withArray("slugs").elements();
-    List<String> slugs = new ArrayList<String>();
+    List<String> slugs = new ArrayList<>();
     while(slugsJson.hasNext()) {
       try {
         slugs.add(URLDecoder.decode(slugsJson.next().asText(), "UTF-8"));

@@ -93,7 +93,7 @@ public class Api {
     ApiData apiData = ApiData.parse(json);
     return new Api(apiData, accessToken, defaultReference, cache, logger, proxy);
   }
-  
+
   /**
    * Entry point to get an {@link Api} object.
    * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null, new Cache.BuiltInCache(999), new Logger.PrintlnLogger());</code>
@@ -201,7 +201,7 @@ public class Api {
   public Cache getCache() {
     return cache;
   }
-  
+
   public Proxy getProxy() {
 		return proxy;
 	}
@@ -269,7 +269,7 @@ public class Api {
    * @return the map &lt;name, proper_name&gt;
    */
   public Map<String, String> getFormNames() {
-      Map<String, String> formNames = new HashMap<String, String>();
+      Map<String, String> formNames = new HashMap<>();
       if (apiData.getForms() != null)
           for(Entry<String, Form> formEntry : apiData.getForms().entrySet())
               formNames.put(formEntry.getKey(), formEntry.getValue().getName());
@@ -549,33 +549,33 @@ public class Api {
     // --
 
     static ApiData parse(JsonNode json) {
-      List<Ref> refs = new ArrayList<Ref>();
+      List<Ref> refs = new ArrayList<>();
       Iterator<JsonNode> refsJson = json.withArray("refs").elements();
       while(refsJson.hasNext()) {
         refs.add(Ref.parse(refsJson.next()));
       }
 
-      Map<String,String> bookmarks = new HashMap<String,String>();
+      Map<String,String> bookmarks = new HashMap<>();
       Iterator<String> bookmarksJson = json.with("bookmarks").fieldNames();
       while(bookmarksJson.hasNext()) {
         String bookmark = bookmarksJson.next();
         bookmarks.put(bookmark, json.with("bookmarks").path(bookmark).asText());
       }
 
-      Map<String,String> types = new HashMap<String,String>();
+      Map<String,String> types = new HashMap<>();
       Iterator<String> typesJson = json.with("types").fieldNames();
       while(typesJson.hasNext()) {
         String type = typesJson.next();
         types.put(type, json.with("types").path(type).asText());
       }
 
-      List<String> tags = new ArrayList<String>();
+      List<String> tags = new ArrayList<>();
       Iterator<JsonNode> tagsJson = json.withArray("tags").elements();
       while(tagsJson.hasNext()) {
         tags.add(tagsJson.next().asText());
       }
 
-      Map<String,Form> forms = new HashMap<String,Form>();
+      Map<String,Form> forms = new HashMap<>();
       Iterator<String> formsJson = json.with("forms").fieldNames();
       while(formsJson.hasNext()) {
         String form = formsJson.next();

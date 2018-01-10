@@ -546,7 +546,7 @@ public interface Fragment {
       String type = document.path("type").asText();
       String slug = document.path("slug").asText();
       String lang = document.path("lang").asText();
-      Set<String> tags = new HashSet<String>();
+      Set<String> tags = new HashSet<>();
       for(JsonNode tagJson: document.withArray("tags")) {
         tags.add(tagJson.asText());
       }
@@ -656,7 +656,7 @@ public interface Fragment {
     }
 
     public Image(View main) {
-      this(main, new HashMap<String,View>());
+      this(main, new HashMap<>());
     }
 
     /**
@@ -698,7 +698,7 @@ public interface Fragment {
 
     public static Image parse(JsonNode json) {
       View main = View.parse(json.with("main"));
-      Map<String,View> views = new HashMap<String,View>();
+      Map<String,View> views = new HashMap<>();
       Iterator<String> viewsJson = json.with("views").fieldNames();
       while(viewsJson.hasNext()) {
         String view = viewsJson.next();
@@ -737,7 +737,7 @@ public interface Fragment {
     public String asHtml(LinkResolver linkResolver) {
       String className = "slice";
       if (this.label != null && !this.label.equals("null")) className += (" " + this.label);
-      List<GroupDoc> groupDocs = new ArrayList<GroupDoc>(Arrays.asList(this.nonRepeat));
+      List<GroupDoc> groupDocs = new ArrayList<>(Arrays.asList(this.nonRepeat));
       Group nonRepeat = this.nonRepeat != null ? new Group(groupDocs) : null;
       return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
         WithFragments.fragmentHtml(nonRepeat, linkResolver, null) +
@@ -820,7 +820,7 @@ public interface Fragment {
     }
 
     public static SliceZone parse(JsonNode json) {
-      List<Slice> slices = new ArrayList<Slice>();
+      List<Slice> slices = new ArrayList<>();
       for(JsonNode sliceJson: json) {
         String sliceType = sliceJson.path("slice_type").asText();
         String label = sliceJson.has("slice_label") ? sliceJson.path("slice_label").asText() : null;
@@ -1167,7 +1167,7 @@ public interface Fragment {
     }
 
     public String asHtml(List<Block> blocks, LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
-      List<BlockGroup> blockGroups = new ArrayList<BlockGroup>();
+      List<BlockGroup> blockGroups = new ArrayList<>();
       for(Block block: blocks) {
         BlockGroup lastOne = blockGroups.isEmpty() ? null : blockGroups.get(blockGroups.size() - 1);
         if(lastOne != null && "ul".equals(lastOne.tag) && block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
@@ -1177,17 +1177,17 @@ public interface Fragment {
           lastOne.blocks.add(block);
         }
         else if(block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
-          BlockGroup newBlockGroup = new BlockGroup("ul", new ArrayList<Block>());
+          BlockGroup newBlockGroup = new BlockGroup("ul", new ArrayList<>());
           newBlockGroup.blocks.add(block);
           blockGroups.add(newBlockGroup);
         }
         else if(block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
-          BlockGroup newBlockGroup = new BlockGroup("ol", new ArrayList<Block>());
+          BlockGroup newBlockGroup = new BlockGroup("ol", new ArrayList<>());
           newBlockGroup.blocks.add(block);
           blockGroups.add(newBlockGroup);
         }
         else {
-          BlockGroup newBlockGroup = new BlockGroup(null, new ArrayList<Block>());
+          BlockGroup newBlockGroup = new BlockGroup(null, new ArrayList<>());
           newBlockGroup.blocks.add(block);
           blockGroups.add(newBlockGroup);
         }
@@ -1318,15 +1318,15 @@ public interface Fragment {
         return escape(text);
       }
 
-      Map<Integer, List<Span>> tagsStart = new HashMap<Integer, List<Span>>();
-      Map<Integer, List<Span>> tagsEnd = new HashMap<Integer, List<Span>>();
+      Map<Integer, List<Span>> tagsStart = new HashMap<>();
+      Map<Integer, List<Span>> tagsEnd = new HashMap<>();
 
       for (Span span: spans) {
         if (!tagsStart.containsKey(span.getStart())) {
-          tagsStart.put(span.getStart(), new ArrayList<Span>());
+          tagsStart.put(span.getStart(), new ArrayList<>());
         }
         if (!tagsEnd.containsKey(span.getEnd())) {
-          tagsEnd.put(span.getEnd(), new ArrayList<Span>());
+          tagsEnd.put(span.getEnd(), new ArrayList<>());
         }
         tagsStart.get(span.getStart()).add(span);
         tagsEnd.get(span.getEnd()).add(span);
@@ -1334,7 +1334,7 @@ public interface Fragment {
 
       char c;
       String html = "";
-      Stack<Tuple<Span, String>> stack = new Stack<Tuple<Span, String>>();
+      Stack<Tuple<Span, String>> stack = new Stack<>();
       for (int pos = 0, len = text.length(); pos < len; pos++) {
         if (tagsEnd.containsKey(pos)) {
           for (Span span: tagsEnd.get(pos)) {
@@ -1347,14 +1347,14 @@ public interface Fragment {
             } else {
               // Add the content to the parent tag
               Tuple<Span, String> head = stack.pop();
-              stack.push(new Tuple<Span, String>(head.x, head.y + innerHtml));
+              stack.push(new Tuple<>(head.x, head.y + innerHtml));
             }
           }
         }
         if (tagsStart.containsKey(pos)) {
           for (Span span: tagsStart.get(pos)) {
             // Open a tag
-            stack.push(new Tuple<Span, String>(span, ""));
+            stack.push(new Tuple<>(span, ""));
           }
         }
         c = text.charAt(pos);
@@ -1365,7 +1365,7 @@ public interface Fragment {
         } else {
           // Inner text of a span
           Tuple<Span, String> head = stack.pop();
-          stack.push(new Tuple<Span, String>(head.x, head.y + escaped));
+          stack.push(new Tuple<>(head.x, head.y + escaped));
         }
       }
       // Close remaining tags
@@ -1378,7 +1378,7 @@ public interface Fragment {
         } else {
           // Add the content to the parent tag
           Tuple<Span, String> head = stack.pop();
-          stack.push(new Tuple<Span, String>(head.x, head.y + innerHtml));
+          stack.push(new Tuple<>(head.x, head.y + innerHtml));
         }
       }
       return html;
@@ -1461,7 +1461,7 @@ public interface Fragment {
 
     public static ParsedText parseText(JsonNode json) {
       String text = json.path("text").asText();
-      List<Span> spans = new ArrayList<Span>();
+      List<Span> spans = new ArrayList<>();
       for(JsonNode spanJson: json.withArray("spans")) {
         Span span = parseSpan(spanJson);
         if(span != null) {
@@ -1508,7 +1508,7 @@ public interface Fragment {
     }
 
     public static StructuredText parse(JsonNode json) {
-      List<Block> blocks = new ArrayList<Block>();
+      List<Block> blocks = new ArrayList<>();
       for(JsonNode blockJson: json) {
         Block block = parseBlock(blockJson);
         if(block != null) {
@@ -1543,7 +1543,7 @@ public interface Fragment {
      */
     @Deprecated
     public List<Map<String, Fragment>> toMapList() {
-      List<Map<String, Fragment>> result = new ArrayList<Map<String, Fragment>>();
+      List<Map<String, Fragment>> result = new ArrayList<>();
       for (GroupDoc groupDoc: this.groupDocs) {
         result.add(groupDoc.getFragments());
       }
@@ -1567,7 +1567,7 @@ public interface Fragment {
      * @return the properly initialized Fragment.Group object
      */
     public static Group parse(JsonNode json) {
-      List<GroupDoc> groupDocs = new ArrayList<GroupDoc>();
+      List<GroupDoc> groupDocs = new ArrayList<>();
       for(JsonNode groupJson : json) {
         groupDocs.add(parseGroupDoc(groupJson));
       }
@@ -1583,7 +1583,7 @@ public interface Fragment {
     public static GroupDoc parseGroupDoc(JsonNode groupJson) {
       // each groupJson looks like this: { "somelink" : { "type" : "Link.document", { ... } }, "someimage" : { ... } }
       Iterator<String> dataJson = groupJson.fieldNames();
-      Map<String, Fragment> fragmentMap = new LinkedHashMap<String, Fragment>();
+      Map<String, Fragment> fragmentMap = new LinkedHashMap<>();
       while (dataJson.hasNext()) {
         String field = dataJson.next();
         JsonNode fieldJson = groupJson.path(field);
