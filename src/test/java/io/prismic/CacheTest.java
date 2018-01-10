@@ -45,7 +45,7 @@ public class CacheTest
     }
 
     @Test
-    public void testFullCache() throws InterruptedException {
+    public void testFullCache() {
         Cache cache = fullCache;
         cache.set("/bar/1", TTL, defaultValue());
         Assert.assertEquals("Full cache should accept new entries", cache.get("/bar/1"), defaultValue());
