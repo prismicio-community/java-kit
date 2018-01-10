@@ -47,7 +47,7 @@ class SimplePredicate implements Predicate {
 
   private static String serializeField(Object value) {
     if (value instanceof Iterable) {
-      return "[" + join((Iterable)value, ",") + "]";
+      return "[" + join((Iterable)value) + "]";
     } else if (value instanceof Predicates.Month) {
       return ("\"" + capitalize(((Predicates.Month) value).name()) + "\"");
     } else if (value instanceof Predicates.DayOfWeek) {
@@ -61,7 +61,7 @@ class SimplePredicate implements Predicate {
     }
   }
 
-  private static <T> String join(Iterable<T> elements, String sep) {
+  private static <T> String join(Iterable<T> elements) {
     if (!elements.iterator().hasNext()) return "";
     StringBuilder result = new StringBuilder();
     boolean first = true;
@@ -69,7 +69,7 @@ class SimplePredicate implements Predicate {
       if (first) {
         first = false;
       } else {
-        result.append(sep);
+        result.append(",");
       }
       result.append("\"").append(elt).append("\"");
     }
