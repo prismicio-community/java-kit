@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class HttpClient {
 
   public static JsonNode fetch(String url, Logger logger, Cache cache, Proxy proxy) {
@@ -47,7 +49,7 @@ public class HttpClient {
           }
           return value;
         } else {
-          String body = (response != null) ? IOUtils.toString(response) : "";
+          String body = (response != null) ? IOUtils.toString(response, UTF_8) : "";
           throw new Api.Error(Api.Error.Code.UNEXPECTED, httpConnection.getResponseCode() + " (" + body + ")");
         }
       } catch (MalformedURLException e) {
@@ -71,10 +73,10 @@ public class HttpClient {
               throw new Api.Error(Api.Error.Code.AUTHORIZATION_NEEDED, errorText);
             }
           case 429:
-            body = (response != null) ? IOUtils.toString(response) : "";
+            body = (response != null) ? IOUtils.toString(response, UTF_8) : "";
             throw new Api.Error(Api.Error.Code.TOO_MANY_REQUESTS, "[429] " + body);
           default:
-            body = (response != null) ? IOUtils.toString(response) : "";
+            body = (response != null) ? IOUtils.toString(response, UTF_8) : "";
             throw new RuntimeException("HTTP error " + httpConnection.getResponseCode() + " (" + body + ")");
         }
       }
