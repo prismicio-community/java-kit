@@ -2,7 +2,7 @@ package io.prismic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -30,12 +30,12 @@ public class DocumentTest {
     Assert.assertEquals(
       "The geopoint latitude retrieval work well",
       doc.getGeoPoint("store.coordinates").getLatitude(),
-      48.877108d
+      Double.valueOf(48.877108d)
     );
     Assert.assertEquals(
       "The geopoint longitude retrieval work well",
       doc.getGeoPoint("store.coordinates").getLongitude(),
-      2.3338790d
+      Double.valueOf(2.3338790d)
     );
   }
 

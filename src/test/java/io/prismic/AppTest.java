@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -320,7 +320,7 @@ public class AppTest {
   //       16
   //     );
   // }
-  
+
   @Test
 	public void proxySupportOk() throws UnknownHostException {
 		ProxySpyHttpFiltersSource proxySpy = new ProxySpyHttpFiltersSource();
@@ -361,5 +361,5 @@ public class AppTest {
 		}
 	}
 
-  
+
 }
