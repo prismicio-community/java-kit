@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class ExperimentTest {
 
-  static String experimentsJson = "{"
+  static final String experimentsJson = "{"
       + "\"draft\": [{"
       + "\"id\": \"xxxxxxxxxxoGelsX\","
       + "\"name\": \"Exp 2\","

@@ -105,7 +105,7 @@ public interface Fragment {
 
     // --
 
-    private static DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+    private static final DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public static Timestamp parse(JsonNode json) {
       try {

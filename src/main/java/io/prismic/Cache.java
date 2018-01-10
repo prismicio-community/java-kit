@@ -32,7 +32,7 @@ public interface Cache {
 
   class DefaultCache {
 
-    private static Cache defaultCache = new BuiltInCache(999);
+    private static final Cache defaultCache = new BuiltInCache(999);
 
     private DefaultCache() {}
 
