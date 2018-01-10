@@ -19,7 +19,7 @@ public interface Fragment {
   /**
    * The Text type, represents a plain text
    */
-  public static class Text implements Fragment {
+  class Text implements Fragment {
     private final String value;
 
     public Text(String value) {
@@ -47,7 +47,7 @@ public interface Fragment {
   /**
    * A Date fragment. For date and time, see Timestamp.
    */
-  public static class Date implements Fragment {
+  class Date implements Fragment {
     private final LocalDate value;
 
     public Date(LocalDate value) {
@@ -83,7 +83,7 @@ public interface Fragment {
   /**
    * Timestamp fragment: date with time. For just date, see Date.
    */
-  public static class Timestamp implements Fragment {
+  class Timestamp implements Fragment {
     private final DateTime value;
 
     public Timestamp(DateTime value) {
@@ -121,7 +121,7 @@ public interface Fragment {
   /**
    * A Number fragment. Represented by a Double.
    */
-  public static class Number implements Fragment {
+  class Number implements Fragment {
     private final Double value;
 
     public Number(Double value) {
@@ -157,7 +157,7 @@ public interface Fragment {
   /**
    * A CSS color, represented by its hexadecimal representation (ex: #FF0000)
    */
-  public static class Color implements Fragment {
+  class Color implements Fragment {
     private final String hex;
 
     public Color(String hex) {
@@ -189,7 +189,7 @@ public interface Fragment {
   /**
    * A geographical point fragment, represented by longitude and latitude
    */
-  public static class GeoPoint implements Fragment {
+  class GeoPoint implements Fragment {
 
     private final Double latitude;
     private final Double longitude;
@@ -226,7 +226,7 @@ public interface Fragment {
   /**
    * An embeded object, typically coming from a third party service (example: YouTube video)
    */
-  public static class Embed implements Fragment {
+  class Embed implements Fragment {
     private final String type;
     private final String provider;
     private final String url;
@@ -301,23 +301,23 @@ public interface Fragment {
   /**
    * A Link fragment
    */
-  public static interface Link extends Fragment {
+  interface Link extends Fragment {
     /**
      * Return the target URL of the link. For WebLink the URL is directly received from
      * Prismic, for DocumentLink it is generated from the resolver you pass.
      * @param resolver DocumentLinkResolver, only used for DocumentLink.
      * @return target URL of the link
      */
-    public String getUrl(LinkResolver resolver);
+    String getUrl(LinkResolver resolver);
 
     /**
      * Return the target of the link.
      * @return target of the link
      */
-    public String getTarget();
+    String getTarget();
   }
 
-  public static class WebLink implements Link {
+  class WebLink implements Link {
     private final String url;
     private final String contentType;
     private final String target;
@@ -368,7 +368,7 @@ public interface Fragment {
   /**
    * Link to a file uploaded to Prismic's Media Library, for example a PDF file.
    */
-  public static class FileLink implements Link {
+  class FileLink implements Link {
     private final String url;
     private final String kind;
     private final Long size;
@@ -429,7 +429,7 @@ public interface Fragment {
   /**
    * Link to an image uploaded to Prismic's Media Library
    */
-  public static class ImageLink implements Link {
+  class ImageLink implements Link {
     private final String url;
 
     public ImageLink(String url) {
@@ -463,7 +463,7 @@ public interface Fragment {
    * but for Prismic to return any fragment you need to use the fetchLink parameter
    * when querying your repository.
    */
-  public static class DocumentLink extends WithFragments implements Link {
+  class DocumentLink extends WithFragments implements Link {
     private final String id;
     private final String uid;
     private final String type;
@@ -562,7 +562,7 @@ public interface Fragment {
    * An image fragment. Image are composed of several views that correspond to different sizes
    * of the same image.
    */
-  public static class Image implements Fragment {
+  class Image implements Fragment {
 
     /**
      * A View is a representation of an image at a specific size
@@ -618,7 +618,7 @@ public interface Fragment {
           String target = "";
           if (this.linkTo instanceof WebLink) {
             url = ((WebLink) this.linkTo).getUrl();
-            String webTarget = ((WebLink) this.linkTo).getTarget();
+            String webTarget = this.linkTo.getTarget();
             target = webTarget != null ? " target=\"" + webTarget + "\" rel=\"noopener\"" : "";
           } else if (this.linkTo instanceof ImageLink) {
             url = ((ImageLink) this.linkTo).getUrl();
@@ -712,16 +712,16 @@ public interface Fragment {
   /**
    * A generic Slice fragment
    */
-  public interface Slice {
+  interface Slice {
 
-    public String getSliceType();
-    public String getLabel();
+    String getSliceType();
+    String getLabel();
   }
 
   /**
    * The Composite Slice
    */
-  public static class CompositeSlice implements Slice {
+  class CompositeSlice implements Slice {
     private final String sliceType;
     private final String label;
     private final Group repeat;
@@ -766,7 +766,7 @@ public interface Fragment {
    * @deprecated use CompositeSlice instead
    */
   @Deprecated
-  public static class SimpleSlice implements Slice {
+  class SimpleSlice implements Slice {
     private final String sliceType;
     private final String label;
     private final Fragment value;
@@ -798,7 +798,7 @@ public interface Fragment {
     }
   }
 
-  public static class SliceZone implements Fragment {
+  class SliceZone implements Fragment {
     private final List<Slice> slices;
 
     public SliceZone(List<Slice> slices) {
@@ -848,20 +848,20 @@ public interface Fragment {
    * A Structured text, typically a text including blocks, formatting, links, images... As created
    * in the Writing Room.
    */
-  public static class StructuredText implements Fragment {
+  class StructuredText implements Fragment {
 
-    public static interface Element {}
+    public interface Element {}
 
-    public static interface Block extends Element {
+    public interface Block extends Element {
 
-      public String getLabel();
+      String getLabel();
 
-      public static interface Text extends Block {
-        public String getText();
-        public List<Span> getSpans();
+      interface Text extends Block {
+        String getText();
+        List<Span> getSpans();
       }
 
-      public static class Heading implements Text {
+      class Heading implements Text {
         private final String text;
         private final List<Span> spans;
         private final int level;
@@ -892,7 +892,7 @@ public interface Fragment {
 
       }
 
-      public static class Paragraph implements Text {
+      class Paragraph implements Text {
         private final String text;
         private final List<Span> spans;
         private final String label;
@@ -914,7 +914,7 @@ public interface Fragment {
         public String getLabel() { return label; }
       }
 
-      public static class Preformatted implements Text {
+      class Preformatted implements Text {
         private final String text;
         private final List<Span> spans;
         private final String label;
@@ -941,7 +941,7 @@ public interface Fragment {
       /**
        * A listitem, typically a "li" tag within a "ul" or "ol" (whether the ordered property is true or not)
        */
-      public static class ListItem implements Text {
+      class ListItem implements Text {
         private final String text;
         private final List<Span> spans;
         private final boolean ordered;
@@ -974,7 +974,7 @@ public interface Fragment {
       /**
        * An image within a StructuredText
        */
-      public static class Image implements Block {
+      class Image implements Block {
         private final Fragment.Image.View view;
         private final String label;
 
@@ -1007,7 +1007,7 @@ public interface Fragment {
       /**
        * An embed within a StructuredText
        */
-      public static class Embed implements Block {
+      class Embed implements Block {
         private final Fragment.Embed obj;
         private final String label;
 
@@ -1027,11 +1027,11 @@ public interface Fragment {
 
     }
 
-    public static interface Span extends Element {
-      public int getStart();
-      public int getEnd();
+    public interface Span extends Element {
+      int getStart();
+      int getEnd();
 
-      public static class Em implements Span {
+      class Em implements Span {
         private final int start;
         private final int end;
 
@@ -1049,7 +1049,7 @@ public interface Fragment {
         }
       }
 
-      public static class Strong implements Span {
+      class Strong implements Span {
         private final int start;
         private final int end;
 
@@ -1067,7 +1067,7 @@ public interface Fragment {
         }
       }
 
-      public static class Hyperlink implements Span {
+      class Hyperlink implements Span {
         private final int start;
         private final int end;
         private final Link link;
@@ -1091,7 +1091,7 @@ public interface Fragment {
         }
       }
 
-      public static class Label implements Span {
+      class Label implements Span {
         private final int start;
         private final int end;
         private final String label;
@@ -1523,7 +1523,7 @@ public interface Fragment {
   /**
    * Represents a Group fragment.
    */
-  public static class Group implements Fragment {
+  class Group implements Fragment {
     private final List<GroupDoc> groupDocs;
 
     public Group(List<GroupDoc> groupDocs) {

@@ -6,6 +6,6 @@ package io.prismic;
  */
 public interface HtmlSerializer {
 
-    public abstract String serialize(Fragment.StructuredText.Element element, String content);
+    String serialize(Fragment.StructuredText.Element element, String content);
 
 }

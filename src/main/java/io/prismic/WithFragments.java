@@ -276,9 +276,7 @@ public abstract class WithFragments {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.Text) {
       String value = ((Fragment.Text)fragment).getValue().toLowerCase();
-      if("yes".equals(value) || "true".equals(value)) {
-        return true;
-      }
+      return "yes".equals(value) || "true".equals(value);
     }
     return false;
   }
