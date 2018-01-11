@@ -53,7 +53,7 @@ public class HttpClient {
           throw new Api.Error(Api.Error.Code.UNEXPECTED, httpConnection.getResponseCode() + " (" + body + ")");
         }
       } catch (MalformedURLException e) {
-        throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
+        throw new Api.Error(Api.Error.Code.MALFORMED_URL, e);
       } catch (IOException e) {
         String body;
         String errorText = "Unknown error";
@@ -77,7 +77,7 @@ public class HttpClient {
         }
       }
     } catch(IOException e) {
-      throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
+      throw new Api.Error(Api.Error.Code.UNEXPECTED, e);
     }
   }
 
@@ -85,7 +85,7 @@ public class HttpClient {
     try {
       return URLEncoder.encode(str, "utf-8");
     } catch(Exception e) {
-      throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
+      throw new Api.Error(Api.Error.Code.UNEXPECTED, e);
     }
   }
 

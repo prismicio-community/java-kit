@@ -53,6 +53,16 @@ public class Api {
       this.code = code;
     }
 
+    public Error(Code code, String message, Throwable throwable) {
+      super(message, throwable);
+      this.code = code;
+    }
+
+    public Error(Code code, Throwable throwable) {
+      super(throwable);
+      this.code = code;
+    }
+
     public Code getCode() {
       return code;
     }
