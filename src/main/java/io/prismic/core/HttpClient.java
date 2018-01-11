@@ -57,13 +57,9 @@ public class HttpClient {
       } catch (IOException e) {
         String body;
         String errorText = "Unknown error";
-        try {
-          JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
-          if (errorJson != null) {
-            errorText = errorJson.get("error").asText();
-          }
-        } catch (Exception ex) {
-          ex.printStackTrace();
+        JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
+        if (errorJson != null) {
+          errorText = errorJson.get("error").asText();
         }
         switch(httpConnection.getResponseCode()) {
           case 401:
@@ -81,7 +77,6 @@ public class HttpClient {
         }
       }
     } catch(IOException e) {
-      e.printStackTrace();
       throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
     }
   }
