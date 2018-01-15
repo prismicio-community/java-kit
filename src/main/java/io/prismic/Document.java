@@ -156,18 +156,14 @@ public class Document extends WithFragments {
           String fragmentType = fieldJson.path(i).path("type").asText();
           JsonNode fragmentValue = fieldJson.path(i).path("value");
           Fragment fragment = parseFragment(fragmentType, fragmentValue);
-          if(fragment != null) {
-            fragments.put(fragmentName, fragment);
-          }
+          fragments.put(fragmentName, fragment);
         }
       } else {
         String fragmentName = type + "." + field;
         String fragmentType = fieldJson.path("type").asText();
         JsonNode fragmentValue = fieldJson.path("value");
         Fragment fragment = parseFragment(fragmentType, fragmentValue);
-        if(fragment != null) {
-          fragments.put(fragmentName, fragment);
-        }
+        fragments.put(fragmentName, fragment);
       }
     }
     return fragments;
