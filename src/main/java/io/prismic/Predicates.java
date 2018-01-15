@@ -1,6 +1,6 @@
 package io.prismic;
 
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
 
 public class Predicates {
 
@@ -63,15 +63,15 @@ public class Predicates {
     return new SimplePredicate("number.inRange", fragment, lowerBound, upperBound);
   }
 
-  public static Predicate dateBefore(String fragment, DateTime before) {
+  public static Predicate dateBefore(String fragment, ZonedDateTime before) {
     return new SimplePredicate("date.before", fragment, before);
   }
 
-  public static Predicate dateAfter(String fragment, DateTime after) {
+  public static Predicate dateAfter(String fragment, ZonedDateTime after) {
     return new SimplePredicate("date.after", fragment, after);
   }
 
-  public static Predicate dateBetween(String fragment, DateTime lower, DateTime upper) {
+  public static Predicate dateBetween(String fragment, ZonedDateTime lower, ZonedDateTime upper) {
     return new SimplePredicate("date.between", fragment, lower, upper);
   }
 

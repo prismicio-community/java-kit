@@ -2,13 +2,14 @@ package io.prismic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.List;
+
+import static java.time.ZoneOffset.UTC;
 
 public class DocumentTest {
 
@@ -124,15 +125,7 @@ public class DocumentTest {
     Document doc = Document.parse(node);
 
     Assert.assertEquals(
-      DateTime.now()
-        .withZone( DateTimeZone.UTC )
-        .withYear( 2017 )
-        .withMonthOfYear( 1 )
-        .withDayOfMonth( 13 )
-        .withHourOfDay( 11 )
-        .withMinuteOfHour( 45 )
-        .withSecondOfMinute( 21 )
-        .withMillisOfSecond( 0 ),
+      ZonedDateTime.of(2017, 1, 13, 11, 45, 21, 0, UTC),
       doc.getFirstPublicationDate()
     );
   }
@@ -143,15 +136,7 @@ public class DocumentTest {
     Document doc = Document.parse(node);
 
     Assert.assertEquals(
-      DateTime.now()
-        .withZone( DateTimeZone.UTC )
-        .withYear( 2017 )
-        .withMonthOfYear( 2 )
-        .withDayOfMonth( 21 )
-        .withHourOfDay( 16 )
-        .withMinuteOfHour( 5 )
-        .withSecondOfMinute( 19 )
-        .withMillisOfSecond( 0 ),
+      ZonedDateTime.of(2017, 2, 21, 16, 5, 19, 0, UTC),
       doc.getLastPublicationDate()
     );
   }

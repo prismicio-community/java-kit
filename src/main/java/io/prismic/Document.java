@@ -2,13 +2,16 @@ package io.prismic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.prismic.Fragment.Link;
-import org.joda.time.DateTime;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Document extends WithFragments {
+
+  private static final DateTimeFormatter PUBLICATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
   private final String id;
   private final String uid;
@@ -18,11 +21,11 @@ public class Document extends WithFragments {
   private final String type;
   private final String lang;
   private final List<AlternateLanguage> alternateLanguages;
-  private final DateTime firstPublicationDate;
-  private final DateTime lastPublicationDate;
+  private final ZonedDateTime firstPublicationDate;
+  private final ZonedDateTime lastPublicationDate;
   private final Map<String, Fragment> fragments;
 
-  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, String lang, List<AlternateLanguage> alternateLanguages, DateTime firstPublicationDate, DateTime lastPublicationDate, Map<String,Fragment> fragments) {
+  public Document(String id, String uid, String type, String href, Set<String> tags, List<String> slugs, String lang, List<AlternateLanguage> alternateLanguages, ZonedDateTime firstPublicationDate, ZonedDateTime lastPublicationDate, Map<String, Fragment> fragments) {
     this.id = id;
     this.uid = uid;
     this.type = type;
@@ -75,11 +78,11 @@ public class Document extends WithFragments {
     return alternateLanguages;
   }
 
-  public DateTime getFirstPublicationDate() {
+  public ZonedDateTime getFirstPublicationDate() {
     return firstPublicationDate;
   }
 
-  public DateTime getLastPublicationDate() {
+  public ZonedDateTime getLastPublicationDate() {
     return lastPublicationDate;
   }
 
@@ -179,8 +182,8 @@ public class Document extends WithFragments {
     String href = json.path("href").asText();
     String type = json.path("type").asText();
     String lang = json.path("lang").asText();
-    DateTime firstPublicationDate = parseDateTime(json.path("first_publication_date"));
-    DateTime lastPublicationDate = parseDateTime(json.path("last_publication_date"));
+    ZonedDateTime firstPublicationDate = parseDateTime(json.path("first_publication_date"));
+    ZonedDateTime lastPublicationDate = parseDateTime(json.path("last_publication_date"));
 
     Iterator<JsonNode> alternateLanguagesJson = json.withArray("alternate_languages").elements();
     List<AlternateLanguage> alternateLanguages = new ArrayList<>();
@@ -215,9 +218,9 @@ public class Document extends WithFragments {
     return new Document(id, uid, type, href, tags, slugs, lang, alternateLanguages, firstPublicationDate, lastPublicationDate, fragments);
   }
 
-  private static DateTime parseDateTime(JsonNode json) {
-    return json.asText().equals("null")
+  private static ZonedDateTime parseDateTime(JsonNode json) {
+    return "null".equals(json.asText())
       ? null
-      : DateTime.parse( json.asText() );
+      : ZonedDateTime.parse(json.asText(), PUBLICATION_DATE_FORMATTER);
   }
 }

@@ -1,6 +1,6 @@
 package io.prismic;
 
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
 
 class SimplePredicate implements Predicate {
 
@@ -54,8 +54,8 @@ class SimplePredicate implements Predicate {
       return ("\"" + capitalize(((Predicates.DayOfWeek) value).name()) + "\"");
     } else if (value instanceof String) {
       return ("\"" + value + "\"");
-    } else if (value instanceof DateTime) {
-      return Long.toString(((DateTime) value).getMillis());
+    } else if (value instanceof ZonedDateTime) {
+      return Long.toString(((ZonedDateTime) value).toInstant().toEpochMilli());
     } else {
       return value.toString();
     }
