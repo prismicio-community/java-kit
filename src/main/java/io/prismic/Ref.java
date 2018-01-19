@@ -1,7 +1,8 @@
 package io.prismic;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.joda.time.DateTime;
+
+import java.time.ZonedDateTime;
 
 public class Ref {
 
@@ -9,9 +10,9 @@ public class Ref {
   final private String ref;
   final private String label;
   final private boolean masterRef;
-  final private DateTime scheduledAt;
+  final private ZonedDateTime scheduledAt;
 
-  public Ref(String id, String ref, String label, boolean masterRef, DateTime scheduledAt) {
+  public Ref(String id, String ref, String label, boolean masterRef, ZonedDateTime scheduledAt) {
     this.id = id;
     this.ref = ref;
     this.label = label;
@@ -35,7 +36,7 @@ public class Ref {
     return masterRef;
   }
 
-  public DateTime getScheduledAt() {
+  public ZonedDateTime getScheduledAt() {
     return scheduledAt;
   }
 

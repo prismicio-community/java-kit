@@ -1,11 +1,10 @@
 package io.prismic;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,7 +59,7 @@ public interface Fragment {
     }
 
     public String asText(String pattern) {
-      return value.toString(pattern);
+      return value.format(DateTimeFormatter.ofPattern(pattern));
     }
 
     public String asHtml() {
@@ -68,10 +67,11 @@ public interface Fragment {
     }
 
     // --
+    private static final DateTimeFormatter DATE_FRAGMENT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static Date parse(JsonNode json) {
       try {
-        return new Date(LocalDate.parse(json.asText(), DateTimeFormat.forPattern("yyyy-MM-dd")));
+        return new Date(LocalDate.parse(json.asText(), DATE_FRAGMENT_FORMATTER));
       } catch(Exception e) {
         return null;
       }
@@ -85,18 +85,18 @@ public interface Fragment {
    * Timestamp fragment: date with time. For just date, see Date.
    */
   class Timestamp implements Fragment {
-    private final DateTime value;
+    private final ZonedDateTime value;
 
-    public Timestamp(DateTime value) {
+    public Timestamp(ZonedDateTime value) {
       this.value = value;
     }
 
-    public DateTime getValue() {
+    public ZonedDateTime getValue() {
       return value;
     }
 
     public String asText(String pattern) {
-      return value.toString(pattern);
+      return value.format(DateTimeFormatter.ofPattern(pattern));
     }
 
     public String asHtml() {
@@ -105,11 +105,11 @@ public interface Fragment {
 
     // --
 
-    private static final DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+    private static final DateTimeFormatter TIMESTAMP_FRAGMENT_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public static Timestamp parse(JsonNode json) {
       try {
-        return new Timestamp(DateTime.parse(json.asText(), isoFormat));
+        return new Timestamp(ZonedDateTime.parse(json.asText(), TIMESTAMP_FRAGMENT_FORMATTER));
       } catch(Exception e) {
         return null;
       }
