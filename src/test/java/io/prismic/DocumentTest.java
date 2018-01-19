@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DocumentTest {
 
-  final LinkResolver linkResolver = new SimpleLinkResolver() {
+  private final LinkResolver linkResolver = new SimpleLinkResolver() {
     public String resolve(Fragment.DocumentLink link) {
       return "/"+link.getId()+"/"+link.getSlug();
     }
@@ -272,6 +272,30 @@ public class DocumentTest {
     Assert.assertEquals(
       "<p>Line<br/>with<br/><br/>line breaks</p>",
       text.asHtml(linkResolver)
+    );
+  }
+
+  @Test
+  public void fragmentWithNoType() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"value\": { \"id\": \"5708520413001\", \"data\": { \"key1\": \"value1\", \"key2\": \"value2\" }, \"an_integer\": 123456789 } }";
+    JsonNode json = mapper.readTree(jsonString);
+    Fragment.Raw raw = Fragment.Raw.parse(json.path("value"));
+    Assert.assertEquals(
+      "{\"id\":\"5708520413001\",\"data\":{\"key1\":\"value1\",\"key2\":\"value2\"},\"an_integer\":123456789}",
+      raw.asText()
+    );
+  }
+
+  @Test
+  public void fragmentWithUnknownType() throws Exception {
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonString = "{ \"type\": \"Unknown\", \"value\": { \"id\": \"5708520413001\", \"data\": { \"key1\": \"value1\", \"key2\": \"value2\" }, \"an_integer\": 123456789 } }";
+    JsonNode json = mapper.readTree(jsonString);
+    Fragment.Raw raw = Fragment.Raw.parse(json.path("value"));
+    Assert.assertEquals(
+      "{\"id\":\"5708520413001\",\"data\":{\"key1\":\"value1\",\"key2\":\"value2\"},\"an_integer\":123456789}",
+      raw.asText()
     );
   }
 

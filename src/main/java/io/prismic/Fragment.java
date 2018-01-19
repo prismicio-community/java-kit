@@ -1589,11 +1589,35 @@ public interface Fragment {
         String fragmentType = fieldJson.path("type").asText();
         JsonNode fragmentValue = fieldJson.path("value");
         Fragment fragment = Document.parseFragment(fragmentType, fragmentValue);
-        if (fragment != null) fragmentMap.put(field, fragment);
+        fragmentMap.put(field, fragment);
       }
       return new GroupDoc(fragmentMap);
     }
 
+  }
+
+  /**
+   * Represents a raw fragment from which you can retrieve json in order to handle it manually
+   */
+  class Raw implements Fragment {
+
+    private final JsonNode value;
+
+    public Raw(JsonNode value) {
+      this.value = value;
+    }
+
+    public JsonNode getValue() {
+      return value;
+    }
+
+    public String asText() {
+      return value.toString();
+    }
+
+    public static Raw parse(JsonNode json) {
+      return new Raw(json);
+    }
   }
 
 }

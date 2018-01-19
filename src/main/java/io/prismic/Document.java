@@ -104,7 +104,6 @@ public class Document extends WithFragments {
     return new Fragment.DocumentLink(id, uid, type, tags, getSlug(), lang, fragments, false);
   }
 
-  // --
   static Fragment parseFragment(String type, JsonNode json) {
     switch (type) {
       case "StructuredText":
@@ -139,8 +138,9 @@ public class Document extends WithFragments {
         return Fragment.Group.parse(json);
       case "SliceZone":
         return Fragment.SliceZone.parse(json);
+      default:
+        return Fragment.Raw.parse(json);
     }
-    return null;
   }
 
   static Map<String, Fragment> parseFragments(JsonNode json, String type) {
@@ -156,18 +156,14 @@ public class Document extends WithFragments {
           String fragmentType = fieldJson.path(i).path("type").asText();
           JsonNode fragmentValue = fieldJson.path(i).path("value");
           Fragment fragment = parseFragment(fragmentType, fragmentValue);
-          if(fragment != null) {
-            fragments.put(fragmentName, fragment);
-          }
+          fragments.put(fragmentName, fragment);
         }
       } else {
         String fragmentName = type + "." + field;
         String fragmentType = fieldJson.path("type").asText();
         JsonNode fragmentValue = fieldJson.path("value");
         Fragment fragment = parseFragment(fragmentType, fragmentValue);
-        if(fragment != null) {
-          fragments.put(fragmentName, fragment);
-        }
+        fragments.put(fragmentName, fragment);
       }
     }
     return fragments;
