@@ -2,14 +2,14 @@ package io.prismic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 
 public class ExperimentTest {
 
-  static String experimentsJson = "{"
+  static final String experimentsJson = "{"
       + "\"draft\": [{"
       + "\"id\": \"xxxxxxxxxxoGelsX\","
       + "\"name\": \"Exp 2\","

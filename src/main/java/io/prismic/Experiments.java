@@ -26,7 +26,7 @@ public class Experiments {
    */
   public synchronized List<Experiment> getAll() {
     if (all == null) {
-      all = new ArrayList<Experiment>();
+      all = new ArrayList<>();
       all.addAll(this.draft);
       all.addAll(this.running);
     }
@@ -78,8 +78,8 @@ public class Experiments {
   }
 
   public static Experiments parse(JsonNode json) {
-    List<Experiment> draft = new ArrayList<Experiment>();
-    List<Experiment> running = new ArrayList<Experiment>();
+    List<Experiment> draft = new ArrayList<>();
+    List<Experiment> running = new ArrayList<>();
     Iterator<JsonNode> it;
 
     JsonNode draftJson = json.path("draft");

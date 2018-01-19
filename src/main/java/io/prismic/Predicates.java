@@ -2,8 +2,6 @@ package io.prismic;
 
 import org.joda.time.DateTime;
 
-import java.util.List;
-
 public class Predicates {
 
   public enum DayOfWeek {

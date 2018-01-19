@@ -44,7 +44,7 @@ public class Experiment {
     String googleId = json.path("googleId").asText();
     String name = json.path("name").asText();
 
-    List<Variation> variations = new ArrayList<Variation>();
+    List<Variation> variations = new ArrayList<>();
     Iterator<JsonNode> variationsJson = json.withArray("variations").elements();
     while(variationsJson.hasNext()) {
       variations.add(Variation.parse(variationsJson.next()));

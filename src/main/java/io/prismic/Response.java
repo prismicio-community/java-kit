@@ -1,8 +1,10 @@
 package io.prismic;
 
-import java.util.*;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import com.fasterxml.jackson.databind.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Response {
 
@@ -47,9 +49,9 @@ public class Response {
   }
 
   static Response parse(JsonNode json) {
-    Iterator<JsonNode> resultsJson = null;
+    Iterator<JsonNode> resultsJson;
     resultsJson = json.path("results").elements();
-    List<Document> results = new ArrayList<Document>();
+    List<Document> results = new ArrayList<>();
     while (resultsJson.hasNext()) {
       results.add(Document.parse(resultsJson.next()));
     }

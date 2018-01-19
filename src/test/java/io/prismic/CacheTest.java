@@ -1,10 +1,10 @@
 package io.prismic;
 
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.prismic.Cache.BuiltInCache;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -45,7 +45,7 @@ public class CacheTest
     }
 
     @Test
-    public void testFullCache() throws InterruptedException {
+    public void testFullCache() {
         Cache cache = fullCache;
         cache.set("/bar/1", TTL, defaultValue());
         Assert.assertEquals("Full cache should accept new entries", cache.get("/bar/1"), defaultValue());

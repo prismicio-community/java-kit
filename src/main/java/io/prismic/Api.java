@@ -1,14 +1,13 @@
 package io.prismic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.prismic.core.HttpClient;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Proxy;
 import java.util.*;
 import java.util.Map.Entry;
-
-import io.prismic.core.*;
-
-import com.fasterxml.jackson.databind.*;
 
 /**
  * Embodies an API endpoint, from which it is possible to make queries.
@@ -54,6 +53,16 @@ public class Api {
       this.code = code;
     }
 
+    public Error(Code code, String message, Throwable throwable) {
+      super(message, throwable);
+      this.code = code;
+    }
+
+    public Error(Code code, Throwable throwable) {
+      super(throwable);
+      this.code = code;
+    }
+
     public Code getCode() {
       return code;
     }
@@ -81,19 +90,15 @@ public class Api {
   public static Api get(String endpoint, String accessToken, String defaultReference, final Cache cache, final Logger logger, final Proxy proxy) {
     final String url = (accessToken == null ? endpoint : (endpoint + "?access_token=" + HttpClient.encodeURIComponent(accessToken)));
     JsonNode json = cache.getOrSet(
-        url,
-        5000L,
-        new Cache.Callback() {
-            public JsonNode execute() {
-                return HttpClient.fetch(url, logger, null, proxy);
-            }
-        }
+      url,
+      5000L,
+      () -> HttpClient.fetch(url, logger, null, proxy)
     );
 
     ApiData apiData = ApiData.parse(json);
     return new Api(apiData, accessToken, defaultReference, cache, logger, proxy);
   }
-  
+
   /**
    * Entry point to get an {@link Api} object.
    * Example: <code>API api = API.get("https://lesbonneschoses.prismic.io/api", null, new Cache.BuiltInCache(999), new Logger.PrintlnLogger());</code>
@@ -201,7 +206,7 @@ public class Api {
   public Cache getCache() {
     return cache;
   }
-  
+
   public Proxy getProxy() {
 		return proxy;
 	}
@@ -269,7 +274,7 @@ public class Api {
    * @return the map &lt;name, proper_name&gt;
    */
   public Map<String, String> getFormNames() {
-      Map<String, String> formNames = new HashMap<String, String>();
+      Map<String, String> formNames = new HashMap<>();
       if (apiData.getForms() != null)
           for(Entry<String, Form> formEntry : apiData.getForms().entrySet())
               formNames.put(formEntry.getKey(), formEntry.getValue().getName());
@@ -447,7 +452,7 @@ public class Api {
     if (ref == null) {
       ref = this.defaultReference == null ? this.getMaster().getRef() : this.defaultReference;
     }
-    return this.getByID(this.apiData.bookmarks.get(bookmark));
+    return this.getByID(this.apiData.bookmarks.get(bookmark), ref);
   }
 
   public Document getBookmark(String bookmark) {
@@ -549,33 +554,33 @@ public class Api {
     // --
 
     static ApiData parse(JsonNode json) {
-      List<Ref> refs = new ArrayList<Ref>();
+      List<Ref> refs = new ArrayList<>();
       Iterator<JsonNode> refsJson = json.withArray("refs").elements();
       while(refsJson.hasNext()) {
         refs.add(Ref.parse(refsJson.next()));
       }
 
-      Map<String,String> bookmarks = new HashMap<String,String>();
+      Map<String,String> bookmarks = new HashMap<>();
       Iterator<String> bookmarksJson = json.with("bookmarks").fieldNames();
       while(bookmarksJson.hasNext()) {
         String bookmark = bookmarksJson.next();
         bookmarks.put(bookmark, json.with("bookmarks").path(bookmark).asText());
       }
 
-      Map<String,String> types = new HashMap<String,String>();
+      Map<String,String> types = new HashMap<>();
       Iterator<String> typesJson = json.with("types").fieldNames();
       while(typesJson.hasNext()) {
         String type = typesJson.next();
         types.put(type, json.with("types").path(type).asText());
       }
 
-      List<String> tags = new ArrayList<String>();
+      List<String> tags = new ArrayList<>();
       Iterator<JsonNode> tagsJson = json.withArray("tags").elements();
       while(tagsJson.hasNext()) {
         tags.add(tagsJson.next().asText());
       }
 
-      Map<String,Form> forms = new HashMap<String,Form>();
+      Map<String,Form> forms = new HashMap<>();
       Iterator<String> formsJson = json.with("forms").fieldNames();
       while(formsJson.hasNext()) {
         String form = formsJson.next();

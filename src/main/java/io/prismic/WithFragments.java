@@ -9,7 +9,7 @@ public abstract class WithFragments {
   public abstract Map<String, Fragment> getFragments();
 
   public List<Fragment.DocumentLink> getLinkedDocuments() {
-    List<Fragment.DocumentLink> result = new ArrayList<Fragment.DocumentLink>();
+    List<Fragment.DocumentLink> result = new ArrayList<>();
     for (Fragment fragment: getFragments().values()) {
       if (fragment instanceof Fragment.DocumentLink) {
         result.add((Fragment.DocumentLink)fragment);
@@ -51,7 +51,7 @@ public abstract class WithFragments {
   }
 
   public List<Fragment> getAll(String field) {
-    List<Fragment> result = new ArrayList<Fragment>();
+    List<Fragment> result = new ArrayList<>();
     for(Map.Entry<String,Fragment> entry: getFragments().entrySet()) {
       if(entry.getKey().matches("\\Q" + field + "\\E\\[\\d+\\]")) {
         result.add(entry.getValue());
@@ -77,7 +77,7 @@ public abstract class WithFragments {
 
   public List<Fragment.Image> getAllImages(String field) {
     List<Fragment> fragments = getAll(field);
-    List<Fragment.Image> images = new ArrayList<Fragment.Image>();
+    List<Fragment.Image> images = new ArrayList<>();
     for(Fragment fragment: fragments) {
       if(fragment != null && fragment instanceof Fragment.Image) {
         images.add((Fragment.Image)fragment);
@@ -102,7 +102,7 @@ public abstract class WithFragments {
   }
 
   public List<Fragment.Image.View> getAllImages(String field, String view) {
-    List<Fragment.Image.View> views = new ArrayList<Fragment.Image.View>();
+    List<Fragment.Image.View> views = new ArrayList<>();
     for (Fragment.Image image: getAllImages(field)) {
       Fragment.Image.View imageView = image.getView(view);
       if (imageView != null) {
@@ -276,9 +276,7 @@ public abstract class WithFragments {
     Fragment fragment = get(field);
     if(fragment != null && fragment instanceof Fragment.Text) {
       String value = ((Fragment.Text)fragment).getValue().toLowerCase();
-      if("yes".equals(value) || "true".equals(value)) {
-        return true;
-      }
+      return "yes".equals(value) || "true".equals(value);
     }
     return false;
   }
@@ -290,7 +288,7 @@ public abstract class WithFragments {
   public String asHtml(LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
     StringBuilder html = new StringBuilder();
     for(Map.Entry<String,Fragment> fragment: getFragments().entrySet()) {
-      html.append("<section data-field=\"" + fragment.getKey() + "\">");
+      html.append("<section data-field=\"").append(fragment.getKey()).append("\">");
       html.append(getHtml(fragment.getKey(), linkResolver, htmlSerializer));
       html.append("</section>\n");
     }

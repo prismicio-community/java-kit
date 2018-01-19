@@ -1,13 +1,14 @@
 package io.prismic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
-import org.joda.time.*;
-import org.joda.time.format.*;
-
-import com.fasterxml.jackson.databind.*;
+import java.util.regex.Pattern;
 
 /**
  * A generic fragment of document
@@ -19,7 +20,7 @@ public interface Fragment {
   /**
    * The Text type, represents a plain text
    */
-  public static class Text implements Fragment {
+  class Text implements Fragment {
     private final String value;
 
     public Text(String value) {
@@ -47,7 +48,7 @@ public interface Fragment {
   /**
    * A Date fragment. For date and time, see Timestamp.
    */
-  public static class Date implements Fragment {
+  class Date implements Fragment {
     private final LocalDate value;
 
     public Date(LocalDate value) {
@@ -83,7 +84,7 @@ public interface Fragment {
   /**
    * Timestamp fragment: date with time. For just date, see Date.
    */
-  public static class Timestamp implements Fragment {
+  class Timestamp implements Fragment {
     private final DateTime value;
 
     public Timestamp(DateTime value) {
@@ -104,7 +105,7 @@ public interface Fragment {
 
     // --
 
-    private static DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
+    private static final DateTimeFormatter isoFormat = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ");
 
     public static Timestamp parse(JsonNode json) {
       try {
@@ -121,7 +122,7 @@ public interface Fragment {
   /**
    * A Number fragment. Represented by a Double.
    */
-  public static class Number implements Fragment {
+  class Number implements Fragment {
     private final Double value;
 
     public Number(Double value) {
@@ -157,7 +158,7 @@ public interface Fragment {
   /**
    * A CSS color, represented by its hexadecimal representation (ex: #FF0000)
    */
-  public static class Color implements Fragment {
+  class Color implements Fragment {
     private final String hex;
 
     public Color(String hex) {
@@ -189,7 +190,7 @@ public interface Fragment {
   /**
    * A geographical point fragment, represented by longitude and latitude
    */
-  public static class GeoPoint implements Fragment {
+  class GeoPoint implements Fragment {
 
     private final Double latitude;
     private final Double longitude;
@@ -226,7 +227,7 @@ public interface Fragment {
   /**
    * An embeded object, typically coming from a third party service (example: YouTube video)
    */
-  public static class Embed implements Fragment {
+  class Embed implements Fragment {
     private final String type;
     private final String provider;
     private final String url;
@@ -301,23 +302,23 @@ public interface Fragment {
   /**
    * A Link fragment
    */
-  public static interface Link extends Fragment {
+  interface Link extends Fragment {
     /**
      * Return the target URL of the link. For WebLink the URL is directly received from
      * Prismic, for DocumentLink it is generated from the resolver you pass.
      * @param resolver DocumentLinkResolver, only used for DocumentLink.
      * @return target URL of the link
      */
-    public String getUrl(LinkResolver resolver);
-    
+    String getUrl(LinkResolver resolver);
+
     /**
      * Return the target of the link.
      * @return target of the link
      */
-    public String getTarget();
+    String getTarget();
   }
 
-  public static class WebLink implements Link {
+  class WebLink implements Link {
     private final String url;
     private final String contentType;
     private final String target;
@@ -368,7 +369,7 @@ public interface Fragment {
   /**
    * Link to a file uploaded to Prismic's Media Library, for example a PDF file.
    */
-  public static class FileLink implements Link {
+  class FileLink implements Link {
     private final String url;
     private final String kind;
     private final Long size;
@@ -429,7 +430,7 @@ public interface Fragment {
   /**
    * Link to an image uploaded to Prismic's Media Library
    */
-  public static class ImageLink implements Link {
+  class ImageLink implements Link {
     private final String url;
 
     public ImageLink(String url) {
@@ -463,7 +464,7 @@ public interface Fragment {
    * but for Prismic to return any fragment you need to use the fetchLink parameter
    * when querying your repository.
    */
-  public static class DocumentLink extends WithFragments implements Link {
+  class DocumentLink extends WithFragments implements Link {
     private final String id;
     private final String uid;
     private final String type;
@@ -546,7 +547,7 @@ public interface Fragment {
       String type = document.path("type").asText();
       String slug = document.path("slug").asText();
       String lang = document.path("lang").asText();
-      Set<String> tags = new HashSet<String>();
+      Set<String> tags = new HashSet<>();
       for(JsonNode tagJson: document.withArray("tags")) {
         tags.add(tagJson.asText());
       }
@@ -562,7 +563,7 @@ public interface Fragment {
    * An image fragment. Image are composed of several views that correspond to different sizes
    * of the same image.
    */
-  public static class Image implements Fragment {
+  class Image implements Fragment {
 
     /**
      * A View is a representation of an image at a specific size
@@ -618,7 +619,7 @@ public interface Fragment {
           String target = "";
           if (this.linkTo instanceof WebLink) {
             url = ((WebLink) this.linkTo).getUrl();
-            String webTarget = ((WebLink) this.linkTo).getTarget();
+            String webTarget = this.linkTo.getTarget();
             target = webTarget != null ? " target=\"" + webTarget + "\" rel=\"noopener\"" : "";
           } else if (this.linkTo instanceof ImageLink) {
             url = ((ImageLink) this.linkTo).getUrl();
@@ -656,7 +657,7 @@ public interface Fragment {
     }
 
     public Image(View main) {
-      this(main, new HashMap<String,View>());
+      this(main, new HashMap<>());
     }
 
     /**
@@ -698,7 +699,7 @@ public interface Fragment {
 
     public static Image parse(JsonNode json) {
       View main = View.parse(json.with("main"));
-      Map<String,View> views = new HashMap<String,View>();
+      Map<String,View> views = new HashMap<>();
       Iterator<String> viewsJson = json.with("views").fieldNames();
       while(viewsJson.hasNext()) {
         String view = viewsJson.next();
@@ -712,16 +713,16 @@ public interface Fragment {
   /**
    * A generic Slice fragment
    */
-  public interface Slice {
+  interface Slice {
 
-    public String getSliceType();
-    public String getLabel();
+    String getSliceType();
+    String getLabel();
   }
 
   /**
    * The Composite Slice
    */
-  public static class CompositeSlice implements Slice {
+  class CompositeSlice implements Slice {
     private final String sliceType;
     private final String label;
     private final Group repeat;
@@ -737,7 +738,7 @@ public interface Fragment {
     public String asHtml(LinkResolver linkResolver) {
       String className = "slice";
       if (this.label != null && !this.label.equals("null")) className += (" " + this.label);
-      List<GroupDoc> groupDocs = new ArrayList<GroupDoc>(Arrays.asList(this.nonRepeat));
+      List<GroupDoc> groupDocs = new ArrayList<>(Collections.singletonList(this.nonRepeat));
       Group nonRepeat = this.nonRepeat != null ? new Group(groupDocs) : null;
       return "<div data-slicetype=\"" + this.sliceType + "\" class=\"" + className + "\">" +
         WithFragments.fragmentHtml(nonRepeat, linkResolver, null) +
@@ -763,9 +764,10 @@ public interface Fragment {
   }
 
   /**
-   * The depricated Simple Slice
+   * @deprecated use CompositeSlice instead
    */
-  public static class SimpleSlice implements Slice {
+  @Deprecated
+  class SimpleSlice implements Slice {
     private final String sliceType;
     private final String label;
     private final Fragment value;
@@ -797,7 +799,7 @@ public interface Fragment {
     }
   }
 
-  public static class SliceZone implements Fragment {
+  class SliceZone implements Fragment {
     private final List<Slice> slices;
 
     public SliceZone(List<Slice> slices) {
@@ -819,7 +821,7 @@ public interface Fragment {
     }
 
     public static SliceZone parse(JsonNode json) {
-      List<Slice> slices = new ArrayList<Slice>();
+      List<Slice> slices = new ArrayList<>();
       for(JsonNode sliceJson: json) {
         String sliceType = sliceJson.path("slice_type").asText();
         String label = sliceJson.has("slice_label") ? sliceJson.path("slice_label").asText() : null;
@@ -847,20 +849,20 @@ public interface Fragment {
    * A Structured text, typically a text including blocks, formatting, links, images... As created
    * in the Writing Room.
    */
-  public static class StructuredText implements Fragment {
+  class StructuredText implements Fragment {
 
-    public static interface Element {}
+    public interface Element {}
 
-    public static interface Block extends Element {
+    public interface Block extends Element {
 
-      public String getLabel();
+      String getLabel();
 
-      public static interface Text extends Block {
-        public String getText();
-        public List<Span> getSpans();
+      interface Text extends Block {
+        String getText();
+        List<Span> getSpans();
       }
 
-      public static class Heading implements Text {
+      class Heading implements Text {
         private final String text;
         private final List<Span> spans;
         private final int level;
@@ -891,7 +893,7 @@ public interface Fragment {
 
       }
 
-      public static class Paragraph implements Text {
+      class Paragraph implements Text {
         private final String text;
         private final List<Span> spans;
         private final String label;
@@ -913,7 +915,7 @@ public interface Fragment {
         public String getLabel() { return label; }
       }
 
-      public static class Preformatted implements Text {
+      class Preformatted implements Text {
         private final String text;
         private final List<Span> spans;
         private final String label;
@@ -940,7 +942,7 @@ public interface Fragment {
       /**
        * A listitem, typically a "li" tag within a "ul" or "ol" (whether the ordered property is true or not)
        */
-      public static class ListItem implements Text {
+      class ListItem implements Text {
         private final String text;
         private final List<Span> spans;
         private final boolean ordered;
@@ -973,7 +975,7 @@ public interface Fragment {
       /**
        * An image within a StructuredText
        */
-      public static class Image implements Block {
+      class Image implements Block {
         private final Fragment.Image.View view;
         private final String label;
 
@@ -1006,7 +1008,7 @@ public interface Fragment {
       /**
        * An embed within a StructuredText
        */
-      public static class Embed implements Block {
+      class Embed implements Block {
         private final Fragment.Embed obj;
         private final String label;
 
@@ -1026,11 +1028,11 @@ public interface Fragment {
 
     }
 
-    public static interface Span extends Element {
-      public int getStart();
-      public int getEnd();
+    public interface Span extends Element {
+      int getStart();
+      int getEnd();
 
-      public static class Em implements Span {
+      class Em implements Span {
         private final int start;
         private final int end;
 
@@ -1048,7 +1050,7 @@ public interface Fragment {
         }
       }
 
-      public static class Strong implements Span {
+      class Strong implements Span {
         private final int start;
         private final int end;
 
@@ -1066,7 +1068,7 @@ public interface Fragment {
         }
       }
 
-      public static class Hyperlink implements Span {
+      class Hyperlink implements Span {
         private final int start;
         private final int end;
         private final Link link;
@@ -1090,7 +1092,7 @@ public interface Fragment {
         }
       }
 
-      public static class Label implements Span {
+      class Label implements Span {
         private final int start;
         private final int end;
         private final String label;
@@ -1166,7 +1168,7 @@ public interface Fragment {
     }
 
     public String asHtml(List<Block> blocks, LinkResolver linkResolver, HtmlSerializer htmlSerializer) {
-      List<BlockGroup> blockGroups = new ArrayList<BlockGroup>();
+      List<BlockGroup> blockGroups = new ArrayList<>();
       for(Block block: blocks) {
         BlockGroup lastOne = blockGroups.isEmpty() ? null : blockGroups.get(blockGroups.size() - 1);
         if(lastOne != null && "ul".equals(lastOne.tag) && block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
@@ -1176,17 +1178,17 @@ public interface Fragment {
           lastOne.blocks.add(block);
         }
         else if(block instanceof Block.ListItem && !((Block.ListItem)block).isOrdered()) {
-          BlockGroup newBlockGroup = new BlockGroup("ul", new ArrayList<Block>());
+          BlockGroup newBlockGroup = new BlockGroup("ul", new ArrayList<>());
           newBlockGroup.blocks.add(block);
           blockGroups.add(newBlockGroup);
         }
         else if(block instanceof Block.ListItem && ((Block.ListItem)block).isOrdered()) {
-          BlockGroup newBlockGroup = new BlockGroup("ol", new ArrayList<Block>());
+          BlockGroup newBlockGroup = new BlockGroup("ol", new ArrayList<>());
           newBlockGroup.blocks.add(block);
           blockGroups.add(newBlockGroup);
         }
         else {
-          BlockGroup newBlockGroup = new BlockGroup(null, new ArrayList<Block>());
+          BlockGroup newBlockGroup = new BlockGroup(null, new ArrayList<>());
           newBlockGroup.blocks.add(block);
           blockGroups.add(newBlockGroup);
         }
@@ -1194,11 +1196,11 @@ public interface Fragment {
       StringBuilder html = new StringBuilder();
       for(BlockGroup blockGroup: blockGroups) {
         if(blockGroup.tag != null) {
-          html.append("<" + blockGroup.tag + ">");
+          html.append("<").append(blockGroup.tag).append(">");
           for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver, htmlSerializer));
           }
-          html.append("</" + blockGroup.tag + ">");
+          html.append("</").append(blockGroup.tag).append(">");
         } else {
           for(Block block: blockGroup.blocks) {
             html.append(asHtml(block, linkResolver, htmlSerializer));
@@ -1317,23 +1319,23 @@ public interface Fragment {
         return escape(text);
       }
 
-      Map<Integer, List<Span>> tagsStart = new HashMap<Integer, List<Span>>();
-      Map<Integer, List<Span>> tagsEnd = new HashMap<Integer, List<Span>>();
+      Map<Integer, List<Span>> tagsStart = new HashMap<>();
+      Map<Integer, List<Span>> tagsEnd = new HashMap<>();
 
       for (Span span: spans) {
         if (!tagsStart.containsKey(span.getStart())) {
-          tagsStart.put(span.getStart(), new ArrayList<Span>());
+          tagsStart.put(span.getStart(), new ArrayList<>());
         }
         if (!tagsEnd.containsKey(span.getEnd())) {
-          tagsEnd.put(span.getEnd(), new ArrayList<Span>());
+          tagsEnd.put(span.getEnd(), new ArrayList<>());
         }
         tagsStart.get(span.getStart()).add(span);
         tagsEnd.get(span.getEnd()).add(span);
       }
 
       char c;
-      String html = "";
-      Stack<Tuple<Span, String>> stack = new Stack<Tuple<Span, String>>();
+      StringBuilder html = new StringBuilder();
+      Stack<Tuple<Span, String>> stack = new Stack<>();
       for (int pos = 0, len = text.length(); pos < len; pos++) {
         if (tagsEnd.containsKey(pos)) {
           for (Span span: tagsEnd.get(pos)) {
@@ -1342,29 +1344,29 @@ public interface Fragment {
             String innerHtml = serialize(tag.x, tag.y, linkResolver, htmlSerializer);
             if (stack.isEmpty()) {
               // The tag was top level
-              html += innerHtml;
+              html.append(innerHtml);
             } else {
               // Add the content to the parent tag
               Tuple<Span, String> head = stack.pop();
-              stack.push(new Tuple<Span, String>(head.x, head.y + innerHtml));
+              stack.push(new Tuple<>(head.x, head.y + innerHtml));
             }
           }
         }
         if (tagsStart.containsKey(pos)) {
           for (Span span: tagsStart.get(pos)) {
             // Open a tag
-            stack.push(new Tuple<Span, String>(span, ""));
+            stack.push(new Tuple<>(span, ""));
           }
         }
         c = text.charAt(pos);
         String escaped = escape(Character.toString(c));
         if (stack.isEmpty()) {
           // Top-level text
-          html += escaped;
+          html.append(escaped);
         } else {
           // Inner text of a span
           Tuple<Span, String> head = stack.pop();
-          stack.push(new Tuple<Span, String>(head.x, head.y + escaped));
+          stack.push(new Tuple<>(head.x, head.y + escaped));
         }
       }
       // Close remaining tags
@@ -1373,14 +1375,14 @@ public interface Fragment {
         String innerHtml = serialize(tag.x, tag.y, linkResolver, htmlSerializer);
         if (stack.isEmpty()) {
           // The tag was top level
-          html += innerHtml;
+          html.append(innerHtml);
         } else {
           // Add the content to the parent tag
           Tuple<Span, String> head = stack.pop();
-          stack.push(new Tuple<Span, String>(head.x, head.y + innerHtml));
+          stack.push(new Tuple<>(head.x, head.y + innerHtml));
         }
       }
-      return html;
+      return html.toString();
     }
 
     public String asHtml(LinkResolver linkResolver) {
@@ -1403,17 +1405,15 @@ public interface Fragment {
       }
       String linkType = json.path("type").asText();
       JsonNode value = json.with("value");
-      if("Link.web".equals(linkType)) {
-        return Link.WebLink.parse(value);
-      }
-      else if("Link.document".equals(linkType)) {
-        return Link.DocumentLink.parse(value);
-      }
-      else if("Link.file".equals(linkType)) {
-        return Link.FileLink.parse(value);
-      }
-      else if("Link.image".equals(linkType)) {
-        return Link.ImageLink.parse(value);
+      switch (linkType) {
+        case "Link.web":
+          return WebLink.parse(value);
+        case "Link.document":
+          return DocumentLink.parse(value);
+        case "Link.file":
+          return FileLink.parse(value);
+        case "Link.image":
+          return ImageLink.parse(value);
       }
       return null;
     }
@@ -1460,7 +1460,7 @@ public interface Fragment {
 
     public static ParsedText parseText(JsonNode json) {
       String text = json.path("text").asText();
-      List<Span> spans = new ArrayList<Span>();
+      List<Span> spans = new ArrayList<>();
       for(JsonNode spanJson: json.withArray("spans")) {
         Span span = parseSpan(spanJson);
         if(span != null) {
@@ -1507,7 +1507,7 @@ public interface Fragment {
     }
 
     public static StructuredText parse(JsonNode json) {
-      List<Block> blocks = new ArrayList<Block>();
+      List<Block> blocks = new ArrayList<>();
       for(JsonNode blockJson: json) {
         Block block = parseBlock(blockJson);
         if(block != null) {
@@ -1522,7 +1522,7 @@ public interface Fragment {
   /**
    * Represents a Group fragment.
    */
-  public static class Group implements Fragment {
+  class Group implements Fragment {
     private final List<GroupDoc> groupDocs;
 
     public Group(List<GroupDoc> groupDocs) {
@@ -1542,7 +1542,7 @@ public interface Fragment {
      */
     @Deprecated
     public List<Map<String, Fragment>> toMapList() {
-      List<Map<String, Fragment>> result = new ArrayList<Map<String, Fragment>>();
+      List<Map<String, Fragment>> result = new ArrayList<>();
       for (GroupDoc groupDoc: this.groupDocs) {
         result.add(groupDoc.getFragments());
       }
@@ -1566,7 +1566,7 @@ public interface Fragment {
      * @return the properly initialized Fragment.Group object
      */
     public static Group parse(JsonNode json) {
-      List<GroupDoc> groupDocs = new ArrayList<GroupDoc>();
+      List<GroupDoc> groupDocs = new ArrayList<>();
       for(JsonNode groupJson : json) {
         groupDocs.add(parseGroupDoc(groupJson));
       }
@@ -1582,7 +1582,7 @@ public interface Fragment {
     public static GroupDoc parseGroupDoc(JsonNode groupJson) {
       // each groupJson looks like this: { "somelink" : { "type" : "Link.document", { ... } }, "someimage" : { ... } }
       Iterator<String> dataJson = groupJson.fieldNames();
-      Map<String, Fragment> fragmentMap = new LinkedHashMap<String, Fragment>();
+      Map<String, Fragment> fragmentMap = new LinkedHashMap<>();
       while (dataJson.hasNext()) {
         String field = dataJson.next();
         JsonNode fieldJson = groupJson.path(field);

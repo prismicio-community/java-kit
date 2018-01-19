@@ -1,18 +1,13 @@
 package io.prismic.servlet;
 
-import io.prismic.*;
+import io.prismic.Api;
+import io.prismic.Prismic;
 
-import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /*
  * WebFilter for JEE applications.
@@ -27,7 +22,7 @@ public class PrismicFilter implements Filter {
 	private String accessToken;
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
+	public void init(FilterConfig filterConfig) {
     endpoint = filterConfig.getInitParameter("endpoint");
     accessToken = filterConfig.getInitParameter("accessToken");
 	}

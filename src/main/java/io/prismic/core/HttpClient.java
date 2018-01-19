@@ -1,19 +1,23 @@
 package io.prismic.core;
 
-import java.io.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.prismic.Api;
+import io.prismic.Cache;
+import io.prismic.Logger;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.*;
 
-import io.prismic.*;
-
-import com.fasterxml.jackson.databind.*;
-
-import org.apache.commons.io.IOUtils;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class HttpClient {
 
   public static JsonNode fetch(String url, Logger logger, Cache cache, Proxy proxy) {
-    logger = (logger!=null) ? logger : new Logger.NoLogger();
-    cache = (cache!=null) ? cache : new Cache.NoCache();
+    logger = (logger != null) ? logger : new Logger.NoLogger();
+    cache = (cache != null) ? cache : new Cache.NoCache();
     try {
       JsonNode cachedResult = cache.get(url);
       if (cachedResult != null) {
@@ -45,23 +49,19 @@ public class HttpClient {
           }
           return value;
         } else {
-          String body = (response != null) ? IOUtils.toString(response) : "";
+          String body = (response != null) ? IOUtils.toString(response, UTF_8) : "";
           throw new Api.Error(Api.Error.Code.UNEXPECTED, httpConnection.getResponseCode() + " (" + body + ")");
         }
       } catch (MalformedURLException e) {
-        throw new Api.Error(Api.Error.Code.MALFORMED_URL, e.getMessage());
+        throw new Api.Error(Api.Error.Code.MALFORMED_URL, e);
       } catch (IOException e) {
         String body;
         String errorText = "Unknown error";
-        try {
-          JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
-          if (errorJson != null) {
-            errorText = errorJson.get("error").asText();
-          }
-        } catch (Exception ex) {
-          ex.printStackTrace();
+        JsonNode errorJson = new ObjectMapper().readTree(httpConnection.getErrorStream());
+        if (errorJson != null) {
+          errorText = errorJson.get("error").asText();
         }
-        switch(httpConnection.getResponseCode()) {
+        switch (httpConnection.getResponseCode()) {
           case 401:
             if ("Invalid access token".equals(errorText)) {
               throw new Api.Error(Api.Error.Code.INVALID_TOKEN, errorText);
@@ -69,26 +69,23 @@ public class HttpClient {
               throw new Api.Error(Api.Error.Code.AUTHORIZATION_NEEDED, errorText);
             }
           case 429:
-            body = (response != null) ? IOUtils.toString(response) : "";
+            body = (response != null) ? IOUtils.toString(response, UTF_8) : "";
             throw new Api.Error(Api.Error.Code.TOO_MANY_REQUESTS, "[429] " + body);
           default:
-            body = (response != null) ? IOUtils.toString(response) : "";
-            throw new RuntimeException("HTTP error " + httpConnection.getResponseCode() + " (" + body + ")");
+            body = (response != null) ? IOUtils.toString(response, UTF_8) : "";
+            throw new Api.Error(Api.Error.Code.UNEXPECTED, "HTTP error " + httpConnection.getResponseCode() + " (" + body + ")");
         }
       }
-    } catch(Api.Error e) {
-      throw e;
-    } catch(IOException e) {
-      e.printStackTrace();
-      throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
+    } catch (IOException e) {
+      throw new Api.Error(Api.Error.Code.UNEXPECTED, e);
     }
   }
 
   public static String encodeURIComponent(String str) {
     try {
       return URLEncoder.encode(str, "utf-8");
-    } catch(Exception e) {
-      throw new Api.Error(Api.Error.Code.UNEXPECTED, e.getMessage());
+    } catch (Exception e) {
+      throw new Api.Error(Api.Error.Code.UNEXPECTED, e);
     }
   }
 

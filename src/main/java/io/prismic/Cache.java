@@ -1,16 +1,16 @@
 package io.prismic;
 
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections4.map.LRUMap;
 
 public interface Cache {
 
-  public void set(String key, Long ttl, JsonNode response);
-  public JsonNode get(String key);
-  public JsonNode getOrSet(String key, Long ttl, Callback f);
+  void set(String key, Long ttl, JsonNode response);
+  JsonNode get(String key);
+  JsonNode getOrSet(String key, Long ttl, Callback f);
 
   // --
-  public static class NoCache implements Cache {
+  class NoCache implements Cache {
 
     @Override
     public void set(String key, Long ttl, JsonNode response) {
@@ -30,9 +30,9 @@ public interface Cache {
 
   // --
 
-  public static class DefaultCache {
+  class DefaultCache {
 
-    private static Cache defaultCache = new BuiltInCache(999);
+    private static final Cache defaultCache = new BuiltInCache(999);
 
     private DefaultCache() {}
 
@@ -43,11 +43,11 @@ public interface Cache {
 
   // --
 
-  public interface Callback {
-    public JsonNode execute();
+  interface Callback {
+    JsonNode execute();
   }
 
-  public static class BuiltInCache implements Cache {
+  class BuiltInCache implements Cache {
 
     private final java.util.Map<String, Entry> cache;
 
@@ -93,7 +93,7 @@ public interface Cache {
     }
 
     private Boolean isExpired(String key) {
-      Entry entry = (Entry)this.cache.get(key);
+      Entry entry = this.cache.get(key);
       return entry != null && entry.expiration !=0 && entry.expiration < System.currentTimeMillis();
     }
 

@@ -1,12 +1,12 @@
 package io.prismic;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.prismic.Fragment.Link;
+import org.joda.time.DateTime;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
-
-import org.joda.time.DateTime;
-
-import com.fasterxml.jackson.databind.*;
 
 public class Document extends WithFragments {
 
@@ -106,60 +106,46 @@ public class Document extends WithFragments {
 
   // --
   static Fragment parseFragment(String type, JsonNode json) {
-    if("StructuredText".equals(type)) {
-      return Fragment.StructuredText.parse(json);
-    }
-    else if("Image".equals(type)) {
-      return Fragment.Image.parse(json);
-    }
-    else if("Link.web".equals(type)) {
-      return Fragment.Link.WebLink.parse(json);
-    }
-    else if("Link.document".equals(type)) {
-      return Fragment.Link.DocumentLink.parse(json);
-    }
-    else if("Link.file".equals(type)) {
-      return Fragment.Link.FileLink.parse(json);
-    }
-    else if("Link.image".equals(type)) {
-      return Fragment.Link.ImageLink.parse(json);
-    }
-    else if("Text".equals(type)) {
-      return Fragment.Text.parse(json);
-    }
-    else if("Select".equals(type)) {
-      return Fragment.Text.parse(json);
-    }
-    else if("Date".equals(type)) {
-      return Fragment.Date.parse(json);
-    }
-    else if("Timestamp".equals(type)) {
-      return Fragment.Timestamp.parse(json);
-    }
-    else if("Number".equals(type)) {
-      return Fragment.Number.parse(json);
-    }
-    else if("Color".equals(type)) {
-      return Fragment.Color.parse(json);
-    }
-    else if("Embed".equals(type)) {
-      return Fragment.Embed.parse(json);
-    }
-    else if("GeoPoint".equals(type)) {
+    switch (type) {
+      case "StructuredText":
+        return Fragment.StructuredText.parse(json);
+      case "Image":
+        return Fragment.Image.parse(json);
+      case "Link.web":
+        return Link.WebLink.parse(json);
+      case "Link.document":
+        return Link.DocumentLink.parse(json);
+      case "Link.file":
+        return Link.FileLink.parse(json);
+      case "Link.image":
+        return Link.ImageLink.parse(json);
+      case "Text":
+        return Fragment.Text.parse(json);
+      case "Select":
+        return Fragment.Text.parse(json);
+      case "Date":
+        return Fragment.Date.parse(json);
+      case "Timestamp":
+        return Fragment.Timestamp.parse(json);
+      case "Number":
+        return Fragment.Number.parse(json);
+      case "Color":
+        return Fragment.Color.parse(json);
+      case "Embed":
+        return Fragment.Embed.parse(json);
+      case "GeoPoint":
         return Fragment.GeoPoint.parse(json);
-    }
-    else if("Group".equals(type)) {
-      return Fragment.Group.parse(json);
-    }
-    else if("SliceZone".equals(type)) {
-      return Fragment.SliceZone.parse(json);
+      case "Group":
+        return Fragment.Group.parse(json);
+      case "SliceZone":
+        return Fragment.SliceZone.parse(json);
     }
     return null;
   }
 
   static Map<String, Fragment> parseFragments(JsonNode json, String type) {
     Iterator<String> dataJson = json.fieldNames();
-    Map<String, Fragment> fragments = new LinkedHashMap<String, Fragment>();
+    Map<String, Fragment> fragments = new LinkedHashMap<>();
     while(dataJson.hasNext()) {
       String field = dataJson.next();
       JsonNode fieldJson = json.path(field);
@@ -197,7 +183,7 @@ public class Document extends WithFragments {
     DateTime lastPublicationDate = parseDateTime(json.path("last_publication_date"));
 
     Iterator<JsonNode> alternateLanguagesJson = json.withArray("alternate_languages").elements();
-    List<AlternateLanguage> alternateLanguages = new ArrayList<AlternateLanguage>();
+    List<AlternateLanguage> alternateLanguages = new ArrayList<>();
     while(alternateLanguagesJson.hasNext()) {
       JsonNode altLangJson = alternateLanguagesJson.next();
       String altLangId = altLangJson.path("id").asText();
@@ -208,13 +194,13 @@ public class Document extends WithFragments {
     }
 
     Iterator<JsonNode> tagsJson = json.withArray("tags").elements();
-    Set<String> tags = new HashSet<String>();
+    Set<String> tags = new HashSet<>();
     while(tagsJson.hasNext()) {
       tags.add(tagsJson.next().asText());
     }
 
     Iterator<JsonNode> slugsJson = json.withArray("slugs").elements();
-    List<String> slugs = new ArrayList<String>();
+    List<String> slugs = new ArrayList<>();
     while(slugsJson.hasNext()) {
       try {
         slugs.add(URLDecoder.decode(slugsJson.next().asText(), "UTF-8"));
