@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.Proxy;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Embodies an API endpoint, from which it is possible to make queries.
@@ -92,7 +93,7 @@ public class Api {
     JsonNode json = cache.getOrSet(
       url,
       5000L,
-      () -> HttpClient.fetch(url, logger, null, proxy)
+      CompletableFuture.supplyAsync(() -> HttpClient.fetch(url, logger, null, proxy))
     );
 
     ApiData apiData = ApiData.parse(json);
