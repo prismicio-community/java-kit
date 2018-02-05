@@ -15,7 +15,19 @@ public interface Cache {
 
   JsonNode get(String key);
 
-  JsonNode getOrSet(String key, Long ttl, Future<JsonNode> callback);
+  default JsonNode getOrSet(String key, Long ttl, Future<JsonNode> callback) {
+    JsonNode found = this.get(key);
+    if (found != null) {
+      return found;
+    }
+    try {
+      JsonNode json = callback.get();
+      this.set(key, ttl, json);
+      return json;
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   // --
 
@@ -28,15 +40,6 @@ public interface Cache {
     @Override
     public JsonNode get(String key) {
       return null;
-    }
-
-    @Override
-    public JsonNode getOrSet(String key, Long ttl, Future<JsonNode> callback) {
-      try {
-        return callback.get();
-      } catch (InterruptedException | ExecutionException e) {
-        throw new RuntimeException(e);
-      }
     }
 
   }
@@ -89,21 +92,6 @@ public interface Cache {
     public void set(String key, Long ttl, JsonNode response) {
       Long expiration = ttl + System.currentTimeMillis();
       this.cache.put(key, new Entry(expiration, response));
-    }
-
-    @Override
-    public JsonNode getOrSet(String key, Long ttl, Future<JsonNode> callback) {
-      JsonNode found = this.get(key);
-      if (found != null) {
-        return found;
-      }
-      try {
-        JsonNode json = callback.get();
-        this.set(key, ttl, json);
-        return json;
-      } catch (InterruptedException | ExecutionException e) {
-        throw new RuntimeException(e);
-      }
     }
 
     private Boolean isExpired(String key) {
