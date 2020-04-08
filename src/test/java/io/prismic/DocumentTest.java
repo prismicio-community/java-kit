@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static java.time.ZoneOffset.UTC;
@@ -282,6 +283,21 @@ public class DocumentTest {
       "{\"id\":\"5708520413001\",\"data\":{\"key1\":\"value1\",\"key2\":\"value2\"},\"an_integer\":123456789}",
       raw.asText()
     );
+  }
+
+  @Test
+  public void sliceZoneAsHtml() {
+    List<Fragment.Slice> slices = Collections.singletonList(
+      new Fragment.CompositeSlice("header", null, new Fragment.Group(Collections.emptyList()), new GroupDoc(Collections.emptyMap()))
+    );
+
+    Fragment.SliceZone sliceZone = new Fragment.SliceZone(
+      slices
+    );
+
+    String output = WithFragments.fragmentHtml(sliceZone, linkResolver, null);
+
+    Assert.assertEquals("<div data-slicetype=\"header\" class=\"slice\"></div>", output);
   }
 
   /**
