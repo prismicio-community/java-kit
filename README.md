@@ -17,14 +17,14 @@ This library is on Maven Central. The kit coordinates are:
 </dependency>
 ```
 
-*(you may need to adapt the version number)*
+_(you may need to adapt the version number)_
 
 The kit requires **Java 8** or superior.
 
 #### Documentation
 
-* [Prismic.io documentation](https://prismic.io/docs/java/getting-started-in-jav/getting-started-with-java)
-* [Javadoc](http://prismicio.github.io/java-kit/)
+- [Prismic.io documentation](./docs)
+- [Javadoc](http://prismicio.github.io/java-kit/)
 
 ### Changelog
 
@@ -32,13 +32,13 @@ Need to see what changed, or to upgrade your kit? We keep our changelog on [this
 
 #### Install the kit locally
 
-Run ```./mvnw install```.
+Run `./mvnw install`.
 
-Always run ```./mvnw test``` before committing, to make sure everything runs as expected.
+Always run `./mvnw test` before committing, to make sure everything runs as expected.
 
 #### Test
 
-Please write tests using [JUnit4](http://junit.org/junit4/) for any bugfix or new feature; please add the tests to the [AppTest.java file](https://github.com/prismicio/java-kit/blob/master/src/test/java/io/prismic/AppTest.java). Run ```./mvnw test``` to test.
+Please write tests using [JUnit4](http://junit.org/junit4/) for any bugfix or new feature; please add the tests to the [AppTest.java file](https://github.com/prismicio/java-kit/blob/master/src/test/java/io/prismic/AppTest.java). Run `./mvnw test` to test.
 
 If you find existing code that is not optimally tested and wish to make it better, we really appreciate it; but you should document it on its own branch and its own pull request.
 
