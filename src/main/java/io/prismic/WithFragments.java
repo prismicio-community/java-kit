@@ -186,6 +186,9 @@ public abstract class WithFragments {
     else if(fragment instanceof Fragment.Group) {
       return ((Fragment.Group)fragment).asHtml(linkResolver);
     }
+    else if (fragment instanceof Fragment.SliceZone) {
+      return ((Fragment.SliceZone) fragment).asHtml(linkResolver);
+    }
     return "";
   }
 
