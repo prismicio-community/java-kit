@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,9 +52,17 @@ public class AppTest {
   /**
    * Make sure a call to a private repository without a token returns the expected error
    */
-  @Test(expected = Api.Error.class)
+  @Test
   public void invalidToken() {
-    Api api = Api.get("https://private-test.prismic.io/api");
+    Throwable thrown = null;
+    try {
+      Api.get("https://private-test.prismic.io/api");
+    } catch (Throwable t) {
+      thrown = t;
+    }
+    Throwable rootCause = ExceptionUtils.getRootCause(thrown);
+    Assert.assertEquals(Api.Error.class, rootCause.getClass());
+    Assert.assertEquals("Invalid access token", rootCause.getMessage());
   }
 
   /**

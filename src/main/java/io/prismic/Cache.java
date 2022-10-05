@@ -3,13 +3,34 @@ package io.prismic;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections4.map.LRUMap;
 
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import static java.util.Collections.synchronizedMap;
+
 public interface Cache {
 
   void set(String key, Long ttl, JsonNode response);
+
   JsonNode get(String key);
-  JsonNode getOrSet(String key, Long ttl, Callback f);
+
+  default JsonNode getOrSet(String key, Long ttl, Future<JsonNode> callback) {
+    JsonNode found = this.get(key);
+    if (found != null) {
+      return found;
+    }
+    try {
+      JsonNode json = callback.get();
+      this.set(key, ttl, json);
+      return json;
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   // --
+
   class NoCache implements Cache {
 
     @Override
@@ -21,39 +42,32 @@ public interface Cache {
       return null;
     }
 
-    @Override
-    public JsonNode getOrSet(String key, Long ttl, Callback f) {
-      return f.execute();
-    }
-
   }
 
   // --
 
   class DefaultCache {
 
-    private static final Cache defaultCache = new BuiltInCache(999);
+    private static final Cache DEFAULT_CACHE = new BuiltInCache(999);
 
-    private DefaultCache() {}
+    private DefaultCache() {
+    }
 
     public static Cache getInstance() {
-      return defaultCache;
+      return DEFAULT_CACHE;
     }
   }
 
   // --
 
-  interface Callback {
-    JsonNode execute();
-  }
-
   class BuiltInCache implements Cache {
 
-    private final java.util.Map<String, Entry> cache;
+    private final Map<String, Entry> cache;
 
     static class Entry {
       public final Long expiration;
       public final JsonNode value;
+
       public Entry(Long expiration, JsonNode value) {
         this.expiration = expiration;
         this.value = value;
@@ -61,7 +75,7 @@ public interface Cache {
     }
 
     public BuiltInCache(int maxDocuments) {
-      this.cache = java.util.Collections.synchronizedMap(new LRUMap<String, Entry>(maxDocuments));
+      this.cache = synchronizedMap(new LRUMap<String, Entry>(maxDocuments));
     }
 
     @Override
@@ -80,21 +94,9 @@ public interface Cache {
       this.cache.put(key, new Entry(expiration, response));
     }
 
-    @Override
-    public JsonNode getOrSet(String key, Long ttl, Callback f) {
-      JsonNode found = this.get(key);
-      if(found == null) {
-        JsonNode json = f.execute();
-        this.set(key, ttl, json);
-        return json;
-      } else {
-        return found;
-      }
-    }
-
     private Boolean isExpired(String key) {
       Entry entry = this.cache.get(key);
-      return entry != null && entry.expiration !=0 && entry.expiration < System.currentTimeMillis();
+      return entry != null && entry.expiration != 0 && entry.expiration < System.currentTimeMillis();
     }
 
   }
